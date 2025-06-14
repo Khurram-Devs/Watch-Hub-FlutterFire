@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "59661554320",
+    "project_id": "watch-hub-9529d",
+    "storage_bucket": "watch-hub-9529d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:59661554320:android:853957cebee7aab75a3e15",
+        "android_client_info": {
+          "package_name": "com.example.watch_hub_ep"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAd43Wq3VvkRLhJ7p_P4JyBAN1HoX9HYSU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
