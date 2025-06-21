@@ -1,15 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:provider/provider.dart';
+
 import './widgets/faq_widget.dart';
 import './widgets/add_faq_widget.dart';
+import './widgets/app_header.dart';
+import './theme/theme_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => ThemeProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -17,9 +26,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: FAQScreen(),
+      themeMode: themeProvider.themeMode,
+      theme: ThemeData.light(useMaterial3: true),
+      darkTheme: ThemeData.dark(useMaterial3: true),
+      home: const FAQScreen(),
     );
   }
 }
@@ -30,9 +44,7 @@ class FAQScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('FAQ Admin'),
-      ),
+      appBar: const AppHeader(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.only(bottom: 16),
         child: Column(
