@@ -18,10 +18,12 @@ class _InfiniteBrandsScrollerState extends State<InfiniteBrandsScroller>
   late final ScrollController _scrollController;
   late final Ticker _ticker;
 
-  static const double _scrollSpeed = 15;
-  static const double _itemSpacing = 24.0;
+  static const double _scrollSpeed = 20.0;
+  static const Duration _frameRate = Duration(milliseconds: 16);
+  static const double _spacing = 16.0;
+  static const int _repeatFactor = 60;
 
-  late final List<String> _infiniteList;
+  late final List<String> _duplicatedImages;
   bool _isReady = false;
 
   @override
@@ -29,8 +31,8 @@ class _InfiniteBrandsScrollerState extends State<InfiniteBrandsScroller>
     super.initState();
     _scrollController = ScrollController();
 
-    _infiniteList = List.generate(
-      widget.brandImageUrls.length * 60,
+    _duplicatedImages = List.generate(
+      widget.brandImageUrls.length * _repeatFactor,
       (i) => widget.brandImageUrls[i % widget.brandImageUrls.length],
     );
 
@@ -40,17 +42,16 @@ class _InfiniteBrandsScrollerState extends State<InfiniteBrandsScroller>
         _scrollController.jumpTo(middle);
         _isReady = true;
       }
-
-      _ticker = createTicker(_onTick)..start();
+      _ticker = createTicker(_tick)..start();
     });
   }
 
-  void _onTick(Duration elapsed) {
+  void _tick(Duration elapsed) {
     if (!_isReady || !_scrollController.hasClients) return;
 
     final offset = _scrollController.offset;
     final maxExtent = _scrollController.position.maxScrollExtent;
-    final newOffset = offset + _scrollSpeed / 60;
+    final newOffset = offset + _scrollSpeed * (_frameRate.inMilliseconds / 1000);
 
     if (newOffset >= maxExtent - 200) {
       final middle = maxExtent / 2;
@@ -70,26 +71,51 @@ class _InfiniteBrandsScrollerState extends State<InfiniteBrandsScroller>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
-    return SizedBox(
-      height: 80,
-      child: ListView.builder(
-        controller: _scrollController,
-        scrollDirection: Axis.horizontal,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: _infiniteList.length,
-        itemBuilder: (context, index) {
-          final url = _infiniteList[index];
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: _itemSpacing / 2),
-            child: CircleAvatar(
-              radius: 28,
-              backgroundColor: theme.cardColor,
-              backgroundImage: NetworkImage(url),
-            ),
-          );
-        },
-      ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final screenWidth = MediaQuery.of(context).size.width;
+        final avatarSize = screenWidth < 425 ? 120.0 : 180.0;
+
+        return SizedBox(
+          height: avatarSize + 24,
+          child: ListView.builder(
+            controller: _scrollController,
+            scrollDirection: Axis.horizontal,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: _duplicatedImages.length,
+            itemBuilder: (context, index) {
+              final imageUrl = _duplicatedImages[index];
+
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: _spacing / 2),
+                child: Container(
+                  width: avatarSize,
+                  height: avatarSize,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: isDark
+                            ? Colors.black
+                            : Colors.grey,
+                        blurRadius: 6,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: CircleAvatar(
+                    radius: avatarSize / 2,
+                    backgroundColor: theme.cardColor,
+                    backgroundImage: NetworkImage(imageUrl),
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 }

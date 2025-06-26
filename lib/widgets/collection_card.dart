@@ -27,7 +27,7 @@ class CollectionCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: theme.shadowColor.withOpacity(0.4),
+            color: theme.shadowColor.withValues(alpha: 0.4),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -49,7 +49,7 @@ class CollectionCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                       child: Image.network(
                         imageUrl,
-                        fit: BoxFit.cover,
+                        fit: BoxFit.fitHeight,
                         alignment: Alignment.center,
                       ),
                     ),
@@ -77,7 +77,6 @@ class CollectionCard extends StatelessWidget {
                   Text(
                     model,
                     style: theme.textTheme.titleMedium?.copyWith(
-                      fontFamily: 'PlayfairDisplay',
                       fontWeight: FontWeight.bold,
                       color: theme.colorScheme.secondary,
                     ),
@@ -86,9 +85,7 @@ class CollectionCard extends StatelessWidget {
                   Text(
                     description,
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.textTheme.bodyMedium?.color?.withOpacity(
-                        0.7,
-                      ),
+                      color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -99,7 +96,7 @@ class CollectionCard extends StatelessWidget {
                           text: '\$',
                           style: theme.textTheme.labelSmall?.copyWith(
                             fontSize: 16,
-                            color: theme.colorScheme.secondary.withOpacity(0.8),
+                            color: theme.colorScheme.secondary.withValues(alpha: 0.8),
                             fontWeight: FontWeight.w500,
                           ),
                         ),

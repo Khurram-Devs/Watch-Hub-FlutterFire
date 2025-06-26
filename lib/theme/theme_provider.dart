@@ -15,6 +15,50 @@ class ThemeProvider with ChangeNotifier {
 
   static const Color goldenColor = Color(0xFFC0A265);
 
+  TextTheme _customTextTheme(Brightness brightness) {
+    final baseTextColor = brightness == Brightness.dark ? Colors.white : Colors.black;
+
+    return TextTheme(
+      displayLarge: TextStyle(
+        fontSize: 32,
+        fontWeight: FontWeight.bold,
+        color: baseTextColor,
+      ),
+      titleLarge: TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.bold,
+        color: baseTextColor,
+      ),
+      titleMedium: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.w600,
+        color: baseTextColor.withValues(alpha:0.9),
+      ),
+      titleSmall: TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.w500,
+        color: baseTextColor.withValues(alpha:0.85),
+      ),
+      bodyLarge: GoogleFonts.lato(
+        fontSize: 16,
+        color: baseTextColor.withValues(alpha:0.95),
+      ),
+      bodyMedium: GoogleFonts.lato(
+        fontSize: 14,
+        color: baseTextColor.withValues(alpha:0.85),
+      ),
+      bodySmall: GoogleFonts.lato(
+        fontSize: 12,
+        color: baseTextColor.withValues(alpha:0.7),
+      ),
+      labelSmall: GoogleFonts.lato(
+        fontSize: 12,
+        fontWeight: FontWeight.bold,
+        color: goldenColor,
+      ),
+    );
+  }
+
   ThemeData get lightTheme => ThemeData(
         useMaterial3: true,
         brightness: Brightness.light,
@@ -24,11 +68,7 @@ class ThemeProvider with ChangeNotifier {
           primary: Colors.black,
           secondary: goldenColor,
         ),
-        textTheme: GoogleFonts.playfairDisplayTextTheme().copyWith(
-          titleLarge: const TextStyle(color: Colors.black),
-          bodyMedium: const TextStyle(color: Colors.black87),
-          bodySmall: const TextStyle(color: Colors.black54),
-        ),
+        textTheme: _customTextTheme(Brightness.light),
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.white,
           foregroundColor: Colors.black,
@@ -45,11 +85,7 @@ class ThemeProvider with ChangeNotifier {
           primary: Colors.white,
           secondary: goldenColor,
         ),
-        textTheme: GoogleFonts.playfairDisplayTextTheme().copyWith(
-          titleLarge: const TextStyle(color: Colors.white),
-          bodyMedium: const TextStyle(color: Colors.white70),
-          bodySmall: const TextStyle(color: Colors.white60),
-        ),
+        textTheme: _customTextTheme(Brightness.dark),
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.black,
           foregroundColor: Colors.white,

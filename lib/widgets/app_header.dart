@@ -18,15 +18,17 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
           alignment: Alignment.center,
           children: [
             AppBar(
-              backgroundColor: theme.appBarTheme.backgroundColor ?? Colors.black,
+              backgroundColor:
+                  theme.appBarTheme.backgroundColor ?? Colors.black,
               elevation: 0,
               toolbarHeight: 60,
               titleSpacing: 0,
               leading: Builder(
-                builder: (context) => IconButton(
-                  icon: const Icon(Icons.menu, color: Color(0xFFC0A265)),
-                  onPressed: () => Scaffold.of(context).openDrawer(),
-                ),
+                builder:
+                    (context) => IconButton(
+                      icon: const Icon(Icons.menu, color: Color(0xFFC0A265)),
+                      onPressed: () => Scaffold.of(context).openDrawer(),
+                    ),
               ),
               actions: [
                 IconButton(
@@ -37,7 +39,8 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
                   ),
                 ),
               ],
-              title: const SizedBox(), // leave empty to avoid centering conflict
+              title:
+                  const SizedBox(), // leave empty to avoid centering conflict
             ),
 
             // Center Icon Overlay
@@ -51,7 +54,6 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
           ],
         ),
 
-        // Bottom Header Text
         Container(
           width: double.infinity,
           padding: const EdgeInsets.only(bottom: 4, top: 4),
@@ -62,13 +64,10 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
             ),
           ),
           alignment: Alignment.center,
-          child: const Text(
+          child: Text(
             'ROLEX WATCHES',
-            style: TextStyle(
-              fontFamily: 'PlayfairDisplay',
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFFC0A265),
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              color: Theme.of(context).colorScheme.secondary,
               letterSpacing: 1.2,
             ),
           ),

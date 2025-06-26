@@ -20,7 +20,6 @@ class SectionTitle extends StatelessWidget {
         Text(
           title,
           style: theme.textTheme.titleLarge?.copyWith(
-            fontFamily: 'PlayfairDisplay',
             color: theme.colorScheme.secondary,
             fontWeight: FontWeight.bold,
           ),

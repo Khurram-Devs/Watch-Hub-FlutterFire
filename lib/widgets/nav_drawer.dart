@@ -28,7 +28,6 @@ class NavDrawer extends StatelessWidget {
                 Text(
                   'WatchHub',
                   style: TextStyle(
-                    fontFamily: 'PlayfairDisplay',
                     fontSize: 20,
                     color: Color(0xFFC0A265),
                     fontWeight: FontWeight.bold,

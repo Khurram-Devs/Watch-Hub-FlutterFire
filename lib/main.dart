@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
-import 'firebase_options.dart';
+import 'package:google_fonts/google_fonts.dart';
 
+import 'firebase_options.dart';
 import './theme/theme_provider.dart';
 import './screens/user/home_screen.dart';
 import './screens/admin/faq_screen.dart';
@@ -29,8 +30,12 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: themeProvider.lightTheme,
-      darkTheme: themeProvider.darkTheme,
+      theme: themeProvider.lightTheme.copyWith(
+        textTheme: GoogleFonts.audiowideTextTheme(),
+      ),
+      darkTheme: themeProvider.darkTheme.copyWith(
+        textTheme: GoogleFonts.audiowideTextTheme(ThemeData.dark().textTheme),
+      ),
       themeMode: themeProvider.themeMode,
       initialRoute: '/home',
       routes: {
