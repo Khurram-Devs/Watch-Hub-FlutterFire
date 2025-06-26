@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:watch_hub_ep/widgets/footer_widget.dart';
+import 'package:watch_hub_ep/widgets/search_bar_widget.dart';
 import 'package:watch_hub_ep/widgets/testimonial_widget.dart';
 import '../../widgets/section_title.dart';
 import '../../widgets/collection_card.dart';
@@ -7,9 +9,23 @@ import '../../widgets/app_header.dart';
 import '../../widgets/nav_drawer.dart';
 import '../../widgets/single_video_banner.dart';
 import '../../widgets/infinite_brands_scroller.dart';
+import '../../widgets/contact_us_form.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +38,14 @@ class HomeScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const SizedBox(height: 12),
+              SearchBarWidget(
+                controller: _searchController,
+                onChanged: (text) {
+                  print("Searching for: $text");
+                  // You can also trigger a filtering method here
+                },
+              ),
               const SizedBox(height: 12),
 
               const SingleVideoBanner(
@@ -48,6 +72,71 @@ class HomeScreen extends StatelessWidget {
                       description: 'The Cosmopolitan Watch',
                       price: '2,995',
                     ),
+
+                    SizedBox(width: 16),
+                    CollectionCard(
+                      imageUrl: 'https://i.ibb.co/rGjKLnc2/watch-4.png',
+                      model: 'GMT-MASTER II',
+                      description: 'The Cosmopolitan Watch',
+                      price: '2,995',
+                    ),
+
+                    SizedBox(width: 16),
+                    CollectionCard(
+                      imageUrl: 'https://i.ibb.co/rGjKLnc2/watch-4.png',
+                      model: 'GMT-MASTER II',
+                      description: 'The Cosmopolitan Watch',
+                      price: '2,995',
+                    ),
+
+                    SizedBox(width: 16),
+                    CollectionCard(
+                      imageUrl: 'https://i.ibb.co/rGjKLnc2/watch-4.png',
+                      model: 'GMT-MASTER II',
+                      description: 'The Cosmopolitan Watch',
+                      price: '2,995',
+                    ),
+
+                    SizedBox(width: 16),
+                    CollectionCard(
+                      imageUrl: 'https://i.ibb.co/rGjKLnc2/watch-4.png',
+                      model: 'GMT-MASTER II',
+                      description: 'The Cosmopolitan Watch',
+                      price: '2,995',
+                    ),
+
+                    SizedBox(width: 16),
+                    CollectionCard(
+                      imageUrl: 'https://i.ibb.co/rGjKLnc2/watch-4.png',
+                      model: 'GMT-MASTER II',
+                      description: 'The Cosmopolitan Watch',
+                      price: '2,995',
+                    ),
+
+                    SizedBox(width: 16),
+                    CollectionCard(
+                      imageUrl: 'https://i.ibb.co/rGjKLnc2/watch-4.png',
+                      model: 'GMT-MASTER II',
+                      description: 'The Cosmopolitan Watch',
+                      price: '2,995',
+                    ),
+
+                    SizedBox(width: 16),
+                    CollectionCard(
+                      imageUrl: 'https://i.ibb.co/rGjKLnc2/watch-4.png',
+                      model: 'GMT-MASTER II',
+                      description: 'The Cosmopolitan Watch',
+                      price: '2,995',
+                    ),
+
+                    SizedBox(width: 16),
+                    CollectionCard(
+                      imageUrl: 'https://i.ibb.co/rGjKLnc2/watch-4.png',
+                      model: 'GMT-MASTER II',
+                      description: 'The Cosmopolitan Watch',
+                      price: '2,995',
+                    ),
+
                     SizedBox(width: 16),
                     CollectionCard(
                       imageUrl: 'https://i.ibb.co/5gW477z2/watch-3.png',
@@ -140,31 +229,48 @@ class HomeScreen extends StatelessWidget {
                   ],
                 ),
               ),
-                          const SizedBox(height: 32),
-TestimonialCarousel(
-  testimonials: [
-    Testimonial(
-      imageUrl: 'https://images.unsplash.com/photo-1606736739929-b369d6faabdb?q=80&w=200&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      testimonial: 'WatchHub has the most elegant collection I\'ve seen. The luxury is unmatched!',
-      name: 'Ayaan Malik',
-      occupation: 'Fashion Blogger',
-    ),
-    Testimonial(
-      imageUrl: 'https://images.unsplash.com/photo-1606736739929-b369d6faabdb?q=80&w=200&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      testimonial: 'A perfect platform to explore timeless watches. I loved the whole experience!',
-      name: 'Sarah Khan',
-      occupation: 'Entrepreneur',
-    ),
-    Testimonial(
-      imageUrl: 'https://images.unsplash.com/photo-1606736739929-b369d6faabdb?q=80&w=200&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-      testimonial: 'Premium service and unmatched quality! Highly recommended.',
-      name: 'Usman Tariq',
-      occupation: 'Luxury Consultant',
-    ),
-  ],
-),
-const SizedBox(height: 32),
-
+              const SizedBox(height: 32),
+              TestimonialCarousel(
+                testimonials: [
+                  Testimonial(
+                    imageUrl:
+                        'https://images.unsplash.com/photo-1606736739929-b369d6faabdb?q=80&w=200&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                    testimonial:
+                        'WatchHub has the most elegant collection I\'ve seen. The luxury is unmatched!',
+                    name: 'Ayaan Malik',
+                    occupation: 'Fashion Blogger',
+                  ),
+                  Testimonial(
+                    imageUrl:
+                        'https://images.unsplash.com/photo-1606736739929-b369d6faabdb?q=80&w=200&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                    testimonial:
+                        'A perfect platform to explore timeless watches. I loved the whole experience!',
+                    name: 'Sarah Khan',
+                    occupation: 'Entrepreneur',
+                  ),
+                  Testimonial(
+                    imageUrl:
+                        'https://images.unsplash.com/photo-1606736739929-b369d6faabdb?q=80&w=200&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                    testimonial:
+                        'Premium service and unmatched quality! Highly recommended.',
+                    name: 'Usman Tariq',
+                    occupation: 'Luxury Consultant',
+                  ),
+                  Testimonial(
+                    imageUrl:
+                        'https://images.unsplash.com/photo-1606736739929-b369d6faabdb?q=80&w=200&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                    testimonial:
+                        'Premium service and unmatched quality! Highly recommended.',
+                    name: 'Usman Tariq',
+                    occupation: 'Luxury Consultant',
+                  ),
+                ],
+              ),
+              const SizedBox(height: 32),
+              ContactUsForm(),
+              const SizedBox(height: 32),
+              FooterWidget(),
+              const SizedBox(height: 32),
             ],
           ),
         ),

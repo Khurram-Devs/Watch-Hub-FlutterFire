@@ -10,9 +10,7 @@ import './screens/admin/faq_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(
     ChangeNotifierProvider(
       create: (_) => ThemeProvider(),
@@ -30,12 +28,8 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: themeProvider.lightTheme.copyWith(
-        textTheme: GoogleFonts.audiowideTextTheme(),
-      ),
-      darkTheme: themeProvider.darkTheme.copyWith(
-        textTheme: GoogleFonts.audiowideTextTheme(ThemeData.dark().textTheme),
-      ),
+      theme: themeProvider.lightTheme,
+      darkTheme: themeProvider.darkTheme,
       themeMode: themeProvider.themeMode,
       initialRoute: '/home',
       routes: {
