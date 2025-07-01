@@ -3,9 +3,9 @@ import 'package:firebase_core/firebase_core.dart';
 import '../../firebase_options.dart';
 import 'package:provider/provider.dart';
 
-import '../../widgets/faq_widget.dart';
-import '../../widgets/add_faq_widget.dart';
-import '../../widgets/app_header.dart';
+import '../../widgets/faq_screen_widget/faq_widget.dart';
+import '../../widgets/faq_screen_widget/add_faq_widget.dart';
+import '../../widgets/layout_widget/app_header.dart';
 import '../../theme/theme_provider.dart';
 
 void main() async {

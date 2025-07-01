@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:watch_hub_ep/widgets/footer_widget.dart';
-import 'package:watch_hub_ep/widgets/search_bar_widget.dart';
-import 'package:watch_hub_ep/widgets/testimonial_widget.dart';
-import '../../widgets/section_title.dart';
-import '../../widgets/collection_card.dart';
-import '../../widgets/watch_tile.dart';
-import '../../widgets/app_header.dart';
-import '../../widgets/nav_drawer.dart';
-import '../../widgets/single_video_banner.dart';
-import '../../widgets/infinite_brands_scroller.dart';
-import '../../widgets/contact_us_form.dart';
+import 'package:watch_hub_ep/screens/admin/faq_screen.dart';
+import 'package:watch_hub_ep/screens/user/product_detail_screen.dart';
+import '../../models/product_model.dart';
+import '../../services/product_service.dart';
+import '../../services/testimonial_service.dart';
+import 'package:watch_hub_ep/widgets/layout_widget/footer_widget.dart';
+import 'package:watch_hub_ep/widgets/home_screen_widget/search_bar_widget.dart';
+import 'package:watch_hub_ep/widgets/home_screen_widget/testimonial_widget.dart';
+import '../../widgets/layout_widget/section_title.dart';
+import '../../widgets/home_screen_widget/collection_card.dart';
+import '../../widgets/home_screen_widget/watch_tile.dart';
+import '../../widgets/layout_widget/app_header.dart';
+import '../../widgets/layout_widget/nav_drawer.dart';
+import '../../widgets/home_screen_widget/single_video_banner.dart';
+import '../../widgets/home_screen_widget/infinite_brands_scroller.dart';
+import '../../widgets/home_screen_widget/contact_us_form.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,6 +25,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
+  final _productService = ProductService();
+  final _testimonialService = TestimonialService();
 
   @override
   void dispose() {
@@ -39,13 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 12),
-              SearchBarWidget(
-                controller: _searchController,
-                onChanged: (text) {
-                  print("Searching for: $text");
-                  // You can also trigger a filtering method here
-                },
-              ),
+              SearchBarWidget(controller: _searchController),
               const SizedBox(height: 12),
 
               const SingleVideoBanner(
@@ -55,217 +56,153 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 32),
 
               SectionTitle(
-                title: 'Collection 1',
+                title: 'New Arrivals',
                 action: 'See all',
-                onActionTap: () {},
+                onActionTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => FAQScreen()),
+                  );
+                },
               ),
               const SizedBox(height: 12),
 
-              SizedBox(
-                height: 300,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: const [
-                    CollectionCard(
-                      imageUrl: 'https://i.ibb.co/rGjKLnc2/watch-4.png',
-                      model: 'GMT-MASTER II',
-                      description: 'The Cosmopolitan Watch',
-                      price: '2,995',
-                    ),
+              FutureBuilder<List<ProductModel>>(
+                future: _productService.getNewArrivals(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return const Text('Error loading products');
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Text('No products found');
+                  }
 
-                    SizedBox(width: 16),
-                    CollectionCard(
-                      imageUrl: 'https://i.ibb.co/rGjKLnc2/watch-4.png',
-                      model: 'GMT-MASTER II',
-                      description: 'The Cosmopolitan Watch',
-                      price: '2,995',
-                    ),
+                  final products = snapshot.data!;
 
-                    SizedBox(width: 16),
-                    CollectionCard(
-                      imageUrl: 'https://i.ibb.co/rGjKLnc2/watch-4.png',
-                      model: 'GMT-MASTER II',
-                      description: 'The Cosmopolitan Watch',
-                      price: '2,995',
+                  return ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      minHeight: 320,
+                      maxHeight: 340,
                     ),
-
-                    SizedBox(width: 16),
-                    CollectionCard(
-                      imageUrl: 'https://i.ibb.co/rGjKLnc2/watch-4.png',
-                      model: 'GMT-MASTER II',
-                      description: 'The Cosmopolitan Watch',
-                      price: '2,995',
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: products.length,
+                      itemBuilder: (_, index) {
+                        final product = products[index];
+                        return CollectionCard(
+                          product: product,
+                          onViewTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => FAQScreen()),
+                            );
+                          },
+                        );
+                      },
+                      separatorBuilder: (_, __) => const SizedBox(width: 16),
                     ),
-
-                    SizedBox(width: 16),
-                    CollectionCard(
-                      imageUrl: 'https://i.ibb.co/rGjKLnc2/watch-4.png',
-                      model: 'GMT-MASTER II',
-                      description: 'The Cosmopolitan Watch',
-                      price: '2,995',
-                    ),
-
-                    SizedBox(width: 16),
-                    CollectionCard(
-                      imageUrl: 'https://i.ibb.co/rGjKLnc2/watch-4.png',
-                      model: 'GMT-MASTER II',
-                      description: 'The Cosmopolitan Watch',
-                      price: '2,995',
-                    ),
-
-                    SizedBox(width: 16),
-                    CollectionCard(
-                      imageUrl: 'https://i.ibb.co/rGjKLnc2/watch-4.png',
-                      model: 'GMT-MASTER II',
-                      description: 'The Cosmopolitan Watch',
-                      price: '2,995',
-                    ),
-
-                    SizedBox(width: 16),
-                    CollectionCard(
-                      imageUrl: 'https://i.ibb.co/rGjKLnc2/watch-4.png',
-                      model: 'GMT-MASTER II',
-                      description: 'The Cosmopolitan Watch',
-                      price: '2,995',
-                    ),
-
-                    SizedBox(width: 16),
-                    CollectionCard(
-                      imageUrl: 'https://i.ibb.co/rGjKLnc2/watch-4.png',
-                      model: 'GMT-MASTER II',
-                      description: 'The Cosmopolitan Watch',
-                      price: '2,995',
-                    ),
-
-                    SizedBox(width: 16),
-                    CollectionCard(
-                      imageUrl: 'https://i.ibb.co/5gW477z2/watch-3.png',
-                      model: 'SUBMARINER',
-                      description: 'Iconic Diver’s Watch',
-                      price: '4,250',
-                    ),
-                    SizedBox(width: 16),
-                    CollectionCard(
-                      imageUrl: 'https://i.ibb.co/kVZrPm5J/watch-1.png',
-                      model: 'OYSTER PERPETUAL',
-                      description: 'Bold & Elegant',
-                      price: '5,800',
-                    ),
-                    SizedBox(width: 16),
-                    CollectionCard(
-                      imageUrl: 'https://i.ibb.co/pjt3TJnw/watch-2.png',
-                      model: 'OYSTER PERPETUAL',
-                      description: 'Bold & Elegant',
-                      price: '5,800',
-                    ),
-                  ],
-                ),
+                  );
+                  ;
+                },
               ),
 
               const SizedBox(height: 24),
 
-              const SectionTitle(title: 'List Collection'),
+              const SectionTitle(title: 'Premium Discounts'),
               const SizedBox(height: 12),
 
-              WatchTile(
-                imageUrl: 'https://i.ibb.co/rGjKLnc2/watch-4.png',
-                title: 'Rolex Submariner',
-                description: 'Classic diving watch with timeless style.',
-                originalPrice: 2999.99,
-                discountPercentage: 20,
-              ),
-              WatchTile(
-                imageUrl: 'https://i.ibb.co/kVZrPm5J/watch-1.png',
-                title: 'Rolex Submariner',
-                description: 'Classic diving watch with timeless style.',
-                originalPrice: 2999.99,
-                discountPercentage: 10,
-              ),
-              const SizedBox(height: 32),
+              FutureBuilder<List<ProductModel>>(
+                future: _productService.loadDiscountedProducts(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Text("No discounted products found.");
+                  }
 
-              InfiniteBrandsScroller(
-                brandImageUrls: [
-                  'https://images.unsplash.com/photo-1684297476376-8badc0335c63?q=80&w=200&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-                  'https://images.unsplash.com/photo-1574607304075-f7f22632aa64?q=80&w=200&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-                ],
+                  return Column(
+                    children:
+                        snapshot.data!.map((product) {
+                          return WatchTile(
+                            imageUrl: product.images.first,
+                            title: product.title,
+                            brandName: product.brandName,
+                            originalPrice: product.price,
+                            discountPercentage: product.discountPercentage,
+                            onViewTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => ProductDetailScreen(product: product)),
+                              );
+                            },
+                          );
+                        }).toList(),
+                  );
+                },
               ),
+
+              const SizedBox(height: 32),
+        const SectionTitle(title: 'Our Brands'),
+              const SizedBox(height: 12),
+              const InfiniteBrandsScroller(),
+
               const SizedBox(height: 32),
 
               SectionTitle(
-                title: 'Collection 2',
+                title: 'Featured',
                 action: 'See all',
-                onActionTap: () {},
+                onActionTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => FAQScreen()),
+                  );
+                },
               ),
               const SizedBox(height: 12),
 
-              SizedBox(
-                height: 300,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: const [
-                    CollectionCard(
-                      imageUrl:
-                          'https://images.unsplash.com/photo-1589988599196-6bacb4f694b0?q=80&w=200&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-                      model: 'GMT-MASTER II',
-                      description: 'The Cosmopolitan Watch',
-                      price: '2,995',
+              FutureBuilder<List<ProductModel>>(
+                future: _productService.getFeaturedProducts(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return const Text('Error loading products');
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Text('No products found');
+                  }
+
+                  final products = snapshot.data!;
+
+                  return ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      minHeight: 320,
+                      maxHeight: 340,
                     ),
-                    SizedBox(width: 16),
-                    CollectionCard(
-                      imageUrl:
-                          'https://images.unsplash.com/photo-1684297476376-8badc0335c63?q=80&w=200&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-                      model: 'SUBMARINER',
-                      description: 'Iconic Diver’s Watch',
-                      price: '4,250',
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: products.length,
+                      itemBuilder: (_, index) {
+                        final product = products[index];
+                        return CollectionCard(
+                          product: product,
+                          onViewTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => FAQScreen()),
+                            );
+                          },
+                        );
+                      },
+                      separatorBuilder: (_, __) => const SizedBox(width: 16),
                     ),
-                    SizedBox(width: 16),
-                    CollectionCard(
-                      imageUrl:
-                          'https://images.unsplash.com/photo-1606736739929-b369d6faabdb?q=80&w=200&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-                      model: 'OYSTER PERPETUAL',
-                      description: 'Bold & Elegant',
-                      price: '5,800',
-                    ),
-                  ],
-                ),
+                  );
+                },
               ),
               const SizedBox(height: 32),
-              TestimonialCarousel(
-                testimonials: [
-                  Testimonial(
-                    imageUrl:
-                        'https://images.unsplash.com/photo-1606736739929-b369d6faabdb?q=80&w=200&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-                    testimonial:
-                        'WatchHub has the most elegant collection I\'ve seen. The luxury is unmatched!',
-                    name: 'Ayaan Malik',
-                    occupation: 'Fashion Blogger',
-                  ),
-                  Testimonial(
-                    imageUrl:
-                        'https://images.unsplash.com/photo-1606736739929-b369d6faabdb?q=80&w=200&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-                    testimonial:
-                        'A perfect platform to explore timeless watches. I loved the whole experience!',
-                    name: 'Sarah Khan',
-                    occupation: 'Entrepreneur',
-                  ),
-                  Testimonial(
-                    imageUrl:
-                        'https://images.unsplash.com/photo-1606736739929-b369d6faabdb?q=80&w=200&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-                    testimonial:
-                        'Premium service and unmatched quality! Highly recommended.',
-                    name: 'Usman Tariq',
-                    occupation: 'Luxury Consultant',
-                  ),
-                  Testimonial(
-                    imageUrl:
-                        'https://images.unsplash.com/photo-1606736739929-b369d6faabdb?q=80&w=200&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-                    testimonial:
-                        'Premium service and unmatched quality! Highly recommended.',
-                    name: 'Usman Tariq',
-                    occupation: 'Luxury Consultant',
-                  ),
-                ],
-              ),
+              const TestimonialCarousel(),
+
               const SizedBox(height: 32),
               ContactUsForm(),
               const SizedBox(height: 32),

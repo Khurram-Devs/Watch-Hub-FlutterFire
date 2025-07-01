@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class ContactUsForm extends StatefulWidget {
@@ -21,13 +22,34 @@ class _ContactUsFormState extends State<ContactUsForm> {
     super.dispose();
   }
 
-  void _submitForm() {
-    if (_formKey.currentState!.validate()) {
+void _submitForm() async {
+  if (_formKey.currentState!.validate()) {
+    try {
+      await FirebaseFirestore.instance.collection('contactMessages').add({
+        'name': _nameController.text.trim(),
+        'email': _emailController.text.trim(),
+        'message': _messageController.text.trim(),
+        'createdAt': Timestamp.now(),
+      });
+
+      // Show confirmation
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Message sent successfully!')),
       );
+
+      // Clear form fields
+      _formKey.currentState!.reset();
+      _nameController.clear();
+      _emailController.clear();
+      _messageController.clear();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to send message: $e')),
+      );
     }
   }
+}
+
 
   @override
   Widget build(BuildContext context) {

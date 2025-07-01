@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+import 'package:watch_hub_ep/screens/admin/faq_screen.dart';
 
 class SingleVideoBanner extends StatefulWidget {
   final String videoUrl;
@@ -125,7 +126,10 @@ class _SingleVideoBannerState extends State<SingleVideoBanner> {
                     const SizedBox(height: 24),
                     ElevatedButton(
                       onPressed: () {
-                        // Action
+                        Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => FAQScreen()),
+                              );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: theme.colorScheme.secondary,

@@ -1,50 +1,53 @@
 import 'package:flutter/material.dart';
-
-class Testimonial {
-  final String imageUrl;
-  final String testimonial;
-  final String name;
-  final String occupation;
-
-  Testimonial({
-    required this.imageUrl,
-    required this.testimonial,
-    required this.name,
-    required this.occupation,
-  });
-}
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../models/testimonial_model.dart';
 
 class TestimonialCarousel extends StatefulWidget {
-  final List<Testimonial> testimonials;
-
-  const TestimonialCarousel({super.key, required this.testimonials});
+  const TestimonialCarousel({super.key});
 
   @override
   State<TestimonialCarousel> createState() => _TestimonialCarouselState();
 }
 
-
 class _TestimonialCarouselState extends State<TestimonialCarousel> {
   late final PageController _controller;
-  late int _currentIndex;
+  int _currentIndex = 0;
+
+  Future<List<Testimonial>> fetchTestimonials() async {
+    final snapshot = await FirebaseFirestore.instance
+        .collection('testimonials')
+        .orderBy('createdAt', descending: true)
+        .get();
+
+    return snapshot.docs.map((doc) => Testimonial.fromFirestore(doc)).toList();
+  }
 
   @override
   void initState() {
     super.initState();
-    _currentIndex = widget.testimonials.length ~/ 2;
-    _controller = PageController(
-      initialPage: _currentIndex,
-      viewportFraction: 0.85,
-    );
+    _controller = PageController(viewportFraction: 0.85);
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final bool isWide = constraints.maxWidth > 600;
+    return FutureBuilder<List<Testimonial>>(
+      future: fetchTestimonials(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Padding(
+            padding: EdgeInsets.symmetric(vertical: 32),
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Text('No testimonials found.');
+        }
+
+        final testimonials = snapshot.data!;
+        final bool isWide = MediaQuery.of(context).size.width > 600;
         final double cardHeight = isWide ? 320 : 280;
         final double avatarRadius = isWide ? 48 : 40;
         final double fontSize = isWide ? 18 : 16;
@@ -64,11 +67,11 @@ class _TestimonialCarouselState extends State<TestimonialCarousel> {
               height: cardHeight,
               child: PageView.builder(
                 controller: _controller,
+                itemCount: testimonials.length,
                 onPageChanged: (index) =>
                     setState(() => _currentIndex = index),
-                itemCount: widget.testimonials.length,
                 itemBuilder: (context, index) {
-                  final t = widget.testimonials[index];
+                  final t = testimonials[index];
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                     child: Container(
@@ -123,7 +126,7 @@ class _TestimonialCarouselState extends State<TestimonialCarousel> {
             const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(widget.testimonials.length, (index) {
+              children: List.generate(testimonials.length, (index) {
                 final isActive = index == _currentIndex;
                 return AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
