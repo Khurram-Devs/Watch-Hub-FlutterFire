@@ -96,76 +96,89 @@ class _FilterPanelState extends State<FilterPanel> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+Widget build(BuildContext context) {
+  final theme = Theme.of(context);
+  final isDark = theme.brightness == Brightness.dark;
+  final width = MediaQuery.of(context).size.width;
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      elevation: 2,
-      color: theme.cardColor,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Filter Title + Clear All
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  return LayoutBuilder(
+    builder: (context, constraints) {
+      return Material(
+        elevation: 4,
+        borderRadius: BorderRadius.circular(16),
+        color: theme.cardColor,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  "Filter",
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.secondary,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Filters",
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.secondary,
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: _clearFilters,
+                      child: const Text("Clear All"),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 16),
+
+                // Brands
+                Text("Brands", style: theme.textTheme.bodyMedium),
+                const SizedBox(height: 8),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: _brands.map((brand) {
+                      final id = brand['id']!;
+                      final name = brand['name']!;
+                      final isSelected = _selectedBrand == id;
+
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: ChoiceChip(
+                          label: Text(name),
+                          selected: isSelected,
+                          onSelected: (_) {
+                            setState(() {
+                              _selectedBrand = isSelected ? null : id;
+                            });
+                          },
+                          selectedColor: ThemeProvider.goldenColor,
+                          labelStyle: TextStyle(
+                            color: isSelected
+                                ? (isDark ? Colors.black : Colors.white)
+                                : theme.textTheme.bodyMedium?.color,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          backgroundColor: theme.cardColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(24),
+                          ),
+                        ),
+                      );
+                    }).toList(),
                   ),
                 ),
-                TextButton(
-                  onPressed: _clearFilters,
-                  child: const Text("Clear All"),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
 
-            // Brand Dropdown
-            DropdownButtonFormField<String>(
-              value: _selectedBrand,
-              hint: Text("Select Brand", style: Theme.of(context).textTheme.bodySmall,),
-              isExpanded: true,
-              items:
-                  _brands
-                      .map(
-                        (b) => DropdownMenuItem(
-                          value: b['id'],
-                          child: Text( b['name']!,
-                          style: Theme.of(context).textTheme.bodySmall,),
-                          
-                        ),
-                      )
-                      .toList(),
-              onChanged: (value) {
-                setState(() => _selectedBrand = value);
-                _notify();
-              },
-              decoration: InputDecoration(
-                filled: true,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
+                const SizedBox(height: 24),
 
-            // Category Chips
-            Text("Categories", style: theme.textTheme.bodyMedium),
-            const SizedBox(height: 8),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children:
-                    _categories.map((cat) {
+                // Categories
+                Text("Categories", style: theme.textTheme.bodyMedium),
+                const SizedBox(height: 8),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: _categories.map((cat) {
                       final id = cat['id']!;
                       final name = cat['name']!;
                       final iconUrl = cat['iconUrl']!;
@@ -177,16 +190,7 @@ class _FilterPanelState extends State<FilterPanel> {
                         child: FilterChip(
                           selected: selected,
                           backgroundColor: theme.cardColor,
-                          selectedColor:
-                              selected
-                                  ? (isDark
-                                      ? ThemeProvider.goldenColor.withOpacity(
-                                        0.2,
-                                      )
-                                      : ThemeProvider.goldenColor.withOpacity(
-                                        0.85,
-                                      ))
-                                  : theme.cardColor,
+                          selectedColor: ThemeProvider.goldenColor,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(24),
                           ),
@@ -197,29 +201,24 @@ class _FilterPanelState extends State<FilterPanel> {
                                 safeUrl,
                                 height: 18,
                                 width: 18,
-                                color:
-                                    selected
-                                        ? (isDark ? Colors.black : Colors.white)
-                                        : theme.colorScheme.secondary,
-                                placeholderBuilder:
-                                    (_) =>
-                                        const SizedBox(width: 18, height: 18),
-                                errorBuilder:
-                                    (_, __, ___) => const Icon(
-                                      Icons.image_not_supported,
-                                      size: 18,
-                                    ),
+                                color: selected
+                                    ? (isDark ? Colors.black : Colors.white)
+                                    : theme.colorScheme.secondary,
+                                placeholderBuilder: (_) =>
+                                    const SizedBox(width: 18, height: 18),
+                                errorBuilder: (_, __, ___) =>
+                                    const Icon(Icons.image_not_supported,
+                                        size: 18),
                               ),
                               const SizedBox(width: 6),
                               Text(
                                 name,
                                 style: TextStyle(
-                                  color:
-                                      selected
-                                          ? (isDark
-                                              ? Colors.black
-                                              : Colors.white)
-                                          : theme.textTheme.bodyMedium?.color,
+                                  color: selected
+                                      ? (isDark
+                                          ? Colors.black
+                                          : Colors.white)
+                                      : theme.textTheme.bodyMedium?.color,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -233,86 +232,118 @@ class _FilterPanelState extends State<FilterPanel> {
                                 _selectedCategoryIds.remove(id);
                               }
                             });
-                            _notify();
                           },
                         ),
                       );
                     }).toList(),
-              ),
-            ),
-            const SizedBox(height: 24),
+                  ),
+                ),
 
-            // Price Range
-            Text("Price Range", style: theme.textTheme.bodyMedium),
-            const SizedBox(height: 6),
-            RangeSlider(
-              min: 0,
-              max: 10000,
-              divisions: 100,
-              values: RangeValues(_min, _max),
-              labels: RangeLabels('\$${_min.toInt()}', '\$${_max.toInt()}'),
-              onChanged: (range) {
-                setState(() {
-                  _min = range.start;
-                  _max = range.end;
-                });
-              },
-              onChangeEnd: (_) => _notify(),
-            ),
-            const SizedBox(height: 24),
+                const SizedBox(height: 24),
 
-            // Availability & Discount Checkboxes
-            Row(
-              children: [
-                Checkbox(
-                  value: _inStock,
-                  onChanged: (val) {
-                    setState(() => _inStock = val ?? false);
-                    _notify();
+                // Price Range
+                Text("Price Range", style: theme.textTheme.bodyMedium),
+                const SizedBox(height: 6),
+                RangeSlider(
+                  min: 0,
+                  max: 10000,
+                  divisions: 100,
+                  values: RangeValues(_min, _max),
+                  labels: RangeLabels('\$${_min.toInt()}',
+                      '\$${_max.toInt()}'),
+                  onChanged: (range) {
+                    setState(() {
+                      _min = range.start;
+                      _max = range.end;
+                    });
                   },
                 ),
-                const Text("In Stock"),
-                const SizedBox(width: 16),
-                Checkbox(
-                  value: _discountOnly,
-                  onChanged: (val) {
-                    setState(() => _discountOnly = val ?? false);
-                    _notify();
-                  },
-                ),
-                const Text("Discounted"),
-              ],
-            ),
-            const SizedBox(height: 12),
 
-            // Minimum Rating Dropdown
-            DropdownButtonFormField<double>(
-              value: _minRating,
-              hint: const Text("Minimum Rating"),
-              items:
-                  [null, 1, 2, 3, 4, 5].map((r) {
-                    return DropdownMenuItem<double>(
-                      value: r?.toDouble(),
-                      child: Text(
-                        r == null ? "Any" : "$r★ and up",
-                        style: Theme.of(context).textTheme.bodySmall,
+                const SizedBox(height: 24),
+
+                // In stock & Discounted
+                Row(
+                  children: [
+                    Checkbox(
+                      value: _inStock,
+                      onChanged: (val) {
+                        setState(() => _inStock = val ?? false);
+                      },
+                    ),
+                    const Text("In Stock"),
+                    const SizedBox(width: 16),
+                    Checkbox(
+                      value: _discountOnly,
+                      onChanged: (val) {
+                        setState(() => _discountOnly = val ?? false);
+                      },
+                    ),
+                    const Text("Discounted"),
+                  ],
+                ),
+
+                const SizedBox(height: 24),
+
+                // Minimum Rating
+                Text("Minimum Rating", style: theme.textTheme.bodyMedium),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [null, 1, 2, 3, 4, 5].map((r) {
+                    final isSelected = _minRating == r?.toDouble();
+                    return ChoiceChip(
+                      label: Text(r == null ? "Any" : "$r★ & Up"),
+                      selected: isSelected,
+                      onSelected: (_) {
+                        setState(() {
+                          _minRating = isSelected ? null : r?.toDouble();
+                        });
+                      },
+                      selectedColor: ThemeProvider.goldenColor,
+                      labelStyle: TextStyle(
+                        color: isSelected
+                            ? (isDark ? Colors.black : Colors.white)
+                            : theme.textTheme.bodyMedium?.color,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      backgroundColor: theme.cardColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24),
                       ),
                     );
                   }).toList(),
-              onChanged: (val) {
-                setState(() => _minRating = val);
-                _notify();
-              },
-              decoration: InputDecoration(
-                filled: true,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
                 ),
-              ),
+
+                const SizedBox(height: 32),
+
+                // Apply Button
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: _notify,
+                    icon: const Icon(Icons.check),
+                    label: const Text("Apply Filters"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.colorScheme.secondary,
+                      foregroundColor: theme.cardColor,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 16,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
-      ),
-    );
-  }
+      );
+    },
+  );
+}
+
+
 }

@@ -65,7 +65,7 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
           ),
           alignment: Alignment.center,
           child: Text(
-            'ROLEX WATCHES',
+            'WATCH-HUB',
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
               color: Theme.of(context).colorScheme.secondary,
               letterSpacing: 1.2,

@@ -11,9 +11,36 @@ class SortPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    Widget buildButton(String label, String value) {
+      final isSelected = current.value == value;
+      return GestureDetector(
+        onTap: () => onSort(value),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? theme.colorScheme.secondary.withOpacity(0.15)
+                : theme.cardColor,
+            borderRadius: BorderRadius.circular(10),
+            
+          ),
+          child: Text(
+            label,
+            style: theme.textTheme.bodySmall?.copyWith(
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              color: isSelected
+                  ? theme.colorScheme.secondary
+                  : theme.textTheme.bodySmall?.color,
+            ),
+          ),
+        ),
+      );
+    }
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: theme.cardColor,
         borderRadius: BorderRadius.circular(16),
@@ -22,29 +49,23 @@ class SortPanel extends StatelessWidget {
             color: theme.shadowColor.withOpacity(0.05),
             blurRadius: 6,
             offset: const Offset(0, 3),
-          )
+          ),
         ],
       ),
       child: Row(
         children: [
-          Text("Sort by:",  style: Theme.of(context).textTheme.bodySmall),
-          const SizedBox(width: 12),
+          Text("Sort:", style: theme.textTheme.bodySmall),
+          const SizedBox(width: 8),
           Expanded(
-            child: DropdownButtonFormField<String>(
-              value: current.value,
-              isExpanded: true,
-              onChanged: (val) {
-                if (val != null) onSort(val);
-              },
-              items: [
-                DropdownMenuItem(value: 'arrival', child: Text("Newest",  style: Theme.of(context).textTheme.bodySmall)),
-                DropdownMenuItem(value: 'price_asc', child: Text("Price ↑",  style: Theme.of(context).textTheme.bodySmall)),
-                DropdownMenuItem(value: 'price_desc', child: Text("Price ↓",  style: Theme.of(context).textTheme.bodySmall)),
-                DropdownMenuItem(value: 'rating', child: Text("Rating",  style: Theme.of(context).textTheme.bodySmall)),
-              ],
-              decoration: InputDecoration(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  buildButton("Newest", 'arrival'),
+                  buildButton("Price ↑", 'price_asc'),
+                  buildButton("Price ↓", 'price_desc'),
+                  buildButton("Rating", 'rating'),
+                ],
               ),
             ),
           ),

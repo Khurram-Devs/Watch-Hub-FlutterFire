@@ -47,18 +47,18 @@ class NavDrawer extends StatelessWidget {
               );
             },
           ),
+          // ListTile(
+          //   leading: const Icon(Icons.question_answer, color: Color(0xFFC0A265)),
+          //   title: const Text('FAQ Admin'),
+          //   onTap: () {
+          //     Navigator.pushReplacement(
+          //       context,
+          //       MaterialPageRoute(builder: (_) => const FAQScreen()),
+          //     );
+          //   },
+          // ),
           ListTile(
-            leading: const Icon(Icons.question_answer, color: Color(0xFFC0A265)),
-            title: const Text('FAQ Admin'),
-            onTap: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => const FAQScreen()),
-              );
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.question_answer, color: Color(0xFFC0A265)),
+            leading: const Icon(Icons.store, color: Color(0xFFC0A265)),
             title: const Text('Catalog'),
             onTap: () {
               Navigator.pushReplacement(
