@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:watch_hub_ep/screens/catalog_screen.dart';
 
 import 'firebase_options.dart';
 import './theme/theme_provider.dart';
@@ -35,6 +35,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/home': (_) => const HomeScreen(),
         '/faq': (_) => const FAQScreen(),
+        '/catalog': (_) => const CatalogScreen(),
       },
     );
   }

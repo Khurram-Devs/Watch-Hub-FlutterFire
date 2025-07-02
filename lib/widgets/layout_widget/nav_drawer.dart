@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:watch_hub_ep/screens/catalog_screen.dart';
 import '../../theme/theme_provider.dart';
 import '../../screens/user/home_screen.dart';
 import '../../screens/admin/faq_screen.dart';
@@ -53,6 +54,16 @@ class NavDrawer extends StatelessWidget {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (_) => const FAQScreen()),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.question_answer, color: Color(0xFFC0A265)),
+            title: const Text('Catalog'),
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const CatalogScreen()),
               );
             },
           ),

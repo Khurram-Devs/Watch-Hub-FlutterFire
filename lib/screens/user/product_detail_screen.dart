@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:watch_hub_ep/widgets/layout_widget/app_header.dart';
 import 'package:watch_hub_ep/widgets/layout_widget/nav_drawer.dart';
 import 'package:watch_hub_ep/widgets/layout_widget/footer_widget.dart';
-import 'package:watch_hub_ep/widgets/layout_widget/section_title.dart';
 import 'package:watch_hub_ep/widgets/product_detail_widget/image_gallery.dart';
 import 'package:watch_hub_ep/widgets/product_detail_widget/product_info.dart';
 import 'package:watch_hub_ep/widgets/product_detail_widget/product_specs.dart';
