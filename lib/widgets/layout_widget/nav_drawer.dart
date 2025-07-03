@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:watch_hub_ep/screens/catalog_screen.dart';
+import 'package:watch_hub_ep/screens/user/catalog_screen.dart';
+import 'package:watch_hub_ep/screens/user/auth_screen.dart';
 import '../../theme/theme_provider.dart';
 import '../../screens/user/home_screen.dart';
 import '../../screens/admin/faq_screen.dart';
@@ -64,6 +65,16 @@ class NavDrawer extends StatelessWidget {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (_) => const CatalogScreen()),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.store, color: Color(0xFFC0A265)),
+            title: const Text('Auth'),
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const AuthScreen()),
               );
             },
           ),

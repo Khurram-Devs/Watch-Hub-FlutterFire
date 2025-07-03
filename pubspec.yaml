@@ -18,6 +18,9 @@ dependencies:
   marquee: ^2.3.0
   video_player: ^2.10.0
   flutter_svg: ^2.2.0
+  firebase_auth: ^5.6.1
+  google_sign_in: ^6.2.1
+  foundation: ^0.0.5
 
 dev_dependencies:
   flutter_test:
