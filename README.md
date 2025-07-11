@@ -98,7 +98,7 @@ flutter run
 
 ## 📄 License
 
-This project is currently unlicensed.
+This project is currently unlicensed...
 
 ---
 
