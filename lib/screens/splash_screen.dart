@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class SplashScreen extends StatelessWidget {
@@ -19,7 +20,6 @@ class SplashScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Responsive image
                   Image.asset(
                     'assets/images/splash_watch.png',
                     width: screenWidth * 0.8,
@@ -60,7 +60,7 @@ class SplashScreen extends StatelessWidget {
             child: IconButton(
               icon: Icon(Icons.arrow_forward, color: Colors.white, size: screenWidth * 0.08),
               onPressed: () {
-                Navigator.pushReplacementNamed(context, '/faq');
+                context.go('/home');
               },
             ),
           ),

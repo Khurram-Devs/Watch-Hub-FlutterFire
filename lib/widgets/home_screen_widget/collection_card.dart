@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../models/product_model.dart';
+import 'package:watch_hub_ep/widgets/product_detail_widget/add_to_wishlist_button.dart';
 
 class CollectionCard extends StatelessWidget {
   final ProductModel product;
@@ -34,7 +35,7 @@ class CollectionCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Image Section
+          // ░░ Image with Wishlist Icon ░░
           Container(
             height: 150,
             padding: const EdgeInsets.all(6),
@@ -54,16 +55,18 @@ class CollectionCard extends StatelessWidget {
                     ),
                   ),
                 ),
+
+                // ✅ AddToWishlistButton placed here
                 Positioned(
                   top: 8,
                   right: 8,
-                  child: Icon(Icons.favorite_border, color: theme.colorScheme.secondary),
+                  child: AddToWishlistButton(product: product),
                 ),
               ],
             ),
           ),
 
-          // Info Section
+          // ░░ Product Info ░░
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 4, 12, 10),
             child: Column(

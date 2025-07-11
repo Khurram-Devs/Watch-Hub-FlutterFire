@@ -12,7 +12,7 @@ class ProductModel {
   final int stock;
   final DateTime createdAt;
   final String brandName;
-  final Map<String, dynamic> specs; // ✅ FIXED: specs now Map type
+  final Map<String, dynamic> specs;
 
   DocumentSnapshot? firestoreSnapshot;
 
@@ -46,7 +46,7 @@ class ProductModel {
       title: data['title'] ?? '',
       subtitle: data['subtitle'] ?? '',
       description: data['description'] ?? '',
-      specs: Map<String, dynamic>.from(data['specs'] ?? {}), // ✅ FIXED
+      specs: Map<String, dynamic>.from(data['specs'] ?? {}),
       images: List<String>.from(data['images'] ?? []),
       price: (data['price'] ?? 0).toDouble(),
       averageRating: (data['averageRating'] ?? 0).toDouble(),
@@ -55,5 +55,12 @@ class ProductModel {
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       brandName: brandName,
     );
+  }
+
+  static Future<ProductModel> fromDoc(DocumentSnapshot doc) async {
+    final data = doc.data() as Map<String, dynamic>;
+    final model = await fromFirestoreWithBrand(data, doc.id);
+    model.firestoreSnapshot = doc;
+    return model;
   }
 }

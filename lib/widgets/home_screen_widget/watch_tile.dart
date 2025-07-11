@@ -46,7 +46,6 @@ class WatchTile extends StatelessWidget {
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Image + Discount Badge
                 Stack(
                   children: [
                     ClipRRect(
@@ -147,7 +146,6 @@ class WatchTile extends StatelessWidget {
           : Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Image & Badge
                 Stack(
                   children: [
                     ClipRRect(
@@ -191,7 +189,6 @@ class WatchTile extends StatelessWidget {
                 ),
                 const SizedBox(width: 20),
 
-                // Info
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

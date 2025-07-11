@@ -109,7 +109,6 @@ Future<List<ProductModel>> fetchCatalog({
     q = q.where('averageRating', isGreaterThanOrEqualTo: minRating);
   }
 
-  // Sorting and price filters
   if (minPrice != null || maxPrice != null) {
     q = q.orderBy('price');
     if (minPrice != null) {

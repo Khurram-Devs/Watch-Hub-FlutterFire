@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../models/product_model.dart';
 import '../../screens/user/product_detail_screen.dart';
 import '../../theme/theme_provider.dart';
@@ -18,12 +19,7 @@ class ProductListItem extends StatelessWidget {
         : product.price;
 final isOutOfStock = product.stock != null && product.stock! <= 0;
     return GestureDetector(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => ProductDetailScreen(product: product),
-        ),
-      ),
+      onTap: () => context.push('/product/${product.id}'),
       child: Card(
         margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         elevation: 3,
@@ -32,15 +28,14 @@ final isOutOfStock = product.stock != null && product.stock! <= 0;
           padding: const EdgeInsets.all(12),
           child: Row(
             children: [
-              // Left: Product Image + Discount
               Stack(
   children: [
     ClipRRect(
       borderRadius: BorderRadius.circular(10),
       child: Image.network(
         product.images.first,
-        width: 120,
-        height: 120,
+        width: 150,
+        height: 150,
         fit: BoxFit.cover,
       ),
     ),
@@ -84,12 +79,10 @@ final isOutOfStock = product.stock != null && product.stock! <= 0;
 
               const SizedBox(width: 16),
 
-              // Right: Product Info
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Title
                     Text(
                       product.title,
                       maxLines: 1,
@@ -101,7 +94,6 @@ final isOutOfStock = product.stock != null && product.stock! <= 0;
                     ),
                     const SizedBox(height: 4),
 
-                    // Brand Name
                     Text(
                       product.brandName,
                       style: theme.textTheme.bodySmall?.copyWith(
@@ -111,7 +103,6 @@ final isOutOfStock = product.stock != null && product.stock! <= 0;
                     ),
                     const SizedBox(height: 6),
 
-                    // One-line Description
                     if (product.description.isNotEmpty)
                       Text(
                         product.description,
@@ -122,7 +113,6 @@ final isOutOfStock = product.stock != null && product.stock! <= 0;
 
                     const SizedBox(height: 8),
 
-                    // Price
                     Row(
                       children: [
                         if (isDiscounted)

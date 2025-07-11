@@ -32,12 +32,10 @@ void _submitForm() async {
         'createdAt': Timestamp.now(),
       });
 
-      // Show confirmation
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Message sent successfully!')),
       );
 
-      // Clear form fields
       _formKey.currentState!.reset();
       _nameController.clear();
       _emailController.clear();
@@ -85,7 +83,6 @@ void _submitForm() async {
                       ),
                       const SizedBox(height: 24),
 
-                      // Name Field
                       TextFormField(
                         controller: _nameController,
                         decoration: InputDecoration(
@@ -101,7 +98,6 @@ void _submitForm() async {
                       ),
                       const SizedBox(height: 16),
 
-                      // Email Field
                       TextFormField(
                         controller: _emailController,
                         decoration: InputDecoration(
@@ -137,7 +133,6 @@ void _submitForm() async {
                       ),
                       const SizedBox(height: 24),
 
-                      // Submit Button
                       ElevatedButton(
                         onPressed: _submitForm,
                         style: ElevatedButton.styleFrom(

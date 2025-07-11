@@ -12,7 +12,8 @@ class AuthScreen extends StatefulWidget {
   State<AuthScreen> createState() => _AuthScreenState();
 }
 
-class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateMixin {
+class _AuthScreenState extends State<AuthScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   bool _showForgotPassword = false;
 
@@ -32,9 +33,10 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final screenWidth = MediaQuery.of(context).size.width;
-    final cardWidth = screenWidth > 900
-        ? 500
-        : screenWidth > 600
+    final cardWidth =
+        screenWidth > 900
+            ? 500
+            : screenWidth > 600
             ? 600
             : double.infinity;
 
@@ -50,7 +52,10 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
               Center(
                 child: Container(
                   width: cardWidth.toDouble(),
-                  padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 20,
+                    horizontal: 20,
+                  ),
                   decoration: BoxDecoration(
                     color: theme.cardColor,
                     borderRadius: BorderRadius.circular(16),
@@ -59,7 +64,7 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
                         color: Colors.black12,
                         blurRadius: 8,
                         offset: Offset(0, 4),
-                      )
+                      ),
                     ],
                   ),
                   child: Column(
@@ -70,18 +75,20 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
                         indicatorColor: theme.colorScheme.secondary,
                         labelColor: theme.colorScheme.secondary,
                         unselectedLabelColor: theme.unselectedWidgetColor,
-                        labelStyle: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-                        tabs: const [
-                          Tab(text: 'Login'),
-                          Tab(text: 'Sign Up'),
-                        ],
+                        labelStyle: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                        tabs: const [Tab(text: 'Login'), Tab(text: 'Sign Up')],
                       ),
                       const SizedBox(height: 24),
 
                       ConstrainedBox(
-                        constraints: const BoxConstraints(minHeight: 400, maxHeight: 700),
+                        constraints: const BoxConstraints(
+                          minHeight: 400,
+                          maxHeight: 700,
+                        ),
                         child: SizedBox(
-                          height: 500, // fixed height ensures TabBarView doesn't overflow
+                          height: 500,
                           child: TabBarView(
                             controller: _tabController,
                             children: [

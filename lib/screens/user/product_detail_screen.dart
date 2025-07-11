@@ -1,4 +1,8 @@
+// lib/screens/user/product_detail_screen.dart
+
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:watch_hub_ep/models/product_model.dart';
 import 'package:watch_hub_ep/widgets/layout_widget/app_header.dart';
 import 'package:watch_hub_ep/widgets/layout_widget/nav_drawer.dart';
 import 'package:watch_hub_ep/widgets/layout_widget/footer_widget.dart';
@@ -10,66 +14,89 @@ import 'package:watch_hub_ep/widgets/product_detail_widget/add_to_wishlist_butto
 import 'package:watch_hub_ep/widgets/product_detail_widget/related_products_list.dart';
 import 'package:watch_hub_ep/widgets/product_detail_widget/product_faq.dart';
 import 'package:watch_hub_ep/widgets/product_detail_widget/product_reviews_section.dart';
-import '../../models/product_model.dart';
 
-class ProductDetailScreen extends StatelessWidget {
-  final ProductModel product;
+class ProductDetailScreen extends StatefulWidget {
+  final String productId;
+  const ProductDetailScreen({super.key, required this.productId});
 
-  const ProductDetailScreen({super.key, required this.product});
+  @override
+  State<ProductDetailScreen> createState() => _ProductDetailScreenState();
+}
+
+class _ProductDetailScreenState extends State<ProductDetailScreen> {
+  ProductModel? product;
+  bool isLoading = true;
+  bool hasError = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProduct();
+  }
+
+  Future<void> _loadProduct() async {
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('products')
+          .doc(widget.productId)
+          .get();
+      final model = await ProductModel.fromDoc(doc);
+      setState(() {
+        product = model;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        hasError = true;
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     return Scaffold(
-      drawer: const NavDrawer(),
       appBar: const AppHeader(),
+      drawer: const NavDrawer(),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 12),
-
-              ImageGallery(images: product.images),
-              const SizedBox(height: 24),
-
-              ProductInfo(product: product),
-              const SizedBox(height: 20),
-
-              Row(
-                children: [
-                  Expanded(child: AddToCartButton(product: product)),
-                  const SizedBox(width: 12),
-                  Expanded(child: AddToWishlistButton(product: product)),
-                ],
-              ),
-
-              const SizedBox(height: 32),
-
-              ProductSpecs(specs: product.specs),
-              const SizedBox(height: 32),
-
-              RelatedProductsList(
-                brandName: product.brandName,
-                currentProductId: product.id,
-              ),
-
-              const SizedBox(height: 32),
-
-              const ProductFAQ(),
-
-              const SizedBox(height: 32),
-
-              ProductReviewsSection(productId: product.id),
-
-              const SizedBox(height: 32),
-              const FooterWidget(),
-              const SizedBox(height: 32),
-            ],
-          ),
-        ),
+        child: isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : hasError || product == null
+                ? const Center(child: Text('Failed to load product.'))
+                : SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ImageGallery(images: product!.images),
+                        const SizedBox(height: 24),
+                        ProductInfo(product: product!),
+                        const SizedBox(height: 20),
+                        Row(
+                          children: [
+                            Expanded(child: AddToCartButton(product: product!)),
+                            const SizedBox(width: 12),
+                            AddToWishlistButton(product: product!),
+                          ],
+                        ),
+                        const SizedBox(height: 32),
+                        ProductSpecs(specs: product!.specs),
+                        const SizedBox(height: 32),
+                        RelatedProductsList(
+                          brandName: product!.brandName,
+                          currentProductId: product!.id,
+                        ),
+                        const SizedBox(height: 32),
+                        const ProductFAQ(),
+                        const SizedBox(height: 32),
+                        ProductReviewsSection(productId: product!.id),
+                        const SizedBox(height: 32),
+                        const FooterWidget(),
+                      ],
+                    ),
+                  ),
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../models/product_model.dart';
 import '../../screens/user/product_detail_screen.dart';
 import '../../theme/theme_provider.dart';
@@ -17,17 +18,12 @@ class ProductGridItem extends StatelessWidget {
         final isOutOfStock = product.stock != null && product.stock! <= 0;
 
     return GestureDetector(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => ProductDetailScreen(product: product),
-        ),
-      ),
+      onTap: () => context.push('/product/${product.id}'),
       child: Container(
         width: 220,
         constraints: const BoxConstraints(minHeight: 340),
         margin: const EdgeInsets.symmetric(vertical: 8),
-        decoration: BoxDecoration(
+      decoration: BoxDecoration(
           color: theme.cardColor,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
@@ -42,7 +38,6 @@ class ProductGridItem extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: [
-            // ---------------- IMAGE + DISCOUNT BADGE ----------------
             Container(
               height: 250,
               padding: const EdgeInsets.all(6),
@@ -63,7 +58,6 @@ class ProductGridItem extends StatelessWidget {
       ),
     ),
 
-    // Discount badge
     if (isDiscounted)
       Positioned(
         top: 8,
@@ -81,7 +75,6 @@ class ProductGridItem extends StatelessWidget {
         ),
       ),
 
-    // Out of Stock badge
     if (isOutOfStock)
       Positioned(
         top: 8,
@@ -102,7 +95,6 @@ class ProductGridItem extends StatelessWidget {
 ),
             ),
 
-            // ---------------- PRODUCT INFO ----------------
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 4, 12, 10),
               child: Column(
@@ -131,7 +123,6 @@ class ProductGridItem extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
 
-                  // ------------ PRICE ROW ------------
                   isDiscounted
                       ? RichText(
                           text: TextSpan(

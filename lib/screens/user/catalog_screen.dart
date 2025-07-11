@@ -31,7 +31,6 @@ class _CatalogScreenState extends State<CatalogScreen> {
   bool _hasMore = true;
   DocumentSnapshot? _lastDoc;
 
-  // Add to top (inside _CatalogScreenState)
   OverlayEntry? _filterOverlayEntry;
 
   void _showFilterOverlay(BuildContext context) {
@@ -247,7 +246,6 @@ class _CatalogScreenState extends State<CatalogScreen> {
         : Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Filter Button
               ElevatedButton.icon(
                 onPressed: () => _showFilterOverlay(context),
                 icon: const Icon(Icons.tune),

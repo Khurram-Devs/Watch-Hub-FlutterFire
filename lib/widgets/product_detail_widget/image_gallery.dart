@@ -77,7 +77,6 @@ class _ImageGalleryState extends State<ImageGallery> {
                   );
                 },
               ),
-              // Left Arrow
               Positioned(
                 left: 12,
                 child: IconButton(
@@ -86,7 +85,6 @@ class _ImageGalleryState extends State<ImageGallery> {
                   color: theme.colorScheme.secondary,
                 ),
               ),
-              // Right Arrow
               Positioned(
                 right: 12,
                 child: IconButton(

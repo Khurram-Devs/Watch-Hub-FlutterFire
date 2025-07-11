@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:watch_hub_ep/screens/user/catalog_screen.dart';
-import 'package:watch_hub_ep/screens/user/auth_screen.dart';
 import '../../theme/theme_provider.dart';
-import '../../screens/user/home_screen.dart';
-import '../../screens/admin/faq_screen.dart';
 
 class NavDrawer extends StatelessWidget {
   const NavDrawer({super.key});
@@ -42,40 +39,16 @@ class NavDrawer extends StatelessWidget {
             leading: const Icon(Icons.home, color: Color(0xFFC0A265)),
             title: const Text('Home'),
             onTap: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => const HomeScreen()),
-              );
+              Navigator.pop(context);
+              context.go('/home');
             },
           ),
-          // ListTile(
-          //   leading: const Icon(Icons.question_answer, color: Color(0xFFC0A265)),
-          //   title: const Text('FAQ Admin'),
-          //   onTap: () {
-          //     Navigator.pushReplacement(
-          //       context,
-          //       MaterialPageRoute(builder: (_) => const FAQScreen()),
-          //     );
-          //   },
-          // ),
           ListTile(
             leading: const Icon(Icons.store, color: Color(0xFFC0A265)),
             title: const Text('Catalog'),
             onTap: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => const CatalogScreen()),
-              );
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.store, color: Color(0xFFC0A265)),
-            title: const Text('Auth'),
-            onTap: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => const AuthScreen()),
-              );
+              Navigator.pop(context);
+              context.go('/catalog');
             },
           ),
           const Divider(),

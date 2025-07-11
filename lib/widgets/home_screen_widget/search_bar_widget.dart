@@ -1,8 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:go_router/go_router.dart';
+import 'package:watch_hub_ep/screens/user/product_detail_screen.dart';
 import '../../models/product_model.dart';
-import 'package:watch_hub_ep/screens/admin/faq_screen.dart'; // Replace with ProductDetailScreen
 
 class SearchBarWidget extends StatefulWidget {
   final TextEditingController controller;
@@ -104,12 +105,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                   onTap: () {
                     widget.controller.text = p.title;
                     _removeOverlay();
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => FAQScreen(), // Replace with: ProductDetailScreen(product: p)
-                      ),
-                    );
+                    context.push('/product/${p.id}');
                   },
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),

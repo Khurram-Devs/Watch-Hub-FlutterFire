@@ -132,7 +132,6 @@ Widget build(BuildContext context) {
 
                 const SizedBox(height: 16),
 
-                // Brands
                 Text("Brands", style: theme.textTheme.bodyMedium),
                 const SizedBox(height: 8),
                 SingleChildScrollView(
@@ -172,7 +171,6 @@ Widget build(BuildContext context) {
 
                 const SizedBox(height: 24),
 
-                // Categories
                 Text("Categories", style: theme.textTheme.bodyMedium),
                 const SizedBox(height: 8),
                 SingleChildScrollView(
@@ -241,7 +239,6 @@ Widget build(BuildContext context) {
 
                 const SizedBox(height: 24),
 
-                // Price Range
                 Text("Price Range", style: theme.textTheme.bodyMedium),
                 const SizedBox(height: 6),
                 RangeSlider(
@@ -261,7 +258,6 @@ Widget build(BuildContext context) {
 
                 const SizedBox(height: 24),
 
-                // In stock & Discounted
                 Row(
                   children: [
                     Checkbox(
@@ -284,7 +280,6 @@ Widget build(BuildContext context) {
 
                 const SizedBox(height: 24),
 
-                // Minimum Rating
                 Text("Minimum Rating", style: theme.textTheme.bodyMedium),
                 const SizedBox(height: 8),
                 Wrap(
@@ -317,7 +312,6 @@ Widget build(BuildContext context) {
 
                 const SizedBox(height: 32),
 
-                // Apply Button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(

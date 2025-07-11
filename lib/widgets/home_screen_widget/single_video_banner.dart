@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:video_player/video_player.dart';
-import 'package:watch_hub_ep/screens/admin/faq_screen.dart';
+import 'package:watch_hub_ep/screens/user/catalog_screen.dart';
 
 class SingleVideoBanner extends StatefulWidget {
   final String videoUrl;
@@ -45,7 +46,6 @@ class _SingleVideoBannerState extends State<SingleVideoBanner> {
     final theme = Theme.of(context);
     final screenWidth = MediaQuery.of(context).size.width;
 
-    // Responsive height
     final double height = screenWidth < 600
         ? screenWidth * 9 / 16
         : screenWidth < 1024
@@ -72,7 +72,6 @@ class _SingleVideoBannerState extends State<SingleVideoBanner> {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              // Video
               _isInitialized
                   ? FittedBox(
                       fit: BoxFit.cover,
@@ -84,7 +83,6 @@ class _SingleVideoBannerState extends State<SingleVideoBanner> {
                     )
                   : const Center(child: CircularProgressIndicator()),
 
-              // Gradient overlay
               Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -99,7 +97,6 @@ class _SingleVideoBannerState extends State<SingleVideoBanner> {
                 ),
               ),
 
-              // Foreground Text and Button
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
                 child: Column(
@@ -126,10 +123,7 @@ class _SingleVideoBannerState extends State<SingleVideoBanner> {
                     const SizedBox(height: 24),
                     ElevatedButton(
                       onPressed: () {
-                        Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (_) => FAQScreen()),
-                              );
+                        context.push('/catalog');
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: theme.colorScheme.secondary,

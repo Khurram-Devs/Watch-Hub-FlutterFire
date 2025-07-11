@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:watch_hub_ep/screens/admin/faq_screen.dart';
+import 'package:go_router/go_router.dart';
+import 'package:watch_hub_ep/screens/user/catalog_screen.dart';
 import 'package:watch_hub_ep/screens/user/product_detail_screen.dart';
 import '../../models/product_model.dart';
 import '../../services/product_service.dart';
@@ -59,10 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 title: 'New Arrivals',
                 action: 'See all',
                 onActionTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => FAQScreen()),
-                  );
+                  context.push('/catalog');
                 },
               ),
               const SizedBox(height: 12),
@@ -93,17 +91,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         return CollectionCard(
                           product: product,
                           onViewTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (_) => FAQScreen()),
-                            );
+                            context.push('/product/${product.id}');
                           },
                         );
                       },
                       separatorBuilder: (_, __) => const SizedBox(width: 16),
                     ),
                   );
-                  ;
                 },
               ),
 
@@ -132,10 +126,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             originalPrice: product.price,
                             discountPercentage: product.discountPercentage,
                             onViewTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (_) => ProductDetailScreen(product: product)),
-                              );
+                              context.push('/product/${product.id}');
                             },
                           );
                         }).toList(),
@@ -144,7 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
 
               const SizedBox(height: 32),
-        const SectionTitle(title: 'Our Brands'),
+              const SectionTitle(title: 'Our Brands'),
               const SizedBox(height: 12),
               const InfiniteBrandsScroller(),
 
@@ -153,12 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
               SectionTitle(
                 title: 'Featured',
                 action: 'See all',
-                onActionTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => FAQScreen()),
-                  );
-                },
+                onActionTap: () => context.push('/catalog'),
               ),
               const SizedBox(height: 12),
 
@@ -188,10 +174,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         return CollectionCard(
                           product: product,
                           onViewTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (_) => FAQScreen()),
-                            );
+                            context.push('/product/${product.id}');
                           },
                         );
                       },
