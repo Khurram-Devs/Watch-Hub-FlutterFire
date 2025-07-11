@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:watch_hub_ep/models/product_model.dart';
 import 'package:watch_hub_ep/services/profile_service.dart';
@@ -32,31 +33,30 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   bool editing = false;
 
-@override
-void initState() {
-  super.initState();
-  _tc = TabController(length: 4, vsync: this);
+  @override
+  void initState() {
+    super.initState();
+    _tc = TabController(length: 4, vsync: this);
 
-  final initialIndex = switch (widget.tab.toLowerCase()) {
-    'addressbook' => 1,
-    'wishlist' => 2,
-    'orders' => 3,
-    _ => 0,
-  };
-  _tc.index = initialIndex;
+    final initialIndex = switch (widget.tab.toLowerCase()) {
+      'addressbook' => 1,
+      'wishlist' => 2,
+      'orders' => 3,
+      _ => 0,
+    };
+    _tc.index = initialIndex;
 
-  _srv.profileStream().listen((snap) {
-    if (!snap.exists) return;
-    final user = UserModel.fromDoc(snap);
-    setState(() {
-      nameController.text = user.name;
-      emailController.text = user.email;
-      phoneController.text = user.phone;
-      avatarController.text = user.avatar;
+    _srv.profileStream().listen((snap) {
+      if (!snap.exists) return;
+      final user = UserModel.fromDoc(snap);
+      setState(() {
+        nameController.text = user.name;
+        emailController.text = user.email;
+        phoneController.text = user.phone;
+        avatarController.text = user.avatar;
+      });
     });
-  });
-}
-
+  }
 
   @override
   void dispose() {
@@ -107,6 +107,50 @@ void initState() {
     setState(() {});
   }
 
+  Future<bool> isProductInCart(String productId) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return false;
+
+    final doc =
+        await FirebaseFirestore.instance
+            .collection('usersProfile')
+            .doc(user.uid)
+            .get();
+
+    final cart = doc.data()?['cart'] as List<dynamic>?;
+
+    if (cart == null) return false;
+
+    return cart.any((ref) => ref is DocumentReference && ref.id == productId);
+  }
+
+  Future<void> addToCart(BuildContext context, String productId) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please login to add to cart.')),
+      );
+      context.push('/auth');
+      return;
+    }
+
+    final docRef = FirebaseFirestore.instance
+        .collection('usersProfile')
+        .doc(user.uid);
+
+    final productRef = FirebaseFirestore.instance
+        .collection('products')
+        .doc(productId);
+
+    await docRef.update({
+      'cart': FieldValue.arrayUnion([productRef]),
+    });
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Product added to cart!')));
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -155,33 +199,25 @@ void initState() {
                       tabs: const [
                         Tab(
                           child: Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 20,
-                            ),
+                            padding: EdgeInsets.symmetric(horizontal: 20),
                             child: Text('Profile'),
                           ),
                         ),
                         Tab(
                           child: Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 20,
-                            ),
+                            padding: EdgeInsets.symmetric(horizontal: 20),
                             child: Text('Address Book'),
                           ),
                         ),
                         Tab(
                           child: Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 20,
-                            ),
+                            padding: EdgeInsets.symmetric(horizontal: 20),
                             child: Text('Wishlist'),
                           ),
                         ),
                         Tab(
                           child: Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 20,
-                            ),
+                            padding: EdgeInsets.symmetric(horizontal: 20),
                             child: Text('Orders'),
                           ),
                         ),
@@ -410,22 +446,38 @@ void initState() {
                                   ),
                                 ),
                                 if (product.stock > 0)
-                                  ElevatedButton.icon(
-                                    icon: const Icon(Icons.shopping_cart),
-                                    label: const Text('Move to Cart'),
-                                    style: ElevatedButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                            'Move to cart not implemented yet.',
+                                  FutureBuilder<bool>(
+                                    future: isProductInCart(product.id),
+                                    builder: (context, snapshot) {
+                                      final isInCart = snapshot.data ?? false;
+
+                                      return ElevatedButton.icon(
+                                        icon: Icon(
+                                          isInCart
+                                              ? Icons.check
+                                              : Icons.shopping_cart,
+                                        ),
+                                        label: Text(
+                                          isInCart
+                                              ? 'Already in Cart'
+                                              : 'Move to Cart',
+                                        ),
+                                        onPressed:
+                                            isInCart
+                                                ? null
+                                                : () async {
+                                                  await addToCart(
+                                                    context,
+                                                    product.id,
+                                                  );
+                                                  // Optional: refresh parent state if needed
+                                                },
+                                        style: ElevatedButton.styleFrom(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 16,
                                           ),
+                                          backgroundColor:
+                                              isInCart ? Colors.grey : null,
                                         ),
                                       );
                                     },

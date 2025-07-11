@@ -51,6 +51,14 @@ class NavDrawer extends StatelessWidget {
               context.go('/catalog');
             },
           ),
+                    ListTile(
+            leading: const Icon(Icons.shopping_bag_rounded, color: Color(0xFFC0A265)),
+            title: const Text('Cart'),
+            onTap: () {
+              Navigator.pop(context);
+              context.go('/cart');
+            },
+          ),
           const Divider(),
           ListTile(
             leading: Icon(

@@ -10,7 +10,11 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
   const AppHeader({super.key});
 
   Future<Map<String, String>> _fetchUserData(String uid) async {
-    final doc = await FirebaseFirestore.instance.collection('usersProfile').doc(uid).get();
+    final doc =
+        await FirebaseFirestore.instance
+            .collection('usersProfile')
+            .doc(uid)
+            .get();
     final data = doc.data() ?? {};
     return {
       'fullName': data['fullName'] ?? '',
@@ -38,12 +42,71 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
               toolbarHeight: 60,
               titleSpacing: 0,
               leading: Builder(
-                builder: (context) => IconButton(
-                  icon: const Icon(Icons.menu, color: Color(0xFFC0A265)),
-                  onPressed: () => Scaffold.of(context).openDrawer(),
-                ),
+                builder:
+                    (context) => IconButton(
+                      icon: const Icon(Icons.menu, color: Color(0xFFC0A265)),
+                      onPressed: () => Scaffold.of(context).openDrawer(),
+                    ),
               ),
               actions: [
+                if (user != null)
+                  StreamBuilder<QuerySnapshot>(
+                    stream:
+                        FirebaseFirestore.instance
+                            .collection('usersProfile')
+                            .doc(user.uid)
+                            .collection('cart')
+                            .snapshots(),
+                    builder: (context, snapshot) {
+                      int totalQty = 0;
+                      if (snapshot.hasData) {
+                        for (var doc in snapshot.data!.docs) {
+                          final data = doc.data() as Map<String, dynamic>;
+                          totalQty += (data['quantity'] ?? 1) as int;
+                        }
+                      }
+
+                      return Stack(
+                        alignment: Alignment.topRight,
+                        children: [
+                          IconButton(
+                            icon: const Icon(
+                              Icons.shopping_cart_outlined,
+                              color: Color(0xFFC0A265),
+                            ),
+                            onPressed: () => context.push('/cart'),
+                          ),
+                          if (totalQty > 0)
+                            Positioned(
+                              right: 0,
+                              top: 0,
+                              child: Container(
+                                padding: const EdgeInsets.all(5),
+                                decoration: BoxDecoration(
+                                  color: Colors.redAccent,
+                                  shape: BoxShape.circle,
+                                ),
+                                constraints: const BoxConstraints(
+                                  minWidth: 12,
+                                  minHeight: 12,
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    '$totalQty',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      );
+                    },
+                  ),
+
                 IconButton(
                   onPressed: () => themeProvider.toggleTheme(),
                   icon: Icon(
@@ -54,134 +117,183 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
                 const SizedBox(width: 8),
                 Padding(
                   padding: const EdgeInsets.only(right: 12),
-                  child: user == null
-                      ? OutlinedButton(
-                          onPressed: () => context.push('/auth'),
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Color(0xFFC0A265)),
-                            foregroundColor: theme.colorScheme.secondary,
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          child: Text(
-                            "Login",
-                            style: theme.textTheme.titleSmall?.copyWith(
-                              color: theme.colorScheme.secondary,
-                            ),
-                          ),
-                        )
-                      : FutureBuilder<Map<String, String>>(
-                          future: _fetchUserData(user.uid),
-                          builder: (context, snapshot) {
-                            final fullName = snapshot.data?['fullName'] ?? user.displayName ?? 'User';
-                            final avatar = snapshot.data?['avatarUrl'] ?? user.photoURL ?? '';
-                            return PopupMenuButton<String>(
-                              offset: const Offset(0, 60),
-                              color: theme.cardColor,
+                  child:
+                      user == null
+                          ? OutlinedButton(
+                            onPressed: () => context.push('/auth'),
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: Color(0xFFC0A265)),
+                              foregroundColor: theme.colorScheme.secondary,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 12,
+                              ),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
+                                borderRadius: BorderRadius.circular(10),
                               ),
-                              onSelected: (value) async {
-                                if (value == 'profile') {
-                                  context.go('/profile/profile');
-                                } else if (value == 'wishlist') {
-                                  context.go('/profile/wishlist');
-                                } else if (value == 'logout') {
-                                  final shouldLogout = await showDialog<bool>(
-                                    context: context,
-                                    builder: (context) => AlertDialog(
-                                      title: const Text('Confirm Logout'),
-                                      content: const Text('Are you sure you want to log out?'),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () => Navigator.pop(context, false),
-                                          child: const Text('Cancel'),
-                                        ),
-                                        ElevatedButton(
-                                          onPressed: () => Navigator.pop(context, true),
-                                          child: const Text('Logout'),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                  if (shouldLogout == true) {
-                                    await AuthService.logout(context);
-                                  }
-                                }
-                              },
-                              itemBuilder: (context) => [
-                                PopupMenuItem(
-                                  enabled: false,
-                                  padding: const EdgeInsets.all(0),
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 12),
-                                    width: MediaQuery.of(context).size.width > 400 ? 250 : 200,
-                                    child: Column(
-                                      children: [
-                                        CircleAvatar(
-                                          radius: 28,
-                                          backgroundImage: avatar.isNotEmpty
-                                              ? NetworkImage(avatar)
-                                              : const AssetImage('assets/images/default_user.png')
-                                                  as ImageProvider,
-                                        ),
-                                        const SizedBox(height: 8),
-                                        Text(
-                                          fullName,
-                                          style: theme.textTheme.titleSmall?.copyWith(
-                                            fontWeight: FontWeight.bold,
+                            ),
+                            child: Text(
+                              "Login",
+                              style: theme.textTheme.titleSmall?.copyWith(
+                                color: theme.colorScheme.secondary,
+                              ),
+                            ),
+                          )
+                          : FutureBuilder<Map<String, String>>(
+                            future: _fetchUserData(user.uid),
+                            builder: (context, snapshot) {
+                              final fullName =
+                                  snapshot.data?['fullName'] ??
+                                  user.displayName ??
+                                  'User';
+                              final avatar =
+                                  snapshot.data?['avatarUrl'] ??
+                                  user.photoURL ??
+                                  '';
+                              return PopupMenuButton<String>(
+                                offset: const Offset(0, 60),
+                                color: theme.cardColor,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                onSelected: (value) async {
+                                  if (value == 'profile') {
+                                    context.go('/profile/profile');
+                                  } else if (value == 'wishlist') {
+                                    context.go('/profile/wishlist');
+                                  } else if (value == 'logout') {
+                                    final shouldLogout = await showDialog<bool>(
+                                      context: context,
+                                      builder:
+                                          (context) => AlertDialog(
+                                            title: const Text('Confirm Logout'),
+                                            content: const Text(
+                                              'Are you sure you want to log out?',
+                                            ),
+                                            actions: [
+                                              TextButton(
+                                                onPressed:
+                                                    () => Navigator.pop(
+                                                      context,
+                                                      false,
+                                                    ),
+                                                child: const Text('Cancel'),
+                                              ),
+                                              ElevatedButton(
+                                                onPressed:
+                                                    () => Navigator.pop(
+                                                      context,
+                                                      true,
+                                                    ),
+                                                child: const Text('Logout'),
+                                              ),
+                                            ],
                                           ),
-                                          textAlign: TextAlign.center,
+                                    );
+                                    if (shouldLogout == true) {
+                                      await AuthService.logout(context);
+                                    }
+                                  }
+                                },
+                                itemBuilder:
+                                    (context) => [
+                                      PopupMenuItem(
+                                        enabled: false,
+                                        padding: const EdgeInsets.all(0),
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 12,
+                                          ),
+                                          width:
+                                              MediaQuery.of(
+                                                        context,
+                                                      ).size.width >
+                                                      400
+                                                  ? 250
+                                                  : 200,
+                                          child: Column(
+                                            children: [
+                                              CircleAvatar(
+                                                radius: 28,
+                                                backgroundImage:
+                                                    avatar.isNotEmpty
+                                                        ? NetworkImage(avatar)
+                                                        : const AssetImage(
+                                                              'assets/images/default_user.png',
+                                                            )
+                                                            as ImageProvider,
+                                              ),
+                                              const SizedBox(height: 8),
+                                              Text(
+                                                fullName,
+                                                style: theme
+                                                    .textTheme
+                                                    .titleSmall
+                                                    ?.copyWith(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                              const SizedBox(height: 8),
+                                              const Divider(thickness: 1),
+                                            ],
+                                          ),
                                         ),
-                                        const SizedBox(height: 8),
-                                        const Divider(thickness: 1),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                PopupMenuItem(
-                                  value: 'profile',
-                                  child: Row(
-                                    children: [
-                                      const Icon(Icons.person_outline),
-                                      const SizedBox(width: 10),
-                                      Text('Profile', style: theme.textTheme.bodyMedium),
+                                      ),
+                                      PopupMenuItem(
+                                        value: 'profile',
+                                        child: Row(
+                                          children: [
+                                            const Icon(Icons.person_outline),
+                                            const SizedBox(width: 10),
+                                            Text(
+                                              'Profile',
+                                              style: theme.textTheme.bodyMedium,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      PopupMenuItem(
+                                        value: 'wishlist',
+                                        child: Row(
+                                          children: [
+                                            const Icon(Icons.favorite_border),
+                                            const SizedBox(width: 10),
+                                            Text(
+                                              'Wishlist',
+                                              style: theme.textTheme.bodyMedium,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      PopupMenuItem(
+                                        value: 'logout',
+                                        child: Row(
+                                          children: [
+                                            const Icon(Icons.logout),
+                                            const SizedBox(width: 10),
+                                            Text(
+                                              'Logout',
+                                              style: theme.textTheme.bodyMedium,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ],
-                                  ),
+                                child: CircleAvatar(
+                                  radius: 20,
+                                  backgroundImage:
+                                      avatar.isNotEmpty
+                                          ? NetworkImage(avatar)
+                                          : const AssetImage(
+                                                'assets/images/default_user.png',
+                                              )
+                                              as ImageProvider,
                                 ),
-                                PopupMenuItem(
-                                  value: 'wishlist',
-                                  child: Row(
-                                    children: [
-                                      const Icon(Icons.favorite_border),
-                                      const SizedBox(width: 10),
-                                      Text('Wishlist', style: theme.textTheme.bodyMedium),
-                                    ],
-                                  ),
-                                ),
-                                PopupMenuItem(
-                                  value: 'logout',
-                                  child: Row(
-                                    children: [
-                                      const Icon(Icons.logout),
-                                      const SizedBox(width: 10),
-                                      Text('Logout', style: theme.textTheme.bodyMedium),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                              child: CircleAvatar(
-                                radius: 20,
-                                backgroundImage: avatar.isNotEmpty
-                                    ? NetworkImage(avatar)
-                                    : const AssetImage('assets/images/default_user.png')
-                                        as ImageProvider,
-                              ),
-                            );
-                          },
-                        ),
+                              );
+                            },
+                          ),
                 ),
               ],
               title: const SizedBox(),
