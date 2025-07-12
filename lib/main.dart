@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:watch_hub_ep/screens/user/cart_screen.dart';
 import 'package:watch_hub_ep/screens/user/checkout_screen.dart';
+import 'package:watch_hub_ep/screens/user/order_success_screen.dart';
 import 'package:watch_hub_ep/screens/user/product_detail_screen.dart';
 import 'package:watch_hub_ep/screens/user/profile_screen.dart';
 import 'firebase_options.dart';
@@ -88,6 +89,14 @@ class MyApp extends StatelessWidget {
           builder: (context, state) {
             final tab = state.pathParameters['tab']!;
             return ProfileScreen(tab: tab);
+          },
+        ),
+        GoRoute(
+          path: '/order-success/:orderId',
+          name: 'order-success',
+          builder: (context, state) {
+            final orderId = state.pathParameters['orderId']!;
+            return OrderSuccessScreen(orderId: orderId);
           },
         ),
       ],

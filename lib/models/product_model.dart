@@ -34,8 +34,9 @@ class ProductModel {
 
   static Future<ProductModel> fromFirestoreWithBrand(
     Map<String, dynamic> data,
-    String id,
-  ) async {
+    String id, {
+    DocumentSnapshot? snapshot, // Add optional param
+  }) async {
     final brandRef = data['brand'] as DocumentReference;
     final brandSnap = await brandRef.get();
     final brandData = brandSnap.data() as Map<String, dynamic>;
@@ -54,6 +55,7 @@ class ProductModel {
       stock: data['inventoryCount'] ?? 0,
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       brandName: brandName,
+      firestoreSnapshot: snapshot, // ✅ Set the snapshot here
     );
   }
 

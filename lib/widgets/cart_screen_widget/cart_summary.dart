@@ -117,11 +117,12 @@ class CartSummary extends StatelessWidget {
         final product = await ProductModel.fromFirestoreWithBrand(
           productData,
           productSnap.id,
+          snapshot: productSnap,
         );
+
         result.add({'product': product, 'quantity': quantity});
       }
     }
-
     return result;
   }
 

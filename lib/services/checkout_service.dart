@@ -5,27 +5,27 @@ class CheckoutService {
   static final _auth = FirebaseAuth.instance;
   static final _firestore = FirebaseFirestore.instance;
 
-  /// 🔹 Fetch user's saved addresses
   static Future<List<Map<String, dynamic>>> getSavedAddresses() async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) return [];
 
-    final snapshot = await _firestore
-        .collection('usersProfile')
-        .doc(uid)
-        .collection('addresses')
-        .get();
+    final snapshot =
+        await _firestore
+            .collection('usersProfile')
+            .doc(uid)
+            .collection('addresses')
+            .get();
 
     return snapshot.docs.map((e) => e.data()).toList();
   }
 
-  /// 🔹 Validate promo code from Firestore
   static Future<Map<String, dynamic>?> validatePromoCode(String code) async {
-    final promoSnapshot = await _firestore
-        .collection('promoCodes')
-        .where('code', isEqualTo: code.trim())
-        .limit(1)
-        .get();
+    final promoSnapshot =
+        await _firestore
+            .collection('promoCodes')
+            .where('code', isEqualTo: code.trim())
+            .limit(1)
+            .get();
 
     if (promoSnapshot.docs.isEmpty) return null;
 
@@ -35,69 +35,88 @@ class CheckoutService {
 
     if (used >= limit) return null;
 
-    return {
-      'id': promoSnapshot.docs.first.id,
-      ...data,
-    };
+    return {'id': promoSnapshot.docs.first.id, ...data};
   }
 
-  /// 🔹 Place order in Firestore
-  static Future<void> placeOrder({
-    required List<Map<String, dynamic>> cartItems,
-    required double subtotal,
-    required double tax,
-    required double shipping,
-    required double discount,
-    required double total,
-    String promoCode = '',
-    String promoTitle = '',
-  }) async {
-    final uid = _auth.currentUser?.uid;
-    if (uid == null) throw Exception("User not logged in");
+static Future<String> placeOrder({
+  required List<Map<String, dynamic>> cartItems,
+  required double subtotal,
+  required double tax,
+  required double shipping,
+  required double discount,
+  required double total,
+  String promoCode = '',
+  String promoTitle = '',
+}) async {
+  final uid = _auth.currentUser?.uid;
+  if (uid == null) throw Exception("User not logged in");
 
-    final orderData = {
-      'items': cartItems,
-      'subtotal': subtotal,
-      'tax': tax,
-      'shipping': shipping,
-      'discount': discount,
-      'total': total,
-      'promoCode': promoCode,
-      'promoTitle': promoTitle,
-      'status': 'pending',
-      'createdAt': Timestamp.now(),
-    };
+  final orderRef = _firestore
+      .collection('usersProfile')
+      .doc(uid)
+      .collection('orders')
+      .doc();
 
-    final orderRef = _firestore
-        .collection('usersProfile')
-        .doc(uid)
-        .collection('orders')
-        .doc();
+  final List<Map<String, dynamic>> firestoreItems = [];
+  final List<Future<void>> inventoryUpdates = [];
 
-    await orderRef.set(orderData);
-  }
+  for (final item in cartItems) {
+    final product = item['product'];
+    final quantity = item['quantity'] ?? 1;
+    final productRef = product.firestoreSnapshot?.reference;
 
-  /// 🔹 Increment usedTimes of promo code
-  static Future<void> incrementPromoUsage(String promoId) async {
-    final promoRef = _firestore.collection('promoCode').doc(promoId);
-    await promoRef.update({
-      'usedTimes': FieldValue.increment(1),
-    });
-  }
+    if (productRef != null) {
+      firestoreItems.add({
+        'productRef': productRef,
+        'quantity': quantity,
+      });
 
-  /// 🔹 Optional: Clear user cart
-  static Future<void> clearCart() async {
-    final uid = _auth.currentUser?.uid;
-    if (uid == null) return;
-
-    final cartRef = _firestore
-        .collection('usersProfile')
-        .doc(uid)
-        .collection('cart');
-
-    final cartSnapshot = await cartRef.get();
-    for (final doc in cartSnapshot.docs) {
-      await doc.reference.delete();
+      inventoryUpdates.add(productRef.update({
+        'inventoryCount': FieldValue.increment(-quantity),
+      }));
     }
   }
+
+  final orderData = {
+    'items': firestoreItems,
+    'subtotal': subtotal,
+    'tax': tax,
+    'shipping': shipping,
+    'discount': discount,
+    'total': total,
+    'promoCode': promoCode,
+    'promoTitle': promoTitle,
+    'status': 'pending',
+    'createdAt': Timestamp.now(),
+  };
+
+  await orderRef.set(orderData);
+  await Future.wait(inventoryUpdates);
+  await clearCart();
+
+  return orderRef.id;
+}
+
+
+
+
+  static Future<void> incrementPromoUsage(String promoId) async {
+    final promoRef = _firestore.collection('promoCodes').doc(promoId);
+    await promoRef.update({'usedTimes': FieldValue.increment(1)});
+  }
+
+static Future<void> clearCart() async {
+  final uid = _auth.currentUser?.uid;
+  if (uid == null) return;
+
+  final cartRef = _firestore
+      .collection('usersProfile')
+      .doc(uid)
+      .collection('cart');
+
+  final cartSnapshot = await cartRef.get();
+  for (final doc in cartSnapshot.docs) {
+    await doc.reference.delete();
+  }
+}
 }

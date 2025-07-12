@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:watch_hub_ep/services/checkout_service.dart';
 
@@ -28,24 +29,31 @@ class _PromoAndSummarySectionState extends State<PromoAndSummarySection> {
   bool isPlacing = false;
   String message = '';
 
-  double get discount => promo == null
-      ? 0.0
-      : widget.subtotal * (promo!['discountPercent'] / 100);
+  double get discount =>
+      promo == null ? 0.0 : widget.subtotal * (promo!['discountPercent'] / 100);
   double get finalTotal => widget.total - discount;
 
   Future<void> applyPromo() async {
-    final result = await CheckoutService.validatePromoCode(_promoCtrl.text.trim());
+    final result = await CheckoutService.validatePromoCode(
+      _promoCtrl.text.trim(),
+    );
     setState(() {
       promo = result;
-      message = promo != null
-          ? 'Promo "${promo!['title']}" applied!'
-          : 'Invalid or expired promo code';
+      message =
+          promo != null
+              ? 'Promo "${promo!['title']}" applied!'
+              : 'Invalid or expired promo code';
     });
   }
 
   Future<void> placeOrder() async {
-    setState(() => isPlacing = true);
-    await CheckoutService.placeOrder(
+  setState(() {
+    isPlacing = true;
+    message = '';
+  });
+
+  try {
+    final orderId = await CheckoutService.placeOrder(
       cartItems: widget.cartItems,
       subtotal: widget.subtotal,
       tax: widget.tax,
@@ -55,14 +63,22 @@ class _PromoAndSummarySectionState extends State<PromoAndSummarySection> {
       promoCode: promo?['code'] ?? '',
       promoTitle: promo?['title'] ?? '',
     );
+
     if (promo != null) {
       await CheckoutService.incrementPromoUsage(promo!['id']);
     }
+
+    // Navigate to order success screen with orderId
+    if (mounted) context.go('/order-success/$orderId');
+  } catch (e) {
     setState(() {
-      isPlacing = false;
-      message = 'Order placed successfully!';
+      message = 'Failed to place order: $e';
     });
+  } finally {
+    if (mounted) setState(() => isPlacing = false);
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +90,12 @@ class _PromoAndSummarySectionState extends State<PromoAndSummarySection> {
         const SizedBox(height: 8),
         Row(
           children: [
-            Expanded(child: TextField(controller: _promoCtrl, decoration: const InputDecoration(hintText: 'Enter code'))),
+            Expanded(
+              child: TextField(
+                controller: _promoCtrl,
+                decoration: const InputDecoration(hintText: 'Enter code'),
+              ),
+            ),
             const SizedBox(width: 8),
             ElevatedButton(onPressed: applyPromo, child: const Text('Apply')),
           ],
@@ -82,39 +103,56 @@ class _PromoAndSummarySectionState extends State<PromoAndSummarySection> {
         if (message.isNotEmpty)
           Padding(
             padding: const EdgeInsets.only(top: 8),
-            child: Text(message, style: TextStyle(color: message.contains('success') ? Colors.green : Colors.red)),
+            child: Text(
+              message,
+              style: TextStyle(
+                color: message.contains('success') ? Colors.green : Colors.red,
+              ),
+            ),
           ),
         const Divider(height: 32),
         _row('Subtotal', fmt.format(widget.subtotal)),
         _row('Tax (15%)', fmt.format(widget.tax)),
         _row('Shipping', fmt.format(widget.shipping)),
         if (promo != null)
-          _row('Promo : ${promo!['title']}  -${promo!['discountPercent']}%', '-${fmt.format(discount)}'),
+          _row(
+            'Promo : ${promo!['title']}  -${promo!['discountPercent']}%',
+            '-${fmt.format(discount)}',
+          ),
         const Divider(),
         _row('Total', fmt.format(finalTotal), bold: true),
         const SizedBox(height: 16),
         ElevatedButton.icon(
           onPressed: isPlacing ? null : placeOrder,
           icon: const Icon(Icons.check_circle),
-          label: isPlacing
-              ? const CircularProgressIndicator()
-              : const Text('Place Order'),
-          style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 48)),
+          label:
+              isPlacing
+                  ? const CircularProgressIndicator()
+                  : const Text('Place Order'),
+          style: ElevatedButton.styleFrom(
+            minimumSize: const Size(double.infinity, 48),
+          ),
         ),
       ],
     );
   }
 
   Widget _row(String label, String value, {bool bold = false}) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(label, style: bold ? const TextStyle(fontWeight: FontWeight.bold) : null),
-            Text(value, style: bold ? const TextStyle(fontWeight: FontWeight.bold) : null),
-          ],
+    padding: const EdgeInsets.symmetric(vertical: 4),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: bold ? const TextStyle(fontWeight: FontWeight.bold) : null,
         ),
-      );
+        Text(
+          value,
+          style: bold ? const TextStyle(fontWeight: FontWeight.bold) : null,
+        ),
+      ],
+    ),
+  );
 
   @override
   void dispose() {

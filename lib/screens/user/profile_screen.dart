@@ -499,6 +499,8 @@ class _ProfileScreenState extends State<ProfileScreen>
   }
 
   Widget _buildOrders(BuildContext context) {
+    final theme = Theme.of(context);
+
     return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
       stream: _srv.ordersStream(),
       builder: (ctx, snap) {
@@ -516,13 +518,13 @@ class _ProfileScreenState extends State<ProfileScreen>
           itemCount: docs.length,
           separatorBuilder: (_, __) => const SizedBox(height: 16),
           itemBuilder: (context, i) {
-            final d = docs[i].data();
-            final status = d['status'] as String? ?? 'Unknown';
-            final created = (d['createdAt'] as Timestamp).toDate();
+            final data = docs[i].data();
+            final status = data['status'] as String? ?? 'Unknown';
+            final createdAt = (data['createdAt'] as Timestamp).toDate();
             final items =
-                (d['items'] as List<dynamic>? ?? [])
+                (data['items'] as List<dynamic>? ?? [])
                     .cast<Map<String, dynamic>>();
-            final total = (d['total'] as num?)?.toDouble() ?? 0.0;
+            final total = (data['total'] as num?)?.toDouble() ?? 0.0;
 
             return Card(
               elevation: 3,
@@ -531,113 +533,173 @@ class _ProfileScreenState extends State<ProfileScreen>
               ),
               child: Padding(
                 padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final isMobile = constraints.maxWidth < 500;
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Order #${docs[i].id}',
-                          style: Theme.of(context).textTheme.labelMedium,
-                        ),
-                        Text(
-                          status,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color:
-                                status == 'Cancelled'
-                                    ? Colors.red
-                                    : status == 'Shipped'
-                                    ? Colors.green
-                                    : Colors.orange,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      DateFormat.yMMMd().add_jm().format(created),
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-
-                    const Divider(height: 20),
-
-                    ...items.map((it) {
-                      return FutureBuilder<DocumentSnapshot>(
-                        future: it['product'].get(),
-                        builder: (ctx, pSnap) {
-                          if (!pSnap.hasData) return Text('Loading item…');
-                          final pd = pSnap.data!;
-                          final title =
-                              (pd.data() as Map<String, dynamic>)['title'] ??
-                              '';
-                          final qty = it['quantity'] ?? 1;
-                          return Text('• $title ×$qty');
-                        },
-                      );
-                    }).toList(),
-
-                    const SizedBox(height: 8),
-                    Text(
-                      'Total: \$${total.toStringAsFixed(2)}',
-                      style: Theme.of(context).textTheme.labelMedium,
-                    ),
-
-                    const SizedBox(height: 12),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        if (status == 'Pending')
-                          ElevatedButton(
-                            onPressed: () async {
-                              final confirm = await showDialog<bool>(
-                                context: context,
-                                builder:
-                                    (_) => AlertDialog(
-                                      title: const Text('Cancel Order'),
-                                      content: const Text(
-                                        'Do you really want to cancel this order?',
-                                      ),
-                                      actions: [
-                                        TextButton(
-                                          onPressed:
-                                              () =>
-                                                  Navigator.pop(context, false),
-                                          child: const Text('No'),
-                                        ),
-                                        ElevatedButton(
-                                          onPressed:
-                                              () =>
-                                                  Navigator.pop(context, true),
-                                          child: const Text('Yes'),
-                                        ),
-                                      ],
-                                    ),
-                              );
-                              if (confirm == true) {
-                                await _srv.cancelOrder(docs[i].id);
-                              }
-                            },
-                            child: const Text('Cancel Order'),
-                          ),
-
-                        if (status == 'Shipped')
-                          OutlinedButton(
-                            onPressed: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'Track order not implemented yet.',
+                        // Order ID & Status Row
+                        isMobile
+                            ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Order #${docs[i].id}',
+                                  style: theme.textTheme.labelLarge,
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  status,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color:
+                                        status == 'Cancelled'
+                                            ? Colors.red
+                                            : status == 'Shipped'
+                                            ? Colors.green
+                                            : Colors.orange,
                                   ),
                                 ),
+                              ],
+                            )
+                            : Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    'Order #${docs[i].id}',
+                                    style: theme.textTheme.labelLarge,
+                                  ),
+                                ),
+                                Text(
+                                  status,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color:
+                                        status == 'Cancelled'
+                                            ? Colors.red
+                                            : status == 'Shipped'
+                                            ? Colors.green
+                                            : Colors.orange,
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                        const SizedBox(height: 6),
+                        Text(
+                          DateFormat.yMMMd().add_jm().format(createdAt),
+                          style: theme.textTheme.bodySmall,
+                        ),
+                        const Divider(height: 20),
+
+                        // Order Items
+                        ...items.map((item) {
+                          final DocumentReference ref = item['productRef'];
+                          final quantity = item['quantity'] ?? 1;
+
+                          return FutureBuilder<DocumentSnapshot>(
+                            future: ref.get(),
+                            builder: (context, snap) {
+                              if (!snap.hasData) {
+                                return const Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 4),
+                                  child: Text('• Loading product...'),
+                                );
+                              }
+
+                              final productData =
+                                  snap.data!.data() as Map<String, dynamic>?;
+                              final title = productData?['title'] ?? 'Unknown';
+
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 2,
+                                ),
+                                child: Text('• $title × $quantity'),
                               );
                             },
-                            child: const Text('Track Order'),
-                          ),
+                          );
+                        }).toList(),
+
+                        const SizedBox(height: 10),
+                        Text(
+                          'Total: \$${total.toStringAsFixed(2)}',
+                          style: theme.textTheme.labelLarge,
+                        ),
+                        const SizedBox(height: 12),
+
+                        // Buttons
+                        Wrap(
+                          alignment: WrapAlignment.end,
+                          spacing: 12,
+                          runSpacing: 8,
+                          children: [
+                            if (status == 'Pending')
+                              ElevatedButton.icon(
+                                onPressed: () async {
+                                  final confirm = await showDialog<bool>(
+                                    context: context,
+                                    builder:
+                                        (_) => AlertDialog(
+                                          title: const Text('Cancel Order'),
+                                          content: const Text(
+                                            'Do you really want to cancel this order?',
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed:
+                                                  () => Navigator.pop(
+                                                    context,
+                                                    false,
+                                                  ),
+                                              child: const Text('No'),
+                                            ),
+                                            ElevatedButton(
+                                              onPressed:
+                                                  () => Navigator.pop(
+                                                    context,
+                                                    true,
+                                                  ),
+                                              child: const Text('Yes'),
+                                            ),
+                                          ],
+                                        ),
+                                  );
+
+                                  if (confirm == true) {
+                                    await _srv.cancelOrder(docs[i].id);
+                                  }
+                                },
+                                icon: const Icon(Icons.cancel),
+                                label: const Text('Cancel Order'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.redAccent,
+                                ),
+                              ),
+
+                            if (status == 'Shipped')
+                              OutlinedButton.icon(
+                                onPressed: () {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'Tracking not implemented yet.',
+                                      ),
+                                    ),
+                                  );
+                                },
+                                icon: const Icon(Icons.local_shipping),
+                                label: const Text('Track Order'),
+                              ),
+                          ],
+                        ),
                       ],
-                    ),
-                  ],
+                    );
+                  },
                 ),
               ),
             );
