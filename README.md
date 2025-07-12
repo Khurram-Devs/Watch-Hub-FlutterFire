@@ -1,6 +1,7 @@
+
 # ⌚️ WatchHub – Premium Watch Shopping App
 
-**WatchHub** is a modern, luxurious shopping app built using **Flutter** and **Firebase**, offering a responsive and elegant interface for browsing and purchasing premium watches from top global brands. Designed with scalability and customization in mind, it includes real-time Firestore data, a rich product catalog, user authentication, and a complete profile system.
+**WatchHub** is a modern, luxurious shopping app built using **Flutter** and **Firebase**, offering a responsive and elegant interface for browsing and purchasing premium watches from top global brands. Designed with scalability and customization in mind, it includes real-time Firestore data, a rich product catalog, user authentication, cart/wishlist logic, invoice generation, and a complete profile/order system.
 
 ---
 
@@ -13,53 +14,86 @@
 - Google Sign-In
 - Forgot password with email recovery
 - Auth-aware header with dynamic login/profile dropdown
+- Firestore user document creation on sign up (`usersProfile/{uid}`)
 
 #### 🏠 Home & Layout
-- Responsive design (Web + Mobile)
+- Fully responsive (Web, Tablet, Mobile)
 - `AppHeader`, `NavDrawer`, `FooterWidget` used across all screens
-- Carousel banners and promotional sections
+- Carousel banners, promotional sections
+- Infinite brand logos scroller (auto-looping)
+- Search bar with real-time suggestions
 
 #### 🛍️ Product Catalog
-- Data from Firestore `products` & `categories`
-- Grid/List toggle views
+- Firestore-based dynamic catalog (`products` & `categories`)
+- Grid/List view toggles
 - Sort by: Price, Rating, Newest
-- Filter by Brand, Type, Price Range
+- Filter by Brand, Type, and Price Range
 - Pagination / infinite scroll
 
 #### 📄 Product Detail Page
-- Route-based navigation (`/product/:id`) with dynamic fetch
-- Product images gallery
-- Specifications, pricing (with discount badge), and stock level
-- Related products
-- Customer FAQs and reviews
-- Add to Cart / Wishlist buttons (stock-aware)
+- Route-based navigation (`/product/:id`) with dynamic Firestore fetch
+- Multi-image gallery
+- Pricing with discount badge and strikethrough original price
+- Specifications, average rating, FAQs, and reviews
+- Related products section
+- Add to Cart & Wishlist buttons with stock awareness
 
 #### 🛒 Cart
-- Firestore-based cart per user: `usersProfile/{uid}/cart/{productId}`
-- Real-time quantity updates
-- Quantity selector respects product stock
-- Out-of-stock items are removed automatically
-- Cart summary with subtotal, tax (15%), flat shipping ($25)
-- 'Proceed to Checkout' button (placeholder)
+- Firestore-backed cart per user: `usersProfile/{uid}/cart/{productId}`
+- Quantity selector with real-time Firestore sync
+- Out-of-stock items automatically removed
+- Cart summary panel with:
+  - Subtotal
+  - Tax (15%)
+  - Flat shipping ($25)
+- 'Proceed to Checkout' button
 
 #### ❤️ Wishlist
-- Stored in `usersProfile/{uid}/wishlist`
+- Firestore-based wishlist (`usersProfile/{uid}/wishlist`)
+- Favorite icon toggle in product listings
 - Uses `ProductListItem` layout for display
-- Add/remove logic with dynamic favorite icons
-- Wishlist accessible via profile tab
+- Wishlist tab accessible in Profile page
 
-#### 👤 Profile Page
-- Tab-based layout: `Profile`, `Address Book`, `Wishlist`, `Order History`
-- Real-time user info with avatar, name, email, phone
-- Address book: Add/remove addresses (`usersProfile/{uid}/addresses`)
-- Wishlist: Move to cart placeholder
-- Orders: Search, cancel, download invoice (PDF placeholder)
+#### 💳 Checkout
+- Uses Firestore cart subcollection data
+- Address form + saved address selector from Firestore
+- Payment method selector: Cash on Delivery (Stripe placeholder)
+- Promo code validation from `promoCode` collection
+  - Checks for `usedTimes <= limit`
+  - Discount applied in real-time
+  - `usedTimes` incremented after order
+- Itemized order summary: cart items, promo, subtotal, tax, shipping, total
+- Order saved under `usersProfile/{uid}/orders/{orderId}`
+
+#### ✅ Order Success Screen
+- Displays order ID, summary, total, delivery & payment info
+- Linked from Checkout via route `/order-success/:orderId`
+- Branded, responsive UI
+
+#### 👤 Profile Page (Modular Tabs)
+- **Profile**:
+  - Editable fields: name, phone, avatar URL (real-time updates)
+- **Address Book**:
+  - Add/Remove addresses (`usersProfile/{uid}/addresses`)
+- **Wishlist**:
+  - View wishlist items, remove/move-to-cart (placeholder)
+- **Orders**:
+  - Shows all user orders with real-time Firestore sync
+  - Includes product titles, amounts, and status
+  - Cancelable if pending
+  - PDF invoice download
+
+#### 🧾 PDF Invoice
+- Includes buyer info, product details, pricing, shipping, total
+- Syncfusion PDF generator
+- Saved to Downloads folder (Web/Desktop support)
 
 #### 🎨 Theming & Design
-- Custom design system using `PlayfairDisplay` & `Lato`
-- Luxury-themed color palette (emerald, golden, dark)
-- `ThemeProvider` for light/dark mode toggle
-- Layout uses modular widgets and responsive constraints
+- WatchHub theme using:
+  - Fonts: `PlayfairDisplay`, `Lato`
+  - Palette: Emerald, Golden, Onyx
+- Theme switcher via `ThemeProvider`
+- Reusable widgets for layout & product display
 
 ---
 
@@ -70,11 +104,11 @@
 | Flutter                | Cross-platform UI toolkit                         |
 | Firebase Auth          | Email/Password + Google Sign-In                   |
 | Cloud Firestore        | Products, Users, Cart, Wishlist, Orders, etc.     |
-| GoRouter               | Declarative routing with dynamic paths            |
-| Provider               | Lightweight state management                      |
-| Google Fonts           | Elegant typography (PlayfairDisplay, Lato)        |
-| Flutter Native Splash  | Custom splash screen                              |
-| Syncfusion PDF         | (Planned) For downloading invoices                |
+| GoRouter               | Declarative navigation with nested/tab routes     |
+| Provider               | State management (lightweight)                    |
+| Syncfusion PDF         | Invoice generation with customization             |
+| Google Fonts           | Typography via `PlayfairDisplay`, `Lato`          |
+| Flutter Native Splash  | Branded splash screen                             |
 
 ---
 
@@ -82,18 +116,20 @@
 
 ```
 products/
-  {productId} → title, price, stock, images, discountPercentage, specs, brandId
+{productId} → title, price, stock, images, discountPercentage, specs, brandName
+
+categories/
+{categoryId} → name, type, iconUrl
+
+promoCode/
+{code} → discountPercentage, usedTimes, limit
 
 usersProfile/
   {uid}/
-    wishlist/
-      {productId} → productRef
-    cart/
-      {productId} → productRef, quantity, addedAt
-    addresses/
-      {addressId} → name, address, city, zip, etc.
-    orders/
-      {orderId} → total, status, paymentMethod, items, etc.
+    wishlist/ → List<DocumentReference>
+    cart/{productId} → productRef, quantity, addedAt
+    addresses/{addressId} → name, street, city, zip, country, phone
+    orders/{orderId} → items[], total, status, createdAt, paymentMethod, shippingInfo
 ```
 
 ---
@@ -120,24 +156,26 @@ flutter run
 
 1. Go to [Firebase Console](https://console.firebase.google.com/)
 2. Enable:
-   - Authentication → Email/Password
-   - Authentication → Google
-   - Firestore Database
+
+   * Authentication → Email/Password
+   * Authentication → Google
+   * Firestore Database
 3. Download Firebase config:
-   - Android: `google-services.json` → `android/app/`
-   - iOS: `GoogleService-Info.plist` → `ios/Runner/`
+
+   * Android: `google-services.json` → `android/app/`
+   * iOS: `GoogleService-Info.plist` → `ios/Runner/`
 4. (Optional) Set Firestore rules to allow authenticated access.
 
 ---
 
 ## 📦 Coming Soon
 
-- 🧾 Checkout & Payment integration
-- 📱 Order confirmation page
-- 🧑‍💼 Admin dashboard (orders, product upload)
-- 🌐 Image hosting via **imgbb** (replacing Firebase Storage)
-- 📲 APK Release (will be uploaded to GitHub)
-- 🖼️ Product image zoom/lightbox (web)
+* 🧾 Stripe payment (test/live mode)
+* 🧑‍💼 Admin dashboard (orders, product upload, coupons)
+* 📲 APK release on GitHub
+* 🌐 CDN-hosted images via imgbb or Cloudflare Images
+* 🖼️ Zoomable product image lightbox (web/mobile)
+* 🔔 Notification system for order updates (FCM)
 
 ---
 
@@ -150,3 +188,7 @@ This project is **currently unlicensed**. You may view or contribute, but commer
 ## 🌟 Show Your Support
 
 If you find WatchHub helpful or inspiring, give the repo a ⭐ on GitHub and share your feedback. Contributions, suggestions, or improvements are always welcome!
+
+---
+
+> **Note:** This README file was generated with the help of AI and may not be fully accurate. Please review and update as needed.
