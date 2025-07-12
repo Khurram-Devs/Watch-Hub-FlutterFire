@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:watch_hub_ep/screens/user/catalog_screen.dart';
-import 'package:watch_hub_ep/screens/user/product_detail_screen.dart';
 import '../../models/product_model.dart';
 import '../../services/product_service.dart';
 import '../../services/testimonial_service.dart';

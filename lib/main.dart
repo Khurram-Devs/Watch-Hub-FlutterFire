@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:watch_hub_ep/screens/user/cart_screen.dart';
+import 'package:watch_hub_ep/screens/user/checkout_screen.dart';
 import 'package:watch_hub_ep/screens/user/product_detail_screen.dart';
 import 'package:watch_hub_ep/screens/user/profile_screen.dart';
 import 'firebase_options.dart';
@@ -38,7 +39,7 @@ class MyApp extends StatelessWidget {
 
         if (!loggedIn &&
             (state.matchedLocation == '/cart' ||
-             state.matchedLocation.startsWith('/profile'))) {
+                state.matchedLocation.startsWith('/profile'))) {
           return '/auth';
         }
 
@@ -48,9 +49,29 @@ class MyApp extends StatelessWidget {
       },
       routes: [
         GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
-        GoRoute(path: '/catalog', builder: (context, state) => const CatalogScreen()),
-        GoRoute(path: '/auth', builder: (context, state) => const RedirectAuthScreen()),
+        GoRoute(
+          path: '/catalog',
+          builder: (context, state) => const CatalogScreen(),
+        ),
+        GoRoute(
+          path: '/auth',
+          builder: (context, state) => const RedirectAuthScreen(),
+        ),
         GoRoute(path: '/cart', builder: (context, state) => const CartScreen()),
+        GoRoute(
+          path: '/checkout',
+          name: 'checkout',
+          builder: (context, state) {
+            final cartData = state.extra as Map<String, dynamic>;
+            return CheckoutScreen(
+              cartItems: cartData['items'],
+              subtotal: cartData['subtotal'],
+              tax: cartData['tax'],
+              shipping: cartData['shipping'],
+              total: cartData['total'],
+            );
+          },
+        ),
         GoRoute(
           path: '/product/:id',
           builder: (context, state) {

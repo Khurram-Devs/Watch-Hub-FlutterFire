@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:watch_hub_ep/models/product_model.dart';
 
 class CartSummary extends StatelessWidget {
@@ -15,11 +16,12 @@ class CartSummary extends StatelessWidget {
     }
 
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection('usersProfile')
-          .doc(uid)
-          .collection('cart')
-          .snapshots(),
+      stream:
+          FirebaseFirestore.instance
+              .collection('usersProfile')
+              .doc(uid)
+              .collection('cart')
+              .snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return const Center(child: CircularProgressIndicator());
@@ -60,8 +62,10 @@ class CartSummary extends StatelessWidget {
                   children: [
                     const Text(
                       "Order Summary",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 12),
                     _summaryRow("Subtotal", subtotal),
@@ -74,7 +78,15 @@ class CartSummary extends StatelessWidget {
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () {
-                          // TODO: Implement checkout
+                          final cartData = {
+                            'items': items,
+                            'subtotal': subtotal,
+                            'tax': tax,
+                            'shipping': shipping,
+                            'total': total,
+                          };
+
+                          context.pushNamed('checkout', extra: cartData);
                         },
                         child: const Text("Proceed to Checkout"),
                       ),
@@ -90,7 +102,8 @@ class CartSummary extends StatelessWidget {
   }
 
   Future<List<Map<String, dynamic>>> _buildCartItems(
-      List<QueryDocumentSnapshot> cartDocs) async {
+    List<QueryDocumentSnapshot> cartDocs,
+  ) async {
     final List<Map<String, dynamic>> result = [];
 
     for (final doc in cartDocs) {
@@ -102,7 +115,9 @@ class CartSummary extends StatelessWidget {
       if (productSnap.exists) {
         final productData = productSnap.data() as Map<String, dynamic>;
         final product = await ProductModel.fromFirestoreWithBrand(
-            productData, productSnap.id);
+          productData,
+          productSnap.id,
+        );
         result.add({'product': product, 'quantity': quantity});
       }
     }
