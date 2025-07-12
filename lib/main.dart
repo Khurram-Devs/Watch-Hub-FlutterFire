@@ -3,26 +3,37 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
-import 'package:watch_hub_ep/screens/user/cart_screen.dart';
-import 'package:watch_hub_ep/screens/user/checkout_screen.dart';
-import 'package:watch_hub_ep/screens/user/order_success_screen.dart';
-import 'package:watch_hub_ep/screens/user/product_detail_screen.dart';
-import 'package:watch_hub_ep/screens/user/profile_screen.dart';
+
 import 'firebase_options.dart';
 import './theme/theme_provider.dart';
 import './screens/user/home_screen.dart';
 import './screens/user/catalog_screen.dart';
 import './screens/user/redirect_auth_screen.dart';
+import './screens/user/cart_screen.dart';
+import './screens/user/checkout_screen.dart';
+import './screens/user/order_success_screen.dart';
+import './screens/user/product_detail_screen.dart';
+import './screens/user/profile_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => ThemeProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => AuthChangeNotifier()),
+      ],
       child: const MyApp(),
     ),
   );
+}
+
+/// Notify GoRouter when auth state changes
+class AuthChangeNotifier extends ChangeNotifier {
+  AuthChangeNotifier() {
+    FirebaseAuth.instance.authStateChanges().listen((_) => notifyListeners());
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -30,34 +41,40 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    final themeProvider = Provider.of<ThemeProvider>(context);
 
-    final GoRouter _router = GoRouter(
+    final router = GoRouter(
       initialLocation: '/home',
+      refreshListenable: Provider.of<AuthChangeNotifier>(context),
       redirect: (context, state) {
-        final loggedIn = FirebaseAuth.instance.currentUser != null;
-        final goingToAuth = state.uri.toString() == '/auth';
+        final isLoggedIn = FirebaseAuth.instance.currentUser != null;
+        final isAuthPage = state.matchedLocation == '/auth';
 
-        if (!loggedIn &&
-            (state.matchedLocation == '/cart' ||
-                state.matchedLocation.startsWith('/profile'))) {
+        final protectedRoutes = [
+          '/cart',
+          '/checkout',
+          '/profile',
+          '/profile/profile',
+          '/profile/wishlist',
+          '/profile/address',
+          '/profile/orders',
+        ];
+
+        if (!isLoggedIn &&
+            protectedRoutes.any((route) => state.matchedLocation.startsWith(route))) {
           return '/auth';
         }
 
-        if (loggedIn && goingToAuth) return '/home';
+        if (isLoggedIn && isAuthPage) {
+          return '/home';
+        }
 
         return null;
       },
       routes: [
         GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
-        GoRoute(
-          path: '/catalog',
-          builder: (context, state) => const CatalogScreen(),
-        ),
-        GoRoute(
-          path: '/auth',
-          builder: (context, state) => const RedirectAuthScreen(),
-        ),
+        GoRoute(path: '/catalog', builder: (context, state) => const CatalogScreen()),
+        GoRoute(path: '/auth', builder: (context, state) => const RedirectAuthScreen()),
         GoRoute(path: '/cart', builder: (context, state) => const CartScreen()),
         GoRoute(
           path: '/checkout',
@@ -104,7 +121,7 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      routerConfig: _router,
+      routerConfig: router,
       theme: themeProvider.lightTheme,
       darkTheme: themeProvider.darkTheme,
       themeMode: themeProvider.themeMode,

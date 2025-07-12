@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:watch_hub_ep/theme/theme_provider.dart';
 
 class InfiniteBrandsScroller extends StatefulWidget {
   const InfiniteBrandsScroller({super.key});
@@ -12,8 +11,8 @@ class InfiniteBrandsScroller extends StatefulWidget {
 
 class _InfiniteBrandsScrollerState extends State<InfiniteBrandsScroller>
     with SingleTickerProviderStateMixin {
-  late final ScrollController _scrollController;
-  late final Ticker _ticker;
+  final ScrollController _scrollController = ScrollController();
+  Ticker? _ticker;
 
   static const double _scrollSpeed = 20.0;
   static const Duration _frameRate = Duration(milliseconds: 16);
@@ -26,38 +25,45 @@ class _InfiniteBrandsScrollerState extends State<InfiniteBrandsScroller>
   @override
   void initState() {
     super.initState();
-    _scrollController = ScrollController();
     _fetchBrandsFromFirestore();
   }
 
   Future<void> _fetchBrandsFromFirestore() async {
-    final query = await FirebaseFirestore.instance
-        .collection('categories')
-        .where('type', isEqualTo: 1)
-        .get();
+    try {
+      final query = await FirebaseFirestore.instance
+          .collection('categories')
+          .where('type', isEqualTo: 1)
+          .get();
 
-    final urls = query.docs
-        .map((doc) => doc['iconUrl'] as String)
-        .where((url) => url.isNotEmpty)
-        .toList();
+      final urls = query.docs
+          .map((doc) => doc['iconUrl'] as String? ?? '')
+          .where((url) => url.isNotEmpty)
+          .toList();
 
-    if (urls.isNotEmpty) {
+      if (urls.isEmpty) return;
+
       _brandImages = List.generate(
         urls.length * _repeatFactor,
         (i) => urls[i % urls.length],
       );
 
+      if (!mounted) return;
       setState(() {
         _isReady = true;
       });
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+
         if (_scrollController.hasClients) {
           final middle = _scrollController.position.maxScrollExtent / 2;
           _scrollController.jumpTo(middle);
         }
+
         _ticker = createTicker(_tick)..start();
       });
+    } catch (e) {
+      debugPrint('Error fetching brands: $e');
     }
   }
 
@@ -78,7 +84,7 @@ class _InfiniteBrandsScrollerState extends State<InfiniteBrandsScroller>
 
   @override
   void dispose() {
-    _ticker.dispose();
+    _ticker?.dispose();
     _scrollController.dispose();
     super.dispose();
   }
@@ -86,9 +92,9 @@ class _InfiniteBrandsScrollerState extends State<InfiniteBrandsScroller>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = theme.brightness == Brightness.dark;
     final screenWidth = MediaQuery.of(context).size.width;
-    final avatarSize = screenWidth < 425 ? 120.0 : 180.0;
+    final avatarSize = screenWidth < 425 ? 100.0 : 160.0;
 
     return SizedBox(
       height: avatarSize + 24,
@@ -108,17 +114,18 @@ class _InfiniteBrandsScrollerState extends State<InfiniteBrandsScroller>
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       boxShadow: [
-                            BoxShadow(
-                              color: isDark ? Colors.black : Colors.grey,
-                              blurRadius: 6,
-                              offset: const Offset(0, 6),
-                            ),
-                          ],
+                        BoxShadow(
+                          color: isDark ? Colors.black45 : Colors.grey.shade300,
+                          blurRadius: 6,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
                     child: CircleAvatar(
                       radius: avatarSize / 2,
                       backgroundColor: theme.cardColor,
-                      backgroundImage: NetworkImage(imageUrl,),
+                      backgroundImage: NetworkImage(imageUrl),
+                      onBackgroundImageError: (_, __) {},
                     ),
                   ),
                 );

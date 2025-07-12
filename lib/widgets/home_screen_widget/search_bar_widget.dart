@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
-import 'package:watch_hub_ep/screens/user/product_detail_screen.dart';
 import '../../models/product_model.dart';
 
 class SearchBarWidget extends StatefulWidget {
@@ -19,110 +18,110 @@ class SearchBarWidget extends StatefulWidget {
   State<SearchBarWidget> createState() => _SearchBarWidgetState();
 }
 
-class _SearchBarWidgetState extends State<SearchBarWidget> {
+class _SearchBarWidgetState extends State<SearchBarWidget> with WidgetsBindingObserver {
   final LayerLink _layerLink = LayerLink();
   OverlayEntry? _overlayEntry;
   List<ProductModel> _suggestions = [];
+  List<ProductModel> _cachedProducts = [];
 
   Timer? _debounce;
 
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _loadProducts();
+  }
+
+  Future<void> _loadProducts() async {
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('products')
+          .limit(50)
+          .get();
+
+      _cachedProducts = await Future.wait(snapshot.docs.map((doc) async {
+        return await ProductModel.fromFirestoreWithBrand(doc.data(), doc.id);
+      }));
+    } catch (e) {
+      debugPrint('Search loadProducts error: $e');
+    }
+  }
+
   void _onSearchChanged(String query) {
     _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 350), () async {
-      await _performSearch(query.trim());
+    _debounce = Timer(const Duration(milliseconds: 300), () {
+      _filterSuggestions(query.trim());
     });
   }
 
-  Future<void> _performSearch(String query) async {
+  void _filterSuggestions(String query) {
     _removeOverlay();
-
     if (query.isEmpty) {
       setState(() => _suggestions.clear());
       return;
     }
 
-    final snapshot = await FirebaseFirestore.instance
-        .collection('products')
-        .limit(25)
-        .get();
-
-    final List<ProductModel> allProducts = await Future.wait(snapshot.docs.map((doc) async {
-      return await ProductModel.fromFirestoreWithBrand(doc.data(), doc.id);
-    }));
-
     final lowerQuery = query.toLowerCase();
-    _suggestions = allProducts.where((product) {
+    final filtered = _cachedProducts.where((product) {
       return product.title.toLowerCase().contains(lowerQuery) ||
           product.brandName.toLowerCase().contains(lowerQuery) ||
           product.price.toString().contains(lowerQuery);
     }).toList();
 
-    setState(() {});
+    setState(() => _suggestions = filtered);
 
     if (_suggestions.isNotEmpty) {
       _overlayEntry = _createOverlay();
       Overlay.of(context).insert(_overlayEntry!);
-    } else {
-      _removeOverlay();
-    }
-  }
-
-  void _removeOverlay() {
-    if (_overlayEntry?.mounted ?? false) {
-      _overlayEntry?.remove();
-      _overlayEntry = null;
     }
   }
 
   OverlayEntry _createOverlay() {
     final renderBox = context.findRenderObject() as RenderBox;
     final size = renderBox.size;
-    final position = renderBox.localToGlobal(Offset.zero);
-
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isWide = screenWidth > 600;
-    final imageSize = isWide ? 56.0 : 44.0;
-    final fontSize = isWide ? 16.0 : 14.0;
+    final offset = renderBox.localToGlobal(Offset.zero);
+    final theme = Theme.of(context);
 
     return OverlayEntry(
       builder: (context) => Positioned(
-        left: position.dx,
-        top: position.dy + size.height + 4,
+        left: offset.dx,
+        top: offset.dy + size.height + 4,
         width: size.width,
         child: Material(
-          elevation: 8,
+          elevation: 6,
           borderRadius: BorderRadius.circular(12),
+          color: theme.cardColor,
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxHeight: 320),
-            child: ListView.separated(
-              padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(maxHeight: 300),
+            child: ListView.builder(
               shrinkWrap: true,
+              padding: EdgeInsets.zero,
               itemCount: _suggestions.length,
-              separatorBuilder: (_, __) => Divider(height: 1, color: Theme.of(context).dividerColor),
               itemBuilder: (_, i) {
-                final p = _suggestions[i];
+                final product = _suggestions[i];
                 return InkWell(
                   onTap: () {
-                    widget.controller.text = p.title;
+                    widget.controller.text = product.title;
                     _removeOverlay();
-                    context.push('/product/${p.id}');
+                    context.push('/product/${product.id}');
                   },
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
                     child: Row(
                       children: [
                         ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(8),
                           child: Image.network(
-                            p.images.first,
-                            width: imageSize,
-                            height: imageSize,
+                            product.images.first,
+                            width: 48,
+                            height: 48,
                             fit: BoxFit.cover,
                             errorBuilder: (_, __, ___) => Container(
-                              width: imageSize,
-                              height: imageSize,
+                              width: 48,
+                              height: 48,
                               color: Colors.grey.shade200,
-                              child: const Icon(Icons.watch),
+                              child: const Icon(Icons.watch, color: Colors.grey),
                             ),
                           ),
                         ),
@@ -132,19 +131,19 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                p.title,
-                                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                      fontSize: fontSize,
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                                product.title,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.titleSmall?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                "${p.brandName} • \$${p.price.toStringAsFixed(0)}",
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      fontSize: fontSize - 1,
-                                      color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.75),
-                                    ),
+                                '${product.brandName} • \$${product.price.toStringAsFixed(0)}',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: theme.textTheme.bodySmall?.color?.withOpacity(0.7),
+                                ),
                               ),
                             ],
                           ),
@@ -161,11 +160,27 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
     );
   }
 
+  void _removeOverlay() {
+    if (_overlayEntry?.mounted ?? false) {
+      _overlayEntry?.remove();
+      _overlayEntry = null;
+    }
+  }
+
   @override
   void dispose() {
     _debounce?.cancel();
     _removeOverlay();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Clean overlay when backgrounded
+    if (state == AppLifecycleState.paused) {
+      _removeOverlay();
+    }
   }
 
   @override
@@ -175,7 +190,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
     return CompositedTransformTarget(
       link: _layerLink,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12),
+        padding: const EdgeInsets.symmetric(vertical: 10),
         child: TextField(
           controller: widget.controller,
           onChanged: _onSearchChanged,
@@ -188,8 +203,8 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                     icon: const Icon(Icons.clear),
                     onPressed: () {
                       widget.controller.clear();
-                      _removeOverlay();
                       setState(() => _suggestions.clear());
+                      _removeOverlay();
                     },
                   )
                 : null,
