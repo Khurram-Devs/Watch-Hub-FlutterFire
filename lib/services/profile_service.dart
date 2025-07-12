@@ -50,4 +50,23 @@ class ProfileService {
   Future<void> moveToCart(ProductModel product) async {
     debugPrint('Moving to cart: ${product.title}');
   }
+
+  Future<List<ProductModel>> getProductsFromRefs(List<dynamic> refs) async {
+    final List<ProductModel> products = [];
+
+    for (var ref in refs) {
+      if (ref is DocumentReference) {
+        final doc = await ref.get();
+        if (doc.exists) {
+          final product = await ProductModel.fromFirestoreWithBrand(
+            doc.data() as Map<String, dynamic>,
+            doc.id,
+          );
+          products.add(product);
+        }
+      }
+    }
+
+    return products;
+  }
 }

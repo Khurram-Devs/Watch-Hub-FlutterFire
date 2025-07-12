@@ -11,39 +11,38 @@ class CartService {
   CollectionReference get _cartCollection =>
       _firestore.collection('usersProfile').doc(uid).collection('cart');
 
-Future<List<ProductModel>> fetchCartItems() async {
-  if (uid == null) return [];
+  Future<List<ProductModel>> fetchCartItems() async {
+    if (uid == null) return [];
 
-  final cartDocs = await _cartCollection.get();
-  final List<ProductModel> products = [];
+    final cartDocs = await _cartCollection.get();
+    final List<ProductModel> products = [];
 
-  for (var doc in cartDocs.docs) {
-    final data = doc.data() as Map<String, dynamic>;
-    final productRef = data['productRef'] as DocumentReference;
-    final productSnap = await productRef.get();
+    for (var doc in cartDocs.docs) {
+      final data = doc.data() as Map<String, dynamic>;
+      final productRef = data['productRef'] as DocumentReference;
+      final productSnap = await productRef.get();
 
-    if (!productSnap.exists) {
-      await doc.reference.delete();
-      continue;
+      if (!productSnap.exists) {
+        await doc.reference.delete();
+        continue;
+      }
+
+      final productData = productSnap.data() as Map<String, dynamic>;
+      final product = await ProductModel.fromFirestoreWithBrand(
+        productData,
+        productSnap.id,
+      );
+      product.firestoreSnapshot = productSnap;
+
+      if (product.stock != null && product.stock! > 0) {
+        products.add(product);
+      } else {
+        await doc.reference.delete();
+      }
     }
 
-    final productData = productSnap.data() as Map<String, dynamic>;
-    final product = await ProductModel.fromFirestoreWithBrand(
-      productData,
-      productSnap.id,
-    );
-    product.firestoreSnapshot = productSnap;
-
-    if (product.stock != null && product.stock! > 0) {
-      products.add(product);
-    } else {
-      await doc.reference.delete();
-    }
+    return products;
   }
-
-  return products;
-}
-
 
   Future<void> addToCart(ProductModel product) async {
     if (uid == null) return;
@@ -81,39 +80,46 @@ Future<List<ProductModel>> fetchCartItems() async {
     return doc.exists;
   }
 
-Future<List<Map<String, dynamic>>> fetchCartItemsWithQuantity() async {
-  if (uid == null) return [];
+  Future<List<Map<String, dynamic>>> fetchCartItemsWithQuantity() async {
+    if (uid == null) return [];
 
-  final cartDocs = await _cartCollection.get();
-  final List<Map<String, dynamic>> result = [];
+    final cartDocs = await _cartCollection.get();
+    final List<Map<String, dynamic>> result = [];
 
-  for (var doc in cartDocs.docs) {
-    final data = doc.data() as Map<String, dynamic>;
-    final productRef = data['productRef'] as DocumentReference;
-    final quantity = (data['quantity'] ?? 1) as int;
+    for (var doc in cartDocs.docs) {
+      final data = doc.data() as Map<String, dynamic>;
+      final productRef = data['productRef'] as DocumentReference;
+      final quantity = (data['quantity'] ?? 1) as int;
 
-    final productSnap = await productRef.get();
+      final productSnap = await productRef.get();
 
-    if (!productSnap.exists) {
-      await doc.reference.delete(); 
-      continue;
+      if (!productSnap.exists) {
+        await doc.reference.delete();
+        continue;
+      }
+
+      final productData = productSnap.data() as Map<String, dynamic>;
+      final product = await ProductModel.fromFirestoreWithBrand(
+        productData,
+        productSnap.id,
+      );
+      product.firestoreSnapshot = productSnap;
+
+      if (product.stock != null && product.stock! > 0) {
+        result.add({'product': product, 'quantity': quantity});
+      } else {
+        await doc.reference.delete();
+      }
     }
 
-    final productData = productSnap.data() as Map<String, dynamic>;
-    final product = await ProductModel.fromFirestoreWithBrand(
-      productData,
-      productSnap.id,
-    );
-    product.firestoreSnapshot = productSnap;
-
-    if (product.stock != null && product.stock! > 0) {
-      result.add({'product': product, 'quantity': quantity});
-    } else {
-      await doc.reference.delete(); 
-    }
+    return result;
   }
 
-  return result;
-}
+  Future<bool> isProductInCart(String productId) async {
+    return await isInCart(productId);
+  }
 
+  Future<void> addProductToCart(ProductModel product) async {
+    return await addToCart(product);
+  }
 }
