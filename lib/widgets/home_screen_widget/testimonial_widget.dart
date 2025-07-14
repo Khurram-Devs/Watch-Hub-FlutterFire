@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../models/testimonial_model.dart';
 
 class TestimonialCarousel extends StatefulWidget {
@@ -12,10 +13,12 @@ class TestimonialCarousel extends StatefulWidget {
 class _TestimonialCarouselState extends State<TestimonialCarousel> {
   late final PageController _controller;
   int _currentIndex = 0;
+  late Future<List<Testimonial>> _testimonialFuture;
 
   Future<List<Testimonial>> fetchTestimonials() async {
     final snapshot = await FirebaseFirestore.instance
         .collection('testimonials')
+        .where('status', isEqualTo: 'show') // ✅ Only show approved ones
         .orderBy('createdAt', descending: true)
         .get();
 
@@ -26,14 +29,84 @@ class _TestimonialCarouselState extends State<TestimonialCarousel> {
   void initState() {
     super.initState();
     _controller = PageController(viewportFraction: 0.85);
+    _testimonialFuture = fetchTestimonials(); // fetch only once
+  }
+
+  void _showAddTestimonialDialog() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final doc = await FirebaseFirestore.instance
+        .collection('usersProfile')
+        .doc(user.uid)
+        .get();
+
+    final userData = doc.data();
+    if (userData == null) return;
+
+    final TextEditingController _testimonialController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        final theme = Theme.of(context);
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text("Add Testimonial"),
+          content: TextFormField(
+            controller: _testimonialController,
+            maxLines: 4,
+            decoration: const InputDecoration(
+              labelText: 'Your testimonial',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final text = _testimonialController.text.trim();
+                if (text.isEmpty) return;
+
+                await FirebaseFirestore.instance.collection('testimonials').add({
+                  'name': userData['name'] ?? 'Anonymous',
+                  'imageUrl': userData['imageUrl'] ?? '',
+                  'testimonial': text,
+                  'occupation': userData['occupation'] ?? 'Customer',
+                  'createdAt': Timestamp.now(),
+                  'status': 'pending', // ✅ Set status to pending
+                  'userId': user.uid,
+                });
+
+                Navigator.of(context).pop();
+
+                // Optional: Refresh list in case an admin auto-approves
+                setState(() {
+                  _testimonialFuture = fetchTestimonials();
+                });
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Thank you! Your testimonial is pending approval.")),
+                );
+              },
+              child: const Text("Submit"),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final user = FirebaseAuth.instance.currentUser;
 
     return FutureBuilder<List<Testimonial>>(
-      future: fetchTestimonials(),
+      future: _testimonialFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Padding(
@@ -55,12 +128,26 @@ class _TestimonialCarouselState extends State<TestimonialCarousel> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              "Testimonials",
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: theme.colorScheme.secondary,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Testimonials",
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.secondary,
+                  ),
+                ),
+                if (user != null)
+                  TextButton.icon(
+                    onPressed: _showAddTestimonialDialog,
+                    icon: const Icon(Icons.add_comment),
+                    label: const Text("Add Testimonial"),
+                    style: TextButton.styleFrom(
+                      foregroundColor: theme.colorScheme.secondary,
+                    ),
+                  ),
+              ],
             ),
             const SizedBox(height: 16),
             SizedBox(
