@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
-import 'package:watch_hub_ep/screens/auth_screen.dart';
 import '../../../models/product_model.dart';
 
 class AddToWishlistButton extends StatefulWidget {
@@ -12,7 +11,7 @@ class AddToWishlistButton extends StatefulWidget {
   const AddToWishlistButton({
     super.key,
     required this.product,
-    this.onTap,
+    this.onTap, required String productId,
   });
 
   @override

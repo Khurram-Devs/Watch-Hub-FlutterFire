@@ -6,11 +6,11 @@ import '../services/testimonial_service.dart';
 import 'package:watch_hub_ep/widgets/home_screen_widget/search_bar_widget.dart';
 import 'package:watch_hub_ep/widgets/home_screen_widget/testimonial_widget.dart';
 import '../widgets/layout_widget/section_title.dart';
-import '../widgets/home_screen_widget/collection_card.dart';
-import '../widgets/home_screen_widget/watch_tile.dart';
 import '../widgets/home_screen_widget/single_video_banner.dart';
 import '../widgets/home_screen_widget/infinite_brands_scroller.dart';
 import '../widgets/home_screen_widget/contact_us_form.dart';
+import 'package:watch_hub_ep/widgets/catalog_screen_widget/product_grid_item.dart';
+import 'package:watch_hub_ep/widgets/catalog_screen_widget/product_list_item.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -71,22 +71,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   final products = snapshot.data!;
 
-                  return ConstrainedBox(
-                    constraints: const BoxConstraints(
-                      minHeight: 320,
-                      maxHeight: 340,
-                    ),
+                  return SizedBox(
+                    height: 380,
                     child: ListView.separated(
                       scrollDirection: Axis.horizontal,
                       itemCount: products.length,
                       itemBuilder: (_, index) {
                         final product = products[index];
-                        return CollectionCard(
-                          product: product,
-                          onViewTap: () {
-                            context.push('/product/${product.id}');
-                          },
-                        );
+                        return ProductGridItem(product: product);
                       },
                       separatorBuilder: (_, __) => const SizedBox(width: 16),
                     ),
@@ -95,7 +87,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
 
               const SizedBox(height: 24),
-
               const SectionTitle(title: 'Premium Discounts'),
               const SizedBox(height: 12),
 
@@ -110,19 +101,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   }
 
                   return Column(
-                    children:
-                        snapshot.data!.map((product) {
-                          return WatchTile(
-                            imageUrl: product.images.first,
-                            title: product.title,
-                            brandName: product.brandName,
-                            originalPrice: product.price,
-                            discountPercentage: product.discountPercentage,
-                            onViewTap: () {
-                              context.push('/product/${product.id}');
-                            },
-                          );
-                        }).toList(),
+                    children: snapshot.data!.map((product) {
+                      return ProductListItem(product: product);
+                    }).toList(),
                   );
                 },
               ),
@@ -133,7 +114,6 @@ class _HomeScreenState extends State<HomeScreen> {
               const InfiniteBrandsScroller(),
 
               const SizedBox(height: 32),
-
               SectionTitle(
                 title: 'Featured',
                 action: 'See all',
@@ -154,28 +134,21 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   final products = snapshot.data!;
 
-                  return ConstrainedBox(
-                    constraints: const BoxConstraints(
-                      minHeight: 320,
-                      maxHeight: 340,
-                    ),
+                  return SizedBox(
+                    height: 380,
                     child: ListView.separated(
                       scrollDirection: Axis.horizontal,
                       itemCount: products.length,
                       itemBuilder: (_, index) {
                         final product = products[index];
-                        return CollectionCard(
-                          product: product,
-                          onViewTap: () {
-                            context.push('/product/${product.id}');
-                          },
-                        );
+                        return ProductGridItem(product: product);
                       },
                       separatorBuilder: (_, __) => const SizedBox(width: 16),
                     ),
                   );
                 },
               ),
+
               const SizedBox(height: 32),
               const TestimonialCarousel(),
 

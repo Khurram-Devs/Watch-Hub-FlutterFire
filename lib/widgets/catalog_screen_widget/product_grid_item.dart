@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:watch_hub_ep/widgets/product_detail_widget/add_to_wishlist_button.dart';
 import '../../models/product_model.dart';
-import '../../screens/product_detail_screen.dart';
 import '../../theme/theme_provider.dart';
 
 class ProductGridItem extends StatelessWidget {
@@ -15,7 +15,7 @@ class ProductGridItem extends StatelessWidget {
     final discountedPrice = isDiscounted
         ? product.price * (1 - product.discountPercentage! / 100)
         : product.price;
-        final isOutOfStock = product.stock != null && product.stock! <= 0;
+    final isOutOfStock = product.stock != null && product.stock! <= 0;
 
     return GestureDetector(
       onTap: () => context.push('/product/${product.id}'),
@@ -23,7 +23,7 @@ class ProductGridItem extends StatelessWidget {
         width: 220,
         constraints: const BoxConstraints(minHeight: 340),
         margin: const EdgeInsets.symmetric(vertical: 8),
-      decoration: BoxDecoration(
+        decoration: BoxDecoration(
           color: theme.cardColor,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
@@ -42,57 +42,63 @@ class ProductGridItem extends StatelessWidget {
               height: 250,
               padding: const EdgeInsets.all(6),
               child: Stack(
-  children: [
-    Positioned.fill(
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: Image.network(
-          product.images.first,
-          fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => Container(
-            color: theme.disabledColor.withOpacity(0.1),
-            alignment: Alignment.center,
-            child: Icon(Icons.watch, color: theme.colorScheme.secondary),
-          ),
-        ),
-      ),
-    ),
+                children: [
+                  Positioned.fill(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.network(
+                        product.images.first,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Container(
+                          color: theme.disabledColor.withOpacity(0.1),
+                          alignment: Alignment.center,
+                          child: Icon(Icons.watch, color: theme.colorScheme.secondary),
+                        ),
+                      ),
+                    ),
+                  ),
 
-    if (isDiscounted)
-      Positioned(
-        top: 8,
-        left: 8,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: ThemeProvider.goldenColor,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Text(
-            '-${product.discountPercentage!.toStringAsFixed(0)}%',
-            style: theme.textTheme.labelSmall?.copyWith(color: Colors.black),
-          ),
-        ),
-      ),
+                  if (isDiscounted)
+                    Positioned(
+                      top: 8,
+                      left: 8,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: ThemeProvider.goldenColor,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          '-${product.discountPercentage!.toStringAsFixed(0)}%',
+                          style: theme.textTheme.labelSmall?.copyWith(color: Colors.black),
+                        ),
+                      ),
+                    ),
 
-    if (isOutOfStock)
-      Positioned(
-        top: 8,
-        right: 8,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: Colors.redAccent,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Text(
-            'Out of Stock',
-            style: theme.textTheme.labelSmall?.copyWith(color: Colors.white),
-          ),
-        ),
-      ),
-  ],
-),
+                  if (isOutOfStock)
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.redAccent,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          'Out of Stock',
+                          style: theme.textTheme.labelSmall?.copyWith(color: Colors.white),
+                        ),
+                      ),
+                    ),
+
+                  Positioned(
+                    bottom: 8,
+                    right: 8,
+                    child: AddToWishlistButton(product: product, productId: product.id),
+                  ),
+                ],
+              ),
             ),
 
             Padding(
@@ -122,7 +128,6 @@ class ProductGridItem extends StatelessWidget {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 6),
-
                   isDiscounted
                       ? RichText(
                           text: TextSpan(

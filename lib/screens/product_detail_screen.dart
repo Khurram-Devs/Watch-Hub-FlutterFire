@@ -1,5 +1,3 @@
-// lib/screens/user/product_detail_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:watch_hub_ep/models/product_model.dart';
@@ -73,7 +71,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           children: [
                             Expanded(child: AddToCartButton(product: product!)),
                             const SizedBox(width: 12),
-                            AddToWishlistButton(product: product!),
+                            AddToWishlistButton(product: product!, productId: product!.id,),
                           ],
                         ),
                         const SizedBox(height: 32),

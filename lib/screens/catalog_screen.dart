@@ -92,30 +92,34 @@ class _CatalogScreenState extends State<CatalogScreen> {
   }
 
   Future<void> _fetchPage() async {
-    if (_isLoading || !_hasMore) return;
-    setState(() => _isLoading = true);
+  if (_isLoading || !_hasMore) return;
 
-    final results = await _service.fetchCatalog(
-      page: 1,
-      limit: 20,
-      sort: _sortBy,
-      brand: _brand,
-      minPrice: _minPrice,
-      maxPrice: _maxPrice,
-      lastDoc: _lastDoc,
-      categories: _selectedCategories,
-      inStock: _inStock,
-      discountedOnly: _discountOnly,
-      minRating: _minRating,
-    );
+  setState(() => _isLoading = true);
 
-    setState(() {
-      if (results.length < 20) _hasMore = false;
-      if (results.isNotEmpty) _lastDoc = results.last.firestoreSnapshot;
-      _products.addAll(results);
-      _isLoading = false;
-    });
-  }
+  final results = await _service.fetchCatalog(
+    page: 1,
+    limit: 20,
+    sort: _sortBy,
+    brand: _brand,
+    minPrice: _minPrice,
+    maxPrice: _maxPrice,
+    lastDoc: _lastDoc,
+    categories: _selectedCategories,
+    inStock: _inStock,
+    discountedOnly: _discountOnly,
+    minRating: _minRating,
+  );
+
+  if (!mounted) return;
+
+  setState(() {
+    if (results.length < 20) _hasMore = false;
+    if (results.isNotEmpty) _lastDoc = results.last.firestoreSnapshot;
+    _products.addAll(results);
+    _isLoading = false;
+  });
+}
+
 
   List<String> _selectedCategories = [];
   bool _inStock = false;

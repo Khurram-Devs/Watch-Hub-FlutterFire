@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:watch_hub_ep/widgets/catalog_screen_widget/product_grid_item.dart';
 import '../../../models/product_model.dart';
 import '../../../services/product_service.dart';
-import '../home_screen_widget/collection_card.dart';
 
 class RelatedProductsList extends StatelessWidget {
   final String brandName;
@@ -44,13 +44,12 @@ class RelatedProductsList extends StatelessWidget {
             final products = snapshot.data!;
 
             return SizedBox(
-              height: 340,
+              height: 360,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: products.length,
                 itemBuilder: (_, i) {
-                  final p = products[i];
-                  return CollectionCard(product: p);
+                  return ProductGridItem(product: products[i]);
                 },
                 separatorBuilder: (_, __) => const SizedBox(width: 16),
               ),

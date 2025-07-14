@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:watch_hub_ep/screens/about_us_screen.dart';
 
 import 'firebase_options.dart';
 import 'theme/theme_provider.dart';
@@ -116,6 +117,12 @@ class MyApp extends StatelessWidget {
                   MainScaffold(currentIndex: 2, child: WishlistScreen()),
         ),
         GoRoute(
+          path: '/about-us',
+          builder:
+              (context, state) =>
+                  const MainScaffold(currentIndex: 0, child: AboutUsScreen()),
+        ),
+        GoRoute(
           path: '/orders',
           builder:
               (context, state) =>
@@ -147,9 +154,7 @@ class MyApp extends StatelessWidget {
           path: '/product/:id',
           builder: (context, state) {
             final id = state.pathParameters['id']!;
-            return const MainScaffold(
-              child: ProductDetailScreen(productId: ''),
-            );
+            return MainScaffold(currentIndex: 1,child: ProductDetailScreen(productId: id));
           },
         ),
         GoRoute(
@@ -157,7 +162,7 @@ class MyApp extends StatelessWidget {
           name: 'order-success',
           builder: (context, state) {
             final orderId = state.pathParameters['orderId']!;
-            return const MainScaffold(child: OrderSuccessScreen(orderId: ''));
+            return const MainScaffold(currentIndex: 0,child: OrderSuccessScreen(orderId: ''));
           },
         ),
       ],

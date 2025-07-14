@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:watch_hub_ep/widgets/product_detail_widget/add_to_wishlist_button.dart';
 import '../../models/product_model.dart';
-import '../../screens/product_detail_screen.dart';
 import '../../theme/theme_provider.dart';
 
 class ProductListItem extends StatelessWidget {
@@ -11,13 +11,12 @@ class ProductListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDiscounted =
-        product.discountPercentage != null && product.discountPercentage! > 0;
-
+    final isDiscounted = product.discountPercentage != null && product.discountPercentage! > 0;
     final discountedPrice = isDiscounted
         ? product.price * (1 - product.discountPercentage! / 100)
         : product.price;
-final isOutOfStock = product.stock != null && product.stock! <= 0;
+    final isOutOfStock = product.stock != null && product.stock! <= 0;
+
     return GestureDetector(
       onTap: () => context.push('/product/${product.id}'),
       child: Card(
@@ -29,56 +28,59 @@ final isOutOfStock = product.stock != null && product.stock! <= 0;
           child: Row(
             children: [
               Stack(
-  children: [
-    ClipRRect(
-      borderRadius: BorderRadius.circular(10),
-      child: Image.network(
-        product.images.first,
-        width: 150,
-        height: 150,
-        fit: BoxFit.cover,
-      ),
-    ),
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.network(
+                      product.images.first,
+                      width: 150,
+                      height: 150,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
 
-    if (isDiscounted)
-      Positioned(
-        top: 6,
-        left: 6,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-          decoration: BoxDecoration(
-            color: ThemeProvider.goldenColor,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Text(
-            '-${product.discountPercentage!.toStringAsFixed(0)}%',
-            style: theme.textTheme.labelSmall?.copyWith(color: Colors.black),
-          ),
-        ),
-      ),
+                  if (isDiscounted)
+                    Positioned(
+                      top: 6,
+                      left: 6,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: ThemeProvider.goldenColor,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          '-${product.discountPercentage!.toStringAsFixed(0)}%',
+                          style: theme.textTheme.labelSmall?.copyWith(color: Colors.black),
+                        ),
+                      ),
+                    ),
 
-    if (isOutOfStock)
-      Positioned(
-        top: 6,
-        right: 6,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-          decoration: BoxDecoration(
-            color: Colors.redAccent,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Text(
-            'Out of Stock',
-            style: theme.textTheme.labelSmall?.copyWith(color: Colors.white),
-          ),
-        ),
-      ),
-  ],
-),
+                  if (isOutOfStock)
+                    Positioned(
+                      top: 6,
+                      right: 6,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: Colors.redAccent,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          'Out of Stock',
+                          style: theme.textTheme.labelSmall?.copyWith(color: Colors.white),
+                        ),
+                      ),
+                    ),
 
-
+                  Positioned(
+                    bottom: 6,
+                    right: 6,
+                    child: AddToWishlistButton(product: product,productId: product.id),
+                  ),
+                ],
+              ),
               const SizedBox(width: 16),
-
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -93,7 +95,6 @@ final isOutOfStock = product.stock != null && product.stock! <= 0;
                       ),
                     ),
                     const SizedBox(height: 4),
-
                     Text(
                       product.brandName,
                       style: theme.textTheme.bodySmall?.copyWith(
@@ -102,7 +103,6 @@ final isOutOfStock = product.stock != null && product.stock! <= 0;
                       ),
                     ),
                     const SizedBox(height: 6),
-
                     if (product.description.isNotEmpty)
                       Text(
                         product.description,
@@ -110,9 +110,7 @@ final isOutOfStock = product.stock != null && product.stock! <= 0;
                         overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.bodySmall,
                       ),
-
                     const SizedBox(height: 8),
-
                     Row(
                       children: [
                         if (isDiscounted)

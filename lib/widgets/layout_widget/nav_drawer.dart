@@ -81,9 +81,9 @@ class NavDrawer extends StatelessWidget {
                   context: context,
                 ),
                 _buildNavItem(
-                  icon: Icons.person_outline,
-                  label: 'Profile',
-                  route: '/profile',
+                  icon: Icons.info_outline,
+                  label: 'About Us',
+                  route: '/about-us',
                   context: context,
                 ),
               ],
@@ -100,7 +100,8 @@ class NavDrawer extends StatelessWidget {
               children: [
                 // Theme Toggle
                 IconButton(
-                  tooltip: isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode',
+                  tooltip:
+                      isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode',
                   icon: Icon(
                     isDark ? Icons.light_mode : Icons.dark_mode,
                     color: const Color(0xFFC0A265),
@@ -111,50 +112,59 @@ class NavDrawer extends StatelessWidget {
                 // Auth Actions
                 user == null
                     ? ElevatedButton.icon(
-                        onPressed: () => context.go('/auth'),
-                        icon: const Icon(Icons.login),
-                        label: const Text('Login'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFC0A265),
-                          foregroundColor: Colors.white,
-                        ),
-                      )
-                    : StreamBuilder<DocumentSnapshot>(
-                        stream: FirebaseFirestore.instance
-                            .collection('usersProfile')
-                            .doc(user.uid)
-                            .snapshots(),
-                        builder: (context, snapshot) {
-                          final data = snapshot.data?.data() as Map<String, dynamic>?;
-
-                          final avatar = data?['avatarUrl'] ??
-                              user.photoURL ??
-                              '';
-
-                          return Row(
-                            children: [
-                              CircleAvatar(
-                                radius: 20,
-                                backgroundImage: avatar.isNotEmpty
-                                    ? NetworkImage(avatar)
-                                    : const AssetImage(
-                                            'assets/images/default_user.png')
-                                        as ImageProvider,
-                              ),
-                              IconButton(
-                                tooltip: 'Logout',
-                                icon: const Icon(Icons.logout, color: Colors.redAccent),
-                                onPressed: () async {
-                                  await FirebaseAuth.instance.signOut();
-                                  if (context.mounted) {
-                                    context.go('/auth');
-                                  }
-                                },
-                              ),
-                            ],
-                          );
-                        },
+                      onPressed: () => context.go('/auth'),
+                      icon: const Icon(Icons.login),
+                      label: const Text('Login'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFC0A265),
+                        foregroundColor: Colors.white,
                       ),
+                    )
+                    : StreamBuilder<DocumentSnapshot>(
+                      stream:
+                          FirebaseFirestore.instance
+                              .collection('usersProfile')
+                              .doc(user.uid)
+                              .snapshots(),
+                      builder: (context, snapshot) {
+                        final data =
+                            snapshot.data?.data() as Map<String, dynamic>?;
+
+                        final avatar =
+                            data?['avatarUrl'] ?? user.photoURL ?? '';
+
+                        return Row(
+                          children: [
+                            GestureDetector(
+                              onTap: () => context.go('/profile'),
+                              child: CircleAvatar(
+                                radius: 20,
+                                backgroundImage:
+                                    avatar.isNotEmpty
+                                        ? NetworkImage(avatar)
+                                        : const AssetImage(
+                                              'assets/images/default_user.png',
+                                            )
+                                            as ImageProvider,
+                              ),
+                            ),
+                            IconButton(
+                              tooltip: 'Logout',
+                              icon: const Icon(
+                                Icons.logout,
+                                color: Colors.redAccent,
+                              ),
+                              onPressed: () async {
+                                await FirebaseAuth.instance.signOut();
+                                if (context.mounted) {
+                                  context.go('/auth');
+                                }
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    ),
               ],
             ),
           ),
