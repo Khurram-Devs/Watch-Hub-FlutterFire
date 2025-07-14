@@ -3,8 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:watch_hub_ep/models/product_model.dart';
-import 'package:watch_hub_ep/widgets/layout_widget/app_header.dart';
-import 'package:watch_hub_ep/widgets/layout_widget/nav_drawer.dart';
 import 'package:watch_hub_ep/widgets/catalog_screen_widget/product_list_item.dart';
 import 'package:watch_hub_ep/services/profile_service.dart';
 import 'package:watch_hub_ep/services/cart_service.dart';
@@ -46,8 +44,6 @@ class WishlistScreen extends StatelessWidget {
     final usersProfile = FirebaseFirestore.instance.collection('usersProfile');
 
     return Scaffold(
-      appBar: const AppHeader(),
-      drawer: const NavDrawer(),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),

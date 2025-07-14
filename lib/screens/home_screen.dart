@@ -1,19 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../models/product_model.dart';
-import '../../services/product_service.dart';
-import '../../services/testimonial_service.dart';
-import 'package:watch_hub_ep/widgets/layout_widget/footer_widget.dart';
+import '../models/product_model.dart';
+import '../services/product_service.dart';
+import '../services/testimonial_service.dart';
 import 'package:watch_hub_ep/widgets/home_screen_widget/search_bar_widget.dart';
 import 'package:watch_hub_ep/widgets/home_screen_widget/testimonial_widget.dart';
-import '../../widgets/layout_widget/section_title.dart';
-import '../../widgets/home_screen_widget/collection_card.dart';
-import '../../widgets/home_screen_widget/watch_tile.dart';
-import '../../widgets/layout_widget/app_header.dart';
-import '../../widgets/layout_widget/nav_drawer.dart';
-import '../../widgets/home_screen_widget/single_video_banner.dart';
-import '../../widgets/home_screen_widget/infinite_brands_scroller.dart';
-import '../../widgets/home_screen_widget/contact_us_form.dart';
+import '../widgets/layout_widget/section_title.dart';
+import '../widgets/home_screen_widget/collection_card.dart';
+import '../widgets/home_screen_widget/watch_tile.dart';
+import '../widgets/home_screen_widget/single_video_banner.dart';
+import '../widgets/home_screen_widget/infinite_brands_scroller.dart';
+import '../widgets/home_screen_widget/contact_us_form.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -36,8 +33,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const NavDrawer(),
-      appBar: const AppHeader(),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),

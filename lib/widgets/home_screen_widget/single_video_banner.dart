@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:video_player/video_player.dart';
-import 'package:watch_hub_ep/screens/user/catalog_screen.dart';
+import 'package:watch_hub_ep/screens/catalog_screen.dart';
 
 class SingleVideoBanner extends StatefulWidget {
   final String videoUrl;

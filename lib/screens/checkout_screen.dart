@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:watch_hub_ep/widgets/checkout_screen_widget/checkout_form_section.dart';
 import 'package:watch_hub_ep/widgets/checkout_screen_widget/promo_and_summary_section.dart';
 import 'package:watch_hub_ep/widgets/layout_widget/app_header.dart';
-import 'package:watch_hub_ep/widgets/layout_widget/footer_widget.dart';
 import 'package:watch_hub_ep/widgets/layout_widget/nav_drawer.dart';
 
 class CheckoutScreen extends StatelessWidget {

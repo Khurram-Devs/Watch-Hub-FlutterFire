@@ -3,8 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
 import 'package:watch_hub_ep/services/profile_service.dart';
-import 'package:watch_hub_ep/widgets/layout_widget/app_header.dart';
-import 'package:watch_hub_ep/widgets/layout_widget/nav_drawer.dart';
 import 'package:watch_hub_ep/widgets/orders_screen_widget/order_detail_modal.dart';
 
 class OrdersScreen extends StatelessWidget {
@@ -17,8 +15,6 @@ class OrdersScreen extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: const AppHeader(),
-      drawer: const NavDrawer(),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),

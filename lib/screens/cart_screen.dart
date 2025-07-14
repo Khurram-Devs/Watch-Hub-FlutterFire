@@ -4,8 +4,6 @@ import 'package:watch_hub_ep/models/product_model.dart';
 import 'package:watch_hub_ep/services/cart_service.dart';
 import 'package:watch_hub_ep/widgets/cart_screen_widget/cart_item_tile.dart';
 import 'package:watch_hub_ep/widgets/cart_screen_widget/cart_summary.dart';
-import 'package:watch_hub_ep/widgets/layout_widget/app_header.dart';
-import 'package:watch_hub_ep/widgets/layout_widget/nav_drawer.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -37,8 +35,6 @@ class _CartScreenState extends State<CartScreen> {
   Widget build(BuildContext context) {
     
     return Scaffold(
-      drawer: const NavDrawer(),
-      appBar: const AppHeader(),
       body: SafeArea(
         child: SingleChildScrollView(
           // Cart content

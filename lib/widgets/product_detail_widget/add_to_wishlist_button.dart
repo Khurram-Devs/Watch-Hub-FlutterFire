@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
-import 'package:watch_hub_ep/screens/user/auth_screen.dart';
+import 'package:watch_hub_ep/screens/auth_screen.dart';
 import '../../../models/product_model.dart';
 
 class AddToWishlistButton extends StatefulWidget {

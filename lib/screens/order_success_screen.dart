@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:watch_hub_ep/services/pdf_invoice_service.dart';
 import 'package:watch_hub_ep/widgets/layout_widget/app_header.dart';
-import 'package:watch_hub_ep/widgets/layout_widget/footer_widget.dart';
 import 'package:watch_hub_ep/widgets/layout_widget/nav_drawer.dart';
 
 class OrderSuccessScreen extends StatelessWidget {

@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:watch_hub_ep/widgets/home_screen_widget/search_bar_widget.dart';
-import '../../../services/product_service.dart';
-import '../../../models/product_model.dart';
-import '../../../models/sort_option.dart';
-import '../../../widgets/catalog_screen_widget/filter_panel.dart';
-import '../../../widgets/catalog_screen_widget/sort_panel.dart';
-import '../../../widgets/catalog_screen_widget/view_toggle.dart';
-import '../../../widgets/catalog_screen_widget/product_grid_item.dart';
-import '../../../widgets/catalog_screen_widget/product_list_item.dart';
-import '../../../widgets/layout_widget/app_header.dart';
-import '../../../widgets/layout_widget/nav_drawer.dart';
-import '../../../widgets/layout_widget/footer_widget.dart';
+import '../../services/product_service.dart';
+import '../../models/product_model.dart';
+import '../../models/sort_option.dart';
+import '../../widgets/catalog_screen_widget/filter_panel.dart';
+import '../../widgets/catalog_screen_widget/sort_panel.dart';
+import '../../widgets/catalog_screen_widget/view_toggle.dart';
+import '../../widgets/catalog_screen_widget/product_grid_item.dart';
+import '../../widgets/catalog_screen_widget/product_list_item.dart';
 
 class CatalogScreen extends StatefulWidget {
   const CatalogScreen({super.key});
@@ -185,8 +182,6 @@ class _CatalogScreenState extends State<CatalogScreen> {
     final aspectRatio = itemWidth / itemHeight;
 
     return Scaffold(
-      drawer: const NavDrawer(),
-      appBar: const AppHeader(),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(

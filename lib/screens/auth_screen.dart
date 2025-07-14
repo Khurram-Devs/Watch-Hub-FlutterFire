@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:watch_hub_ep/widgets/auth_screen_widget/login_form.dart';
 import 'package:watch_hub_ep/widgets/auth_screen_widget/signup_form.dart';
-import 'package:watch_hub_ep/widgets/layout_widget/app_header.dart';
-import 'package:watch_hub_ep/widgets/layout_widget/footer_widget.dart';
-import 'package:watch_hub_ep/widgets/layout_widget/nav_drawer.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -41,8 +38,6 @@ class _AuthScreenState extends State<AuthScreen>
             : double.infinity;
 
     return Scaffold(
-      drawer: const NavDrawer(),
-      appBar: const AppHeader(),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),

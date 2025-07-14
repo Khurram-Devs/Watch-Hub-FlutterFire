@@ -3,9 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:watch_hub_ep/models/product_model.dart';
-import 'package:watch_hub_ep/widgets/layout_widget/app_header.dart';
-import 'package:watch_hub_ep/widgets/layout_widget/nav_drawer.dart';
-import 'package:watch_hub_ep/widgets/layout_widget/footer_widget.dart';
 import 'package:watch_hub_ep/widgets/product_detail_widget/image_gallery.dart';
 import 'package:watch_hub_ep/widgets/product_detail_widget/product_info.dart';
 import 'package:watch_hub_ep/widgets/product_detail_widget/product_specs.dart';
@@ -58,8 +55,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: const AppHeader(),
-      drawer: const NavDrawer(),
       body: SafeArea(
         child: isLoading
             ? const Center(child: CircularProgressIndicator())

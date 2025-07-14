@@ -3,20 +3,23 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
-import 'package:watch_hub_ep/screens/user/address_book_screen.dart';
-import 'package:watch_hub_ep/screens/user/orders_screen.dart';
-import 'package:watch_hub_ep/screens/user/profile_screen.dart';
-import 'package:watch_hub_ep/screens/user/wishlist_screen.dart';
 
 import 'firebase_options.dart';
-import './theme/theme_provider.dart';
-import './screens/user/home_screen.dart';
-import './screens/user/catalog_screen.dart';
-import './screens/user/redirect_auth_screen.dart';
-import './screens/user/cart_screen.dart';
-import './screens/user/checkout_screen.dart';
-import './screens/user/order_success_screen.dart';
-import './screens/user/product_detail_screen.dart';
+import 'theme/theme_provider.dart';
+
+import 'screens/home_screen.dart';
+import 'screens/catalog_screen.dart';
+import 'screens/redirect_auth_screen.dart';
+import 'screens/cart_screen.dart';
+import 'screens/checkout_screen.dart';
+import 'screens/order_success_screen.dart';
+import 'screens/product_detail_screen.dart';
+import 'screens/profile_screen.dart';
+import 'screens/address_book_screen.dart';
+import 'screens/wishlist_screen.dart';
+import 'screens/orders_screen.dart';
+
+import 'widgets/layout_widget/main_scaffold.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,7 +35,6 @@ void main() async {
   );
 }
 
-/// Notify GoRouter when auth state changes
 class AuthChangeNotifier extends ChangeNotifier {
   AuthChangeNotifier() {
     FirebaseAuth.instance.authStateChanges().listen((_) => notifyListeners());
@@ -64,9 +66,7 @@ class MyApp extends StatelessWidget {
         ];
 
         if (!isLoggedIn &&
-            protectedRoutes.any(
-              (route) => state.matchedLocation.startsWith(route),
-            )) {
+            protectedRoutes.any((r) => state.matchedLocation.startsWith(r))) {
           return '/auth';
         }
 
@@ -77,43 +77,69 @@ class MyApp extends StatelessWidget {
         return null;
       },
       routes: [
-        GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
+        GoRoute(
+          path: '/home',
+          builder:
+              (context, state) =>
+                  const MainScaffold(currentIndex: 0, child: HomeScreen()),
+        ),
         GoRoute(
           path: '/catalog',
-          builder: (context, state) => const CatalogScreen(),
+          builder:
+              (context, state) =>
+                  const MainScaffold(currentIndex: 1, child: CatalogScreen()),
         ),
         GoRoute(
           path: '/auth',
-          builder: (context, state) => const RedirectAuthScreen(),
+          builder:
+              (context, state) => const MainScaffold(
+                currentIndex: 3,
+                child: RedirectAuthScreen(),
+              ),
         ),
         GoRoute(
           path: '/profile',
-          builder: (context, state) => const ProfileScreen(),
+          builder:
+              (context, state) =>
+                  const MainScaffold(currentIndex: 3, child: ProfileScreen()),
         ),
         GoRoute(
           path: '/address-book',
-          builder: (context, state) => AddressBookScreen(),
+          builder:
+              (context, state) =>
+                  MainScaffold(currentIndex: 3, child: AddressBookScreen()),
         ),
         GoRoute(
           path: '/wishlist',
-          builder: (context, state) => WishlistScreen(),
+          builder:
+              (context, state) =>
+                  MainScaffold(currentIndex: 2, child: WishlistScreen()),
         ),
         GoRoute(
           path: '/orders',
-          builder: (context, state) => OrdersScreen(),
+          builder:
+              (context, state) =>
+                  MainScaffold(currentIndex: 3, child: OrdersScreen()),
         ),
-        GoRoute(path: '/cart', builder: (context, state) => const CartScreen()),
+        GoRoute(
+          path: '/cart',
+          builder:
+              (context, state) =>
+                  const MainScaffold(currentIndex: 2, child: CartScreen()),
+        ),
         GoRoute(
           path: '/checkout',
           name: 'checkout',
           builder: (context, state) {
             final cartData = state.extra as Map<String, dynamic>;
-            return CheckoutScreen(
-              cartItems: cartData['items'],
-              subtotal: cartData['subtotal'],
-              tax: cartData['tax'],
-              shipping: cartData['shipping'],
-              total: cartData['total'],
+            return const MainScaffold(
+              child: CheckoutScreen(
+                cartItems: [],
+                subtotal: 0,
+                tax: 0,
+                shipping: 0,
+                total: 0,
+              ),
             );
           },
         ),
@@ -121,26 +147,17 @@ class MyApp extends StatelessWidget {
           path: '/product/:id',
           builder: (context, state) {
             final id = state.pathParameters['id']!;
-            return ProductDetailScreen(productId: id);
+            return const MainScaffold(
+              child: ProductDetailScreen(productId: ''),
+            );
           },
         ),
-        // GoRoute(
-        //   path: '/profile',
-        //   builder: (context, state) => const ProfileScreen(tab: 'profile'),
-        // ),
-        // GoRoute(
-        //   path: '/profile/:tab',
-        //   builder: (context, state) {
-        //     final tab = state.pathParameters['tab']!;
-        //     return ProfileScreen(tab: tab);
-        //   },
-        // ),
         GoRoute(
           path: '/order-success/:orderId',
           name: 'order-success',
           builder: (context, state) {
             final orderId = state.pathParameters['orderId']!;
-            return OrderSuccessScreen(orderId: orderId);
+            return const MainScaffold(child: OrderSuccessScreen(orderId: ''));
           },
         ),
       ],
