@@ -3,69 +3,52 @@ import 'package:flutter/material.dart';
 import 'package:watch_hub_ep/models/user_model.dart';
 import 'package:watch_hub_ep/services/profile_service.dart';
 import 'package:watch_hub_ep/widgets/layout_widget/app_header.dart';
-import 'package:watch_hub_ep/widgets/layout_widget/footer_widget.dart';
 import 'package:watch_hub_ep/widgets/layout_widget/nav_drawer.dart';
-import 'package:watch_hub_ep/widgets/profile_screen_widget/addresses_tab.dart';
-import 'package:watch_hub_ep/widgets/profile_screen_widget/orders_tab.dart';
-import 'package:watch_hub_ep/widgets/profile_screen_widget/profile_tab.dart';
-import 'package:watch_hub_ep/widgets/profile_screen_widget/wishlist_tab.dart';
 
 class ProfileScreen extends StatefulWidget {
-  final String tab;
-  const ProfileScreen({super.key, required this.tab});
+  const ProfileScreen({super.key});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tc;
-  final ProfileService _srv = ProfileService();
+class _ProfileScreenState extends State<ProfileScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _profileService = ProfileService();
 
-  final nameController = TextEditingController();
-  final emailController = TextEditingController();
-  final phoneController = TextEditingController();
-  final avatarController = TextEditingController();
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _avatarController = TextEditingController();
 
-@override
-void initState() {
-  super.initState();
-  _tc = TabController(length: 4, vsync: this);
+  bool _editing = false;
+  late final StreamSubscription _profileSub;
 
-  final initialIndex = switch (widget.tab.toLowerCase()) {
-    'addressbook' => 1,
-    'wishlist' => 2,
-    'orders' => 3,
-    _ => 0,
-  };
-  _tc.index = initialIndex;
-
-  _profileSub = _srv.profileStream().listen((snap) {
-    if (!snap.exists || !mounted) return;
-    final user = UserModel.fromDoc(snap);
-    setState(() {
-      nameController.text = user.name;
-      emailController.text = user.email;
-      phoneController.text = user.phone;
-      avatarController.text = user.avatar;
+  @override
+  void initState() {
+    super.initState();
+    _profileSub = _profileService.profileStream().listen((doc) {
+      if (!doc.exists || !mounted) return;
+      final user = UserModel.fromDoc(doc);
+      setState(() {
+        _nameController.text = user.name;
+        _emailController.text = user.email;
+        _phoneController.text = user.phone;
+        _avatarController.text = user.avatar;
+      });
     });
-  });
-}
+  }
 
-late final StreamSubscription _profileSub;
+  @override
+  void dispose() {
+    _profileSub.cancel();
+    _nameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _avatarController.dispose();
+    super.dispose();
+  }
 
-@override
-void dispose() {
-  _profileSub.cancel();
-  _tc.dispose();
-  nameController.dispose();
-  emailController.dispose();
-  phoneController.dispose();
-  avatarController.dispose();
-  super.dispose();
-}
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -80,88 +63,87 @@ void dispose() {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Your Account',
+                'Edit Profile',
                 style: theme.textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 16),
-              Container(
-                decoration: BoxDecoration(
-                  color: theme.cardColor,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
-                ),
+              const SizedBox(height: 24),
+              Form(
+                key: _formKey,
                 child: Column(
                   children: [
-                    TabBar(
-                      controller: _tc,
-                      isScrollable: true,
-                      indicatorSize: TabBarIndicatorSize.label,
-                      indicator: BoxDecoration(
-                        borderRadius: BorderRadius.circular(30),
-                        color: theme.colorScheme.secondary.withOpacity(0.15),
-                      ),
-                      labelColor: theme.colorScheme.secondary,
-                      unselectedLabelColor: theme.textTheme.bodySmall?.color,
-                      labelPadding: const EdgeInsets.symmetric(horizontal: 8),
-                      tabs: const [
-                        Tab(
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 20),
-                            child: Text('Profile'),
+                    Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 40,
+                          backgroundImage: _avatarController.text.isNotEmpty
+                              ? NetworkImage(_avatarController.text)
+                              : const AssetImage('assets/images/default_user.png') as ImageProvider,
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Text(
+                            _nameController.text,
+                            style: theme.textTheme.titleLarge,
                           ),
                         ),
-                        Tab(
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 20),
-                            child: Text('Address Book'),
-                          ),
-                        ),
-                        Tab(
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 20),
-                            child: Text('Wishlist'),
-                          ),
-                        ),
-                        Tab(
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 20),
-                            child: Text('Orders'),
-                          ),
+                        IconButton(
+                          icon: Icon(_editing ? Icons.cancel : Icons.edit),
+                          onPressed: () {
+                            setState(() => _editing = !_editing);
+                          },
                         ),
                       ],
                     ),
-                    Container(
-                      height: 600,
-                      padding: const EdgeInsets.all(16),
-                      child: TabBarView(
-                        controller: _tc,
-                        children: [
-                          BuildProfileTab(
-                            nameController: nameController,
-                            emailController: emailController,
-                            phoneController: phoneController,
-                            avatarController: avatarController,
-                            formKey: _formKey,
-                          ),
-                          AddressesTab(),
-                          WishlistTab(),
-                          OrdersTab(),
-                        ],
-                      ),
+                    const SizedBox(height: 24),
+                    TextFormField(
+                      controller: _nameController,
+                      enabled: _editing,
+                      decoration: const InputDecoration(labelText: 'Full Name'),
+                      validator: (v) => v == null || v.isEmpty ? 'Enter name' : null,
                     ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _emailController,
+                      enabled: false,
+                      decoration: const InputDecoration(labelText: 'Email'),
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _phoneController,
+                      enabled: _editing,
+                      decoration: const InputDecoration(labelText: 'Phone'),
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _avatarController,
+                      enabled: _editing,
+                      decoration: const InputDecoration(labelText: 'Avatar URL'),
+                      onChanged: (_) => setState(() {}),
+                    ),
+                    const SizedBox(height: 24),
+                    if (_editing)
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: ElevatedButton.icon(
+                          icon: const Icon(Icons.save),
+                          label: const Text('Save'),
+                          onPressed: () {
+                            if (_formKey.currentState!.validate()) {
+                              _profileService.updateProfile({
+                                'fullName': _nameController.text.trim(),
+                                'phone': _phoneController.text.trim(),
+                                'avatarUrl': _avatarController.text.trim(),
+                              });
+                              setState(() => _editing = false);
+                            }
+                          },
+                        ),
+                      ),
                   ],
                 ),
               ),
-              const SizedBox(height: 32),
-              const FooterWidget(),
             ],
           ),
         ),

@@ -108,10 +108,6 @@ class _AuthScreenState extends State<AuthScreen>
                   ),
                 ),
               ),
-
-              const SizedBox(height: 48),
-              const FooterWidget(),
-              const SizedBox(height: 32),
             ],
           ),
         ),

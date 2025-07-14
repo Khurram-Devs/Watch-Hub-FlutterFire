@@ -5,7 +5,7 @@ import 'package:watch_hub_ep/services/cart_service.dart';
 import 'package:watch_hub_ep/widgets/cart_screen_widget/cart_item_tile.dart';
 import 'package:watch_hub_ep/widgets/cart_screen_widget/cart_summary.dart';
 import 'package:watch_hub_ep/widgets/layout_widget/app_header.dart';
-import 'package:watch_hub_ep/widgets/layout_widget/footer_widget.dart';
+import 'package:watch_hub_ep/widgets/layout_widget/nav_drawer.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -35,14 +35,14 @@ class _CartScreenState extends State<CartScreen> {
 
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          // Header
-          SliverToBoxAdapter(child: const AppHeader()),
-
+      drawer: const NavDrawer(),
+      appBar: const AppHeader(),
+      body: SafeArea(
+        child: SingleChildScrollView(
           // Cart content
-          SliverToBoxAdapter(
+          
             child: FutureBuilder<List<Map<String, dynamic>>>(
               future: _cartFuture,
               builder: (context, snapshot) {
@@ -65,8 +65,6 @@ class _CartScreenState extends State<CartScreen> {
                         onPressed: () => context.push('/catalog'),
                         child: const Text("Add Products"),
                       ),
-                      const SizedBox(height: 60),
-                      const FooterWidget(),
                     ],
                   );
                 }
@@ -112,16 +110,13 @@ class _CartScreenState extends State<CartScreen> {
                         const SizedBox(height: 24),
                         const CartSummary(),
                       ],
-                      const SizedBox(height: 32),
-                      const FooterWidget(),
                     ],
                   ),
                 );
               },
             ),
           ),
-        ],
-      ),
-    );
+          ),
+      );
   }
 }

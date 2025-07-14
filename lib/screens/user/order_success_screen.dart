@@ -108,7 +108,6 @@ class OrderSuccessScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const FooterWidget(),
                   ],
                 ),
               ),

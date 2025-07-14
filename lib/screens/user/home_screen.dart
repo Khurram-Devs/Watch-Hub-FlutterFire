@@ -186,9 +186,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
               const SizedBox(height: 32),
               ContactUsForm(),
-              const SizedBox(height: 32),
-              FooterWidget(),
-              const SizedBox(height: 32),
             ],
           ),
         ),

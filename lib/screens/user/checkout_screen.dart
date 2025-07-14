@@ -72,7 +72,6 @@ class CheckoutScreen extends StatelessWidget {
                         ],
                       ),
               ),
-              const FooterWidget(),
             ],
           ),
         ),

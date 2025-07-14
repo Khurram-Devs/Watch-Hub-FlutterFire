@@ -92,8 +92,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         const ProductFAQ(),
                         const SizedBox(height: 32),
                         ProductReviewsSection(productId: product!.id),
-                        const SizedBox(height: 32),
-                        const FooterWidget(),
+
                       ],
                     ),
                   ),

@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:watch_hub_ep/screens/user/address_book_screen.dart';
+import 'package:watch_hub_ep/screens/user/orders_screen.dart';
+import 'package:watch_hub_ep/screens/user/profile_screen.dart';
+import 'package:watch_hub_ep/screens/user/wishlist_screen.dart';
 
 import 'firebase_options.dart';
 import './theme/theme_provider.dart';
@@ -13,7 +17,6 @@ import './screens/user/cart_screen.dart';
 import './screens/user/checkout_screen.dart';
 import './screens/user/order_success_screen.dart';
 import './screens/user/product_detail_screen.dart';
-import './screens/user/profile_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -53,15 +56,17 @@ class MyApp extends StatelessWidget {
         final protectedRoutes = [
           '/cart',
           '/checkout',
+          '/order-success',
           '/profile',
-          '/profile/profile',
-          '/profile/wishlist',
-          '/profile/address',
-          '/profile/orders',
+          '/address-book',
+          '/wishlist',
+          '/orders',
         ];
 
         if (!isLoggedIn &&
-            protectedRoutes.any((route) => state.matchedLocation.startsWith(route))) {
+            protectedRoutes.any(
+              (route) => state.matchedLocation.startsWith(route),
+            )) {
           return '/auth';
         }
 
@@ -73,8 +78,30 @@ class MyApp extends StatelessWidget {
       },
       routes: [
         GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
-        GoRoute(path: '/catalog', builder: (context, state) => const CatalogScreen()),
-        GoRoute(path: '/auth', builder: (context, state) => const RedirectAuthScreen()),
+        GoRoute(
+          path: '/catalog',
+          builder: (context, state) => const CatalogScreen(),
+        ),
+        GoRoute(
+          path: '/auth',
+          builder: (context, state) => const RedirectAuthScreen(),
+        ),
+        GoRoute(
+          path: '/profile',
+          builder: (context, state) => const ProfileScreen(),
+        ),
+        GoRoute(
+          path: '/address-book',
+          builder: (context, state) => AddressBookScreen(),
+        ),
+        GoRoute(
+          path: '/wishlist',
+          builder: (context, state) => WishlistScreen(),
+        ),
+        GoRoute(
+          path: '/orders',
+          builder: (context, state) => OrdersScreen(),
+        ),
         GoRoute(path: '/cart', builder: (context, state) => const CartScreen()),
         GoRoute(
           path: '/checkout',
@@ -97,17 +124,17 @@ class MyApp extends StatelessWidget {
             return ProductDetailScreen(productId: id);
           },
         ),
-        GoRoute(
-          path: '/profile',
-          builder: (context, state) => const ProfileScreen(tab: 'profile'),
-        ),
-        GoRoute(
-          path: '/profile/:tab',
-          builder: (context, state) {
-            final tab = state.pathParameters['tab']!;
-            return ProfileScreen(tab: tab);
-          },
-        ),
+        // GoRoute(
+        //   path: '/profile',
+        //   builder: (context, state) => const ProfileScreen(tab: 'profile'),
+        // ),
+        // GoRoute(
+        //   path: '/profile/:tab',
+        //   builder: (context, state) {
+        //     final tab = state.pathParameters['tab']!;
+        //     return ProfileScreen(tab: tab);
+        //   },
+        // ),
         GoRoute(
           path: '/order-success/:orderId',
           name: 'order-success',

@@ -322,10 +322,6 @@ class _CatalogScreenState extends State<CatalogScreen> {
                       itemBuilder:
                           (_, i) => ProductListItem(product: _products[i]),
                     ),
-
-                const SizedBox(height: 32),
-                const FooterWidget(),
-                const SizedBox(height: 32),
               ],
             ),
           ),
