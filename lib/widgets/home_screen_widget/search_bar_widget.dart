@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
+import 'package:watch_hub_ep/utils/string_utils.dart';
 import '../../models/product_model.dart';
 
 class SearchBarWidget extends StatefulWidget {
@@ -131,7 +132,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> with WidgetsBindingOb
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                product.title,
+                                capitalizeEachWord(product.title),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: theme.textTheme.titleSmall?.copyWith(
@@ -140,7 +141,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> with WidgetsBindingOb
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                '${product.brandName} • \$${product.price.toStringAsFixed(0)}',
+                                '${capitalize(product.brandName)} • \$${product.price.toStringAsFixed(0)}',
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   color: theme.textTheme.bodySmall?.color?.withOpacity(0.7),
                                 ),

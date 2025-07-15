@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:watch_hub_ep/utils/string_utils.dart';
 import 'package:watch_hub_ep/widgets/product_detail_widget/add_to_wishlist_button.dart';
 import '../../models/product_model.dart';
 import '../../theme/theme_provider.dart';
@@ -46,7 +47,7 @@ class ProductListItem extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                         decoration: BoxDecoration(
-                          color: ThemeProvider.goldenColor,
+                          color: ThemeProvider.goldenAccent,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
@@ -86,7 +87,7 @@ class ProductListItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      product.title,
+                      capitalizeEachWord(product.title),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.titleSmall?.copyWith(
@@ -96,7 +97,7 @@ class ProductListItem extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      product.brandName,
+                      capitalizeEachWord(product.brandName),
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.textTheme.bodySmall?.color?.withOpacity(0.7),
                         fontWeight: FontWeight.w600,
@@ -105,7 +106,7 @@ class ProductListItem extends StatelessWidget {
                     const SizedBox(height: 6),
                     if (product.description.isNotEmpty)
                       Text(
-                        product.description,
+                        capitalize(product.description),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.bodySmall,
@@ -126,7 +127,7 @@ class ProductListItem extends StatelessWidget {
                           '\$${discountedPrice.toStringAsFixed(0)}',
                           style: theme.textTheme.bodyMedium?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: ThemeProvider.emeraldGreen,
+                            color: ThemeProvider.goldenAccent,
                           ),
                         ),
                       ],

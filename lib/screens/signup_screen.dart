@@ -180,14 +180,14 @@ class _SignupScreenState extends State<SignupScreen> {
     return Scaffold(
       body: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 15),
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 500),
             child: Form(
               key: _formKey,
               child: Column(
                 children: [
-                  Text("Create Account", style: theme.textTheme.headlineMedium),
+                  Text("Create Account", style: theme.textTheme.displayLarge),
                   const SizedBox(height: 24),
 
                   TextFormField(

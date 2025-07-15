@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:watch_hub_ep/utils/string_utils.dart';
 import 'package:watch_hub_ep/widgets/product_detail_widget/add_to_wishlist_button.dart';
 import '../../models/product_model.dart';
 import '../../theme/theme_provider.dart';
@@ -65,7 +66,7 @@ class ProductGridItem extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: ThemeProvider.goldenColor,
+                          color: ThemeProvider.goldenAccent,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
@@ -107,7 +108,7 @@ class ProductGridItem extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    product.title,
+                    capitalizeEachWord(product.title),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.titleMedium?.copyWith(
@@ -118,7 +119,7 @@ class ProductGridItem extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    product.brandName,
+                    capitalizeEachWord(product.brandName),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.bodyLarge?.copyWith(
@@ -141,10 +142,10 @@ class ProductGridItem extends StatelessWidget {
                                 ),
                               ),
                               TextSpan(
-                                text: '\$${discountedPrice.toStringAsFixed(0)}',
+                                text: ' \$${discountedPrice.toStringAsFixed(0)}',
                                 style: theme.textTheme.bodyMedium?.copyWith(
                                   fontWeight: FontWeight.bold,
-                                  color: ThemeProvider.emeraldGreen,
+                                  color: ThemeProvider.goldenAccent,
                                 ),
                               ),
                             ],
@@ -154,7 +155,7 @@ class ProductGridItem extends StatelessWidget {
                           '\$${product.price.toStringAsFixed(0)}',
                           style: theme.textTheme.bodyMedium?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: ThemeProvider.emeraldGreen,
+                            color: ThemeProvider.midnightPrimary,
                           ),
                         ),
                 ],

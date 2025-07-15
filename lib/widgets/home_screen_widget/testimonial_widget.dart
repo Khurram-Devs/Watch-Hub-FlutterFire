@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:watch_hub_ep/utils/string_utils.dart';
 import '../../models/testimonial_model.dart';
 
 class TestimonialCarousel extends StatefulWidget {
@@ -220,7 +221,7 @@ class _TestimonialCarouselState extends State<TestimonialCarousel> {
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            '"${t.testimonial}"',
+                            '"${capitalize(t.testimonial)}"',
                             style: theme.textTheme.bodyMedium?.copyWith(
                               fontStyle: FontStyle.italic,
                               fontSize: fontSize,
@@ -229,14 +230,14 @@ class _TestimonialCarouselState extends State<TestimonialCarousel> {
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            t.fullName,
+                            capitalizeEachWord(t.fullName),
                             style: theme.textTheme.titleSmall?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: theme.colorScheme.secondary,
                               fontSize: fontSize,
                             ),
                           ),
-                          Text(t.occupation, style: theme.textTheme.bodySmall),
+                          Text(capitalize(t.occupation), style: theme.textTheme.bodySmall),
                         ],
                       ),
                     ),

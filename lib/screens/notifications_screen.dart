@@ -86,7 +86,7 @@ class NotificationsScreen extends StatelessWidget {
                             ? Theme.of(context).scaffoldBackgroundColor
                             : Theme.of(
                               context,
-                            ).colorScheme.primary.withOpacity(0.05),
+                            ).primaryColor.withOpacity(0.05),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   padding: const EdgeInsets.all(12),

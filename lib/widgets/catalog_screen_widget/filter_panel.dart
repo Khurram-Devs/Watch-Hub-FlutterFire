@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:watch_hub_ep/utils/string_utils.dart';
 import '../../theme/theme_provider.dart';
 
 class FilterPanel extends StatefulWidget {
@@ -145,14 +146,14 @@ Widget build(BuildContext context) {
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 4),
                         child: ChoiceChip(
-                          label: Text(name),
+                          label: Text(capitalize(name)),
                           selected: isSelected,
                           onSelected: (_) {
                             setState(() {
                               _selectedBrand = isSelected ? null : id;
                             });
                           },
-                          selectedColor: ThemeProvider.goldenColor,
+                          selectedColor: ThemeProvider.goldenAccent,
                           labelStyle: TextStyle(
                             color: isSelected
                                 ? (isDark ? Colors.black : Colors.white)
@@ -188,7 +189,7 @@ Widget build(BuildContext context) {
                         child: FilterChip(
                           selected: selected,
                           backgroundColor: theme.cardColor,
-                          selectedColor: ThemeProvider.goldenColor,
+                          selectedColor: ThemeProvider.goldenAccent,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(24),
                           ),
@@ -210,7 +211,7 @@ Widget build(BuildContext context) {
                               ),
                               const SizedBox(width: 6),
                               Text(
-                                name,
+                               capitalizeEachWord(name),
                                 style: TextStyle(
                                   color: selected
                                       ? (isDark
@@ -295,7 +296,7 @@ Widget build(BuildContext context) {
                           _minRating = isSelected ? null : r?.toDouble();
                         });
                       },
-                      selectedColor: ThemeProvider.goldenColor,
+                      selectedColor: ThemeProvider.goldenAccent,
                       labelStyle: TextStyle(
                         color: isSelected
                             ? (isDark ? Colors.black : Colors.white)

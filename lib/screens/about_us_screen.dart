@@ -21,7 +21,7 @@ class AboutUsScreen extends StatelessWidget {
                   "About WatchHub",
                   style: theme.textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.primary,
+                    color: theme.primaryColor,
                   ),
                 ),
                 const SizedBox(height: 16),

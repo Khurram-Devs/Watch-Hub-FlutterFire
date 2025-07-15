@@ -12,41 +12,41 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final user = FirebaseAuth.instance.currentUser;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         AppBar(
-          backgroundColor: theme.appBarTheme.backgroundColor ?? Colors.black,
+          backgroundColor: theme.appBarTheme.backgroundColor ?? theme.scaffoldBackgroundColor,
           elevation: 0,
           toolbarHeight: 60,
           leading: Builder(
-            builder:
-                (context) => IconButton(
-                  icon: const Icon(Icons.menu, color: Color(0xFFC0A265)),
-                  onPressed: () {
-                    final scaffold = Scaffold.maybeOf(context);
-                    if (scaffold?.hasDrawer ?? false) {
-                      scaffold?.openDrawer();
-                    } else {
-                      debugPrint('No drawer found in parent Scaffold');
-                    }
-                  },
-                ),
+            builder: (context) => IconButton(
+              icon: Icon(Icons.menu, color: colorScheme.secondary),
+              onPressed: () {
+                final scaffold = Scaffold.maybeOf(context);
+                if (scaffold?.hasDrawer ?? false) {
+                  scaffold?.openDrawer();
+                } else {
+                  debugPrint('No drawer found in parent Scaffold');
+                }
+              },
+            ),
           ),
           title: Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Icon(Icons.diamond_rounded, color: Color(0xFFC0A265), size: 20),
-              SizedBox(width: 6),
+            children: [
+              Icon(Icons.diamond_rounded, color: colorScheme.secondary, size: 20),
+              const SizedBox(width: 6),
               Text(
                 'WATCH-HUB',
                 style: TextStyle(
                   fontSize: 20,
                   letterSpacing: 1.2,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFFC0A265),
+                  color: colorScheme.secondary,
                 ),
               ),
             ],
@@ -58,13 +58,12 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
                 children: [
                   // Notifications badge
                   StreamBuilder<QuerySnapshot>(
-                    stream:
-                        FirebaseFirestore.instance
-                            .collection('usersProfile')
-                            .doc(user.uid)
-                            .collection('notifications')
-                            .where('isRead', isEqualTo: false)
-                            .snapshots(),
+                    stream: FirebaseFirestore.instance
+                        .collection('usersProfile')
+                        .doc(user.uid)
+                        .collection('notifications')
+                        .where('isRead', isEqualTo: false)
+                        .snapshots(),
                     builder: (context, snapshot) {
                       final count = snapshot.data?.docs.length ?? 0;
 
@@ -72,9 +71,9 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
                         alignment: Alignment.topRight,
                         children: [
                           IconButton(
-                            icon: const Icon(
+                            icon: Icon(
                               Icons.notifications_none_rounded,
-                              color: Color(0xFFC0A265),
+                              color: colorScheme.secondary,
                             ),
                             onPressed: () => context.push('/notifications'),
                           ),
@@ -110,12 +109,11 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
 
                   // Cart badge
                   StreamBuilder<QuerySnapshot>(
-                    stream:
-                        FirebaseFirestore.instance
-                            .collection('usersProfile')
-                            .doc(user.uid)
-                            .collection('cart')
-                            .snapshots(),
+                    stream: FirebaseFirestore.instance
+                        .collection('usersProfile')
+                        .doc(user.uid)
+                        .collection('cart')
+                        .snapshots(),
                     builder: (context, snapshot) {
                       int totalQty = 0;
                       if (snapshot.hasData) {
@@ -129,9 +127,9 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
                         alignment: Alignment.topRight,
                         children: [
                           IconButton(
-                            icon: const Icon(
+                            icon: Icon(
                               Icons.shopping_cart_outlined,
-                              color: Color(0xFFC0A265),
+                              color: colorScheme.secondary,
                             ),
                             onPressed: () => context.push('/cart'),
                           ),
@@ -168,7 +166,7 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
               )
             else
               const SizedBox(
-                width: kToolbarHeight * 2,
+                width: kToolbarHeight,
                 child: Icon(
                   Icons.shopping_cart_outlined,
                   color: Colors.transparent,
