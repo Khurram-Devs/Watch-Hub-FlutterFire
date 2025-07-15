@@ -7,6 +7,9 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
   const AppHeader({super.key});
 
   @override
+  Size get preferredSize => const Size.fromHeight(60);
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final user = FirebaseAuth.instance.currentUser;
@@ -19,19 +22,18 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
           elevation: 0,
           toolbarHeight: 60,
           leading: Builder(
-            builder: (context) {
-              return IconButton(
-                icon: const Icon(Icons.menu, color: Color(0xFFC0A265)),
-                onPressed: () {
-                  final scaffold = Scaffold.maybeOf(context);
-                  if (scaffold?.hasDrawer ?? false) {
-                    scaffold?.openDrawer();
-                  } else {
-                    debugPrint('No drawer found in parent Scaffold');
-                  }
-                },
-              );
-            },
+            builder:
+                (context) => IconButton(
+                  icon: const Icon(Icons.menu, color: Color(0xFFC0A265)),
+                  onPressed: () {
+                    final scaffold = Scaffold.maybeOf(context);
+                    if (scaffold?.hasDrawer ?? false) {
+                      scaffold?.openDrawer();
+                    } else {
+                      debugPrint('No drawer found in parent Scaffold');
+                    }
+                  },
+                ),
           ),
           title: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -51,75 +53,130 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
           ),
           centerTitle: true,
           actions: [
-            user != null
-                ? StreamBuilder<QuerySnapshot>(
-                  stream:
-                      FirebaseFirestore.instance
-                          .collection('usersProfile')
-                          .doc(user.uid)
-                          .collection('cart')
-                          .snapshots(),
-                  builder: (context, snapshot) {
-                    int totalQty = 0;
-                    if (snapshot.hasData) {
-                      for (var doc in snapshot.data!.docs) {
-                        final data = doc.data() as Map<String, dynamic>;
-                        totalQty += (data['quantity'] ?? 1) as int;
-                      }
-                    }
+            if (user != null)
+              Row(
+                children: [
+                  // Notifications badge
+                  StreamBuilder<QuerySnapshot>(
+                    stream:
+                        FirebaseFirestore.instance
+                            .collection('usersProfile')
+                            .doc(user.uid)
+                            .collection('notifications')
+                            .where('isRead', isEqualTo: false) // 👈 Only unread
+                            .snapshots(),
+                    builder: (context, snapshot) {
+                      final count = snapshot.data?.docs.length ?? 0;
 
-                    return Stack(
-                      alignment: Alignment.topRight,
-                      children: [
-                        IconButton(
-                          icon: const Icon(
-                            Icons.shopping_cart_outlined,
-                            color: Color(0xFFC0A265),
+                      return Stack(
+                        alignment: Alignment.topRight,
+                        children: [
+                          IconButton(
+                            icon: const Icon(
+                              Icons.notifications_none_rounded,
+                              color: Color(0xFFC0A265),
+                            ),
+                            onPressed: () => context.push('/notifications'),
                           ),
-                          onPressed: () => context.push('/cart'),
-                        ),
-                        if (totalQty > 0)
-                          Positioned(
-                            right: 6,
-                            top: 6,
-                            child: Container(
-                              padding: const EdgeInsets.all(5),
-                              decoration: const BoxDecoration(
-                                color: Colors.redAccent,
-                                shape: BoxShape.circle,
-                              ),
-                              constraints: const BoxConstraints(
-                                minWidth: 16,
-                                minHeight: 16,
-                              ),
-                              child: Text(
-                                '$totalQty',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
+                          if (count > 0)
+                            Positioned(
+                              right: 6,
+                              top: 6,
+                              child: Container(
+                                padding: const EdgeInsets.all(5),
+                                decoration: const BoxDecoration(
+                                  color: Colors.redAccent,
+                                  shape: BoxShape.circle,
                                 ),
-                                textAlign: TextAlign.center,
+                                constraints: const BoxConstraints(
+                                  minWidth: 16,
+                                  minHeight: 16,
+                                ),
+                                child: Text(
+                                  '$count',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
                               ),
                             ),
-                          ),
-                      ],
-                    );
-                  },
-                )
-                : const SizedBox(
-                  width: kToolbarHeight,
-                  child: Icon(
-                    Icons.shopping_cart_outlined,
-                    color: Colors.transparent,
+                        ],
+                      );
+                    },
                   ),
+
+                  // Cart badge
+                  StreamBuilder<QuerySnapshot>(
+                    stream:
+                        FirebaseFirestore.instance
+                            .collection('usersProfile')
+                            .doc(user.uid)
+                            .collection('cart')
+                            .snapshots(),
+                    builder: (context, snapshot) {
+                      int totalQty = 0;
+                      if (snapshot.hasData) {
+                        for (var doc in snapshot.data!.docs) {
+                          final data = doc.data() as Map<String, dynamic>;
+                          totalQty += (data['quantity'] ?? 1) as int;
+                        }
+                      }
+
+                      return Stack(
+                        alignment: Alignment.topRight,
+                        children: [
+                          IconButton(
+                            icon: const Icon(
+                              Icons.shopping_cart_outlined,
+                              color: Color(0xFFC0A265),
+                            ),
+                            onPressed: () => context.push('/cart'),
+                          ),
+                          if (totalQty > 0)
+                            Positioned(
+                              right: 6,
+                              top: 6,
+                              child: Container(
+                                padding: const EdgeInsets.all(5),
+                                decoration: const BoxDecoration(
+                                  color: Colors.redAccent,
+                                  shape: BoxShape.circle,
+                                ),
+                                constraints: const BoxConstraints(
+                                  minWidth: 16,
+                                  minHeight: 16,
+                                ),
+                                child: Text(
+                                  '$totalQty',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                        ],
+                      );
+                    },
+                  ),
+                ],
+              )
+            else
+              const SizedBox(
+                width: kToolbarHeight * 2,
+                child: Icon(
+                  Icons.shopping_cart_outlined,
+                  color: Colors.transparent,
                 ),
+              ),
           ],
         ),
       ],
     );
   }
-
-  @override
-  Size get preferredSize => const Size.fromHeight(60);
 }

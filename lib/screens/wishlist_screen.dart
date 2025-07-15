@@ -25,12 +25,14 @@ class WishlistScreen extends StatelessWidget {
     return await _cartService.isProductInCart(productId);
   }
 
-  Future<void> _addToCart(BuildContext context, ProductModel product) async {
-    await _cartService.addProductToCart(product);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Product moved to cart')),
-    );
-  }
+Future<void> _addToCart(BuildContext context, ProductModel product) async {
+  await _cartService.addProductToCart(product);
+  await _removeFromWishlist(product.id);
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(content: Text('Product moved to cart')),
+  );
+}
+
 
   @override
   Widget build(BuildContext context) {

@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:watch_hub_ep/screens/about_us_screen.dart';
 import 'package:watch_hub_ep/screens/login_screen.dart';
+import 'package:watch_hub_ep/screens/notifications_screen.dart';
 import 'package:watch_hub_ep/screens/signup_screen.dart';
 
 import 'firebase_options.dart';
@@ -138,6 +139,14 @@ class MyApp extends StatelessWidget {
           builder:
               (context, state) =>
                   const MainScaffold(currentIndex: 2, child: CartScreen()),
+        ),
+        GoRoute(
+          path: '/notifications',
+          builder:
+              (context, state) => const MainScaffold(
+                currentIndex: 3,
+                child: NotificationsScreen(),
+              ),
         ),
         GoRoute(
           path: '/checkout',
