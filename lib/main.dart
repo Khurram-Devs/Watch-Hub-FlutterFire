@@ -4,13 +4,14 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:watch_hub_ep/screens/about_us_screen.dart';
+import 'package:watch_hub_ep/screens/login_screen.dart';
+import 'package:watch_hub_ep/screens/signup_screen.dart';
 
 import 'firebase_options.dart';
 import 'theme/theme_provider.dart';
 
 import 'screens/home_screen.dart';
 import 'screens/catalog_screen.dart';
-import 'screens/redirect_auth_screen.dart';
 import 'screens/cart_screen.dart';
 import 'screens/checkout_screen.dart';
 import 'screens/order_success_screen.dart';
@@ -54,7 +55,7 @@ class MyApp extends StatelessWidget {
       refreshListenable: Provider.of<AuthChangeNotifier>(context),
       redirect: (context, state) {
         final isLoggedIn = FirebaseAuth.instance.currentUser != null;
-        final isAuthPage = state.matchedLocation == '/auth';
+        final isAuthPage = state.matchedLocation.startsWith('/auth');
 
         final protectedRoutes = [
           '/cart',
@@ -68,7 +69,7 @@ class MyApp extends StatelessWidget {
 
         if (!isLoggedIn &&
             protectedRoutes.any((r) => state.matchedLocation.startsWith(r))) {
-          return '/auth';
+          return '/auth/signup';
         }
 
         if (isLoggedIn && isAuthPage) {
@@ -91,12 +92,16 @@ class MyApp extends StatelessWidget {
                   const MainScaffold(currentIndex: 1, child: CatalogScreen()),
         ),
         GoRoute(
-          path: '/auth',
+          path: '/auth/login',
           builder:
-              (context, state) => const MainScaffold(
-                currentIndex: 3,
-                child: RedirectAuthScreen(),
-              ),
+              (context, state) =>
+                  const MainScaffold(currentIndex: 2, child: LoginScreen()),
+        ),
+        GoRoute(
+          path: '/auth/signup',
+          builder:
+              (context, state) =>
+                  const MainScaffold(currentIndex: 2, child: SignupScreen()),
         ),
         GoRoute(
           path: '/profile',
@@ -154,7 +159,10 @@ class MyApp extends StatelessWidget {
           path: '/product/:id',
           builder: (context, state) {
             final id = state.pathParameters['id']!;
-            return MainScaffold(currentIndex: 1,child: ProductDetailScreen(productId: id));
+            return MainScaffold(
+              currentIndex: 1,
+              child: ProductDetailScreen(productId: id),
+            );
           },
         ),
         GoRoute(
@@ -162,7 +170,10 @@ class MyApp extends StatelessWidget {
           name: 'order-success',
           builder: (context, state) {
             final orderId = state.pathParameters['orderId']!;
-            return const MainScaffold(currentIndex: 0,child: OrderSuccessScreen(orderId: ''));
+            return const MainScaffold(
+              currentIndex: 0,
+              child: OrderSuccessScreen(orderId: ''),
+            );
           },
         ),
       ],

@@ -49,7 +49,7 @@ class _AddToWishlistButtonState extends State<AddToWishlistButton> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please login to add items to wishlist.")),
       );
-      context.push('/auth');
+      context.push('/auth/login');
       return;
     }
 

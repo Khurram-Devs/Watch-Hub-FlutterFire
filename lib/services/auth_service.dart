@@ -15,7 +15,7 @@ class AuthService {
       ).showSnackBar(const SnackBar(content: Text('Logged out successfully')));
 
       if (context.mounted) {
-        context.go('/auth');
+        context.go('/auth/signup');
       }
     } catch (e) {
       ScaffoldMessenger.of(

@@ -112,7 +112,7 @@ class NavDrawer extends StatelessWidget {
                 // Auth Actions
                 user == null
                     ? ElevatedButton.icon(
-                      onPressed: () => context.go('/auth'),
+                      onPressed: () => context.go('/auth/login'),
                       icon: const Icon(Icons.login),
                       label: const Text('Login'),
                       style: ElevatedButton.styleFrom(
@@ -157,7 +157,7 @@ class NavDrawer extends StatelessWidget {
                               onPressed: () async {
                                 await FirebaseAuth.instance.signOut();
                                 if (context.mounted) {
-                                  context.go('/auth');
+                                  context.go('/auth/login');
                                 }
                               },
                             ),

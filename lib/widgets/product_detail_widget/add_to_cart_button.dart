@@ -41,7 +41,7 @@ class _AddToCartButtonState extends State<AddToCartButton> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please login to add items to cart.")),
       );
-      context.push('/auth');
+      context.push('/auth/login');
       return;
     }
 
