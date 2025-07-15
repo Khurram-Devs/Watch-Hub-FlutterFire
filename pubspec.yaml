@@ -28,6 +28,7 @@ dependencies:
   path_provider: ^2.1.2
   file_picker: ^6.1.1
   http: ^1.4.6
+  timeago: ^3.6.0
 
 dev_dependencies:
   flutter_test:
