@@ -37,7 +37,6 @@ class _CartScreenState extends State<CartScreen> {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          // Cart content
           
             child: FutureBuilder<List<Map<String, dynamic>>>(
               future: _cartFuture,

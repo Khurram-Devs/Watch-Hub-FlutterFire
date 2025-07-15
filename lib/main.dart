@@ -153,13 +153,13 @@ class MyApp extends StatelessWidget {
           name: 'checkout',
           builder: (context, state) {
             final cartData = state.extra as Map<String, dynamic>;
-            return const MainScaffold(
+            return MainScaffold(
               child: CheckoutScreen(
-                cartItems: [],
-                subtotal: 0,
-                tax: 0,
-                shipping: 0,
-                total: 0,
+                cartItems: List<Map<String, dynamic>>.from(cartData['items']),
+                subtotal: cartData['subtotal'] ?? 0.0,
+                tax: cartData['tax'] ?? 0.0,
+                shipping: cartData['shipping'] ?? 0.0,
+                total: cartData['total'] ?? 0.0,
               ),
             );
           },

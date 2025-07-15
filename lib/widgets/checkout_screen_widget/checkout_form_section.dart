@@ -65,7 +65,7 @@ class _CheckoutFormSectionState extends State<CheckoutFormSection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Billing Details', style: theme.textTheme.headlineSmall),
+        Text('Billing Details', style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
         const SizedBox(height: 12),
         if (savedAddresses.isNotEmpty)
           DropdownButtonFormField<Map<String, dynamic>?>(
@@ -121,47 +121,35 @@ class _CheckoutFormSectionState extends State<CheckoutFormSection> {
           ),
         ),
         const SizedBox(height: 24),
-        Text('Payment Method', style: theme.textTheme.titleMedium),
+        Text('Payment Method', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+        const SizedBox(height: 8),
         RadioListTile<String>(
           title: const Text('Cash on Delivery'),
           value: 'COD',
           groupValue: paymentMethod,
           onChanged: (val) => setState(() => paymentMethod = val!),
         ),
-        RadioListTile<String>(
-          title: const Text('Stripe (Not supported yet)'),
-          value: 'Stripe',
-          groupValue: paymentMethod,
-          onChanged: null,
-        ),
       ],
     );
   }
 
-Widget _field(TextEditingController controller, String label, [bool required = false]) {
-  final alwaysEnabled = [
-    firstNameCtrl,
-    lastNameCtrl,
-    companyCtrl,
-  ].contains(controller);
+  Widget _field(TextEditingController controller, String label, [bool required = false]) {
+    final alwaysEnabled = [firstNameCtrl, lastNameCtrl, companyCtrl].contains(controller);
+    final alwaysDisabled = controller == emailCtrl;
 
-  final alwaysDisabled = controller == emailCtrl;
-
-  return SizedBox(
-    width: widget.isMobile ? double.infinity : 250,
-    child: TextFormField(
-      controller: controller,
-      decoration: InputDecoration(labelText: label),
-      validator: required && controller.text.isEmpty
-          ? (_) => '$label is required'
-          : null,
-      readOnly: alwaysDisabled,
-      enabled: alwaysDisabled ? false : (alwaysEnabled || selectedAddress == null),
-    ),
-  );
-}
-
-
+    return SizedBox(
+      width: widget.isMobile ? double.infinity : 260,
+      child: TextFormField(
+        controller: controller,
+        decoration: InputDecoration(labelText: label, border: const OutlineInputBorder()),
+        validator: required && controller.text.isEmpty
+            ? (_) => '$label is required'
+            : null,
+        readOnly: alwaysDisabled,
+        enabled: alwaysDisabled ? false : (alwaysEnabled || selectedAddress == null),
+      ),
+    );
+  }
 
   @override
   void dispose() {

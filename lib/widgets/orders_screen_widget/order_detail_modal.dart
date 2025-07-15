@@ -16,8 +16,9 @@ class OrderDetailModal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final createdAt = (orderData['createdAt'] as Timestamp).toDate();
-    final items = (orderData['items'] as List<dynamic>).cast<Map<String, dynamic>>();
+
+    final createdAt = (orderData['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now();
+    final items = (orderData['items'] as List?)?.cast<Map<String, dynamic>>() ?? [];
     final total = (orderData['total'] as num?)?.toDouble() ?? 0.0;
     final tax = (orderData['tax'] as num?)?.toDouble() ?? 0.0;
     final subtotal = (orderData['subtotal'] as num?)?.toDouble() ?? 0.0;
@@ -26,60 +27,101 @@ class OrderDetailModal extends StatelessWidget {
     final status = orderData['status'] ?? 'Unknown';
 
     return Dialog(
-      insetPadding: const EdgeInsets.all(16),
       backgroundColor: theme.cardColor,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      insetPadding: const EdgeInsets.all(16),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxHeight: 600),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        constraints: const BoxConstraints(maxHeight: 620, maxWidth: 600),
+        child: Column(
+          children: [
+            // HEADER
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 20, 12, 0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Order #$orderId', style: theme.textTheme.titleMedium),
-                  TextButton.icon(
-                    onPressed: () async {
-                      await PDFInvoiceService.generateAndDownloadInvoice(orderId);
-                    },
-                    icon: const Icon(Icons.picture_as_pdf),
-                    label: const Text('Download Invoice'),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Order #$orderId', style: theme.textTheme.titleMedium),
+                        const SizedBox(height: 4),
+                        Text(
+                          DateFormat.yMMMd().add_jm().format(createdAt),
+                          style: theme.textTheme.bodySmall,
+                        ),
+                        const SizedBox(height: 4),
+                        Chip(
+                          label: Text(
+                            status,
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                          backgroundColor: _getStatusColor(status),
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.pop(context),
                   ),
                 ],
               ),
-              Text(DateFormat.yMMMd().add_jm().format(createdAt), style: theme.textTheme.bodySmall),
-              Text('Status: $status', style: theme.textTheme.bodyMedium?.copyWith(color: status == 'Cancelled' ? Colors.red : status == 'Shipped' ? Colors.green : Colors.orange)),
-              const Divider(height: 24),
+            ),
 
-              Expanded(
-                child: ListView.builder(
-                  itemCount: items.length,
-                  itemBuilder: (context, index) {
-                    final item = items[index];
-                    final qty = item['quantity'] ?? 1;
-                    final ref = item['productRef'] as DocumentReference;
+            // INVOICE BUTTON
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 4, 20, 0),
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: TextButton.icon(
+                  icon: const Icon(Icons.picture_as_pdf),
+                  label: const Text('Download Invoice'),
+                  onPressed: () async {
+                    await PDFInvoiceService.generateAndDownloadInvoice(orderId);
+                  },
+                ),
+              ),
+            ),
 
-                    return FutureBuilder<DocumentSnapshot>(
-                      future: ref.get(),
-                      builder: (context, snap) {
-                        if (!snap.hasData) return const Padding(padding: EdgeInsets.all(8), child: LinearProgressIndicator());
+            const Divider(height: 24),
 
-                        final product = snap.data!.data() as Map<String, dynamic>? ?? {};
-                        final title = product['title'] ?? 'Unknown';
-                        final price = (product['price'] as num?)?.toDouble() ?? 0.0;
-                        final image = (product['images'] as List?)?.first ?? '';
+            // ITEM LIST
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Scrollbar(
+                  child: ListView.separated(
+                    itemCount: items.length,
+                    separatorBuilder: (_, __) => const Divider(height: 24),
+                    itemBuilder: (context, index) {
+                      final item = items[index];
+                      final qty = item['quantity'] ?? 1;
+                      final ref = item['productRef'] as DocumentReference?;
 
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: Row(
+                      if (ref == null) return const SizedBox();
+
+                      return FutureBuilder<DocumentSnapshot>(
+                        future: ref.get(),
+                        builder: (context, snap) {
+                          if (!snap.hasData) {
+                            return const Center(child: LinearProgressIndicator());
+                          }
+
+                          final product = snap.data!.data() as Map<String, dynamic>? ?? {};
+                          final title = product['title'] ?? 'Unknown';
+                          final price = (product['price'] as num?)?.toDouble() ?? 0.0;
+                          final imageList = product['images'] as List? ?? [];
+                          final imageUrl = imageList.isNotEmpty ? imageList.first.toString() : '';
+
+                          return Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(8),
                                 child: Image.network(
-                                  image,
+                                  imageUrl,
                                   width: 60,
                                   height: 60,
                                   fit: BoxFit.cover,
@@ -87,7 +129,7 @@ class OrderDetailModal extends StatelessWidget {
                                     width: 60,
                                     height: 60,
                                     color: Colors.grey.shade200,
-                                    child: const Icon(Icons.watch),
+                                    child: const Icon(Icons.watch, size: 24),
                                   ),
                                 ),
                               ),
@@ -96,45 +138,80 @@ class OrderDetailModal extends StatelessWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(title, style: theme.textTheme.titleSmall),
+                                    Text(
+                                      title,
+                                      style: theme.textTheme.titleSmall,
+                                    ),
                                     const SizedBox(height: 4),
                                     Text('Quantity: $qty'),
                                     Text('Price: \$${price.toStringAsFixed(2)}'),
-                                    Text('Total: \$${(price * qty).toStringAsFixed(2)}'),
+                                    Text(
+                                      'Total: \$${(price * qty).toStringAsFixed(2)}',
+                                      style: const TextStyle(fontWeight: FontWeight.w500),
+                                    ),
                                   ],
                                 ),
                               ),
                             ],
-                          ),
-                        );
-                      },
-                    );
-                  },
+                          );
+                        },
+                      );
+                    },
+                  ),
                 ),
               ),
+            ),
 
-              const Divider(height: 24),
-              Align(
+            // FOOTER TOTALS
+            const Divider(height: 24),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+              child: Align(
                 alignment: Alignment.centerRight,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text('Subtotal: \$${subtotal.toStringAsFixed(2)}'),
-                    Text('Tax: \$${tax.toStringAsFixed(2)}'),
-                    Text('Shipping: \$${shipping.toStringAsFixed(2)}'),
-                    Text('Discount: -\$${discount.toStringAsFixed(2)}'),
+                    _totalRow('Subtotal', subtotal),
+                    _totalRow('Tax', tax),
+                    _totalRow('Shipping', shipping),
+                    _totalRow('Discount', -discount),
                     const SizedBox(height: 4),
                     Text(
                       'Total: \$${total.toStringAsFixed(2)}',
-                      style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ],
                 ),
-              )
-            ],
-          ),
+              ),
+            ),
+          ],
         ),
       ),
     );
+  }
+
+  Widget _totalRow(String label, double value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 1),
+      child: Text(
+        '$label: \$${value.toStringAsFixed(2)}',
+        style: const TextStyle(fontSize: 14),
+      ),
+    );
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case 'Cancelled':
+        return Colors.redAccent;
+      case 'Shipped':
+        return Colors.green;
+      case 'Delivered':
+        return Colors.blue;
+      default:
+        return Colors.orange;
+    }
   }
 }

@@ -31,8 +31,8 @@ class CartService {
       final product = await ProductModel.fromFirestoreWithBrand(
         productData,
         productSnap.id,
+        snapshot: productSnap,
       );
-      product.firestoreSnapshot = productSnap;
 
       if (product.stock != null && product.stock! > 0) {
         products.add(product);
@@ -102,8 +102,8 @@ class CartService {
       final product = await ProductModel.fromFirestoreWithBrand(
         productData,
         productSnap.id,
+        snapshot: productSnap,
       );
-      product.firestoreSnapshot = productSnap;
 
       if (product.stock != null && product.stock! > 0) {
         result.add({'product': product, 'quantity': quantity});

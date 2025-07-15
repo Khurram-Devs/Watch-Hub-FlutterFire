@@ -33,31 +33,32 @@ class ProductModel {
   });
 
   static Future<ProductModel> fromFirestoreWithBrand(
-    Map<String, dynamic> data,
-    String id, {
-    DocumentSnapshot? snapshot, // Add optional param
-  }) async {
-    final brandRef = data['brand'] as DocumentReference;
-    final brandSnap = await brandRef.get();
-    final brandData = brandSnap.data() as Map<String, dynamic>;
-    final brandName = brandData['name'];
+  Map<String, dynamic> data,
+  String id, {
+  DocumentSnapshot? snapshot,
+}) async {
+  final brandRef = data['brand'] as DocumentReference;
+  final brandSnap = await brandRef.get();
+  final brandData = brandSnap.data() as Map<String, dynamic>;
+  final brandName = brandData['name'];
 
-    return ProductModel(
-      id: id,
-      title: data['title'] ?? '',
-      subtitle: data['subtitle'] ?? '',
-      description: data['description'] ?? '',
-      specs: Map<String, dynamic>.from(data['specs'] ?? {}),
-      images: List<String>.from(data['images'] ?? []),
-      price: (data['price'] ?? 0).toDouble(),
-      averageRating: (data['averageRating'] ?? 0).toDouble(),
-      discountPercentage: (data['discountPercentage'] ?? 0).toDouble(),
-      stock: data['inventoryCount'] ?? 0,
-      createdAt: (data['createdAt'] as Timestamp).toDate(),
-      brandName: brandName,
-      firestoreSnapshot: snapshot, // ✅ Set the snapshot here
-    );
-  }
+  return ProductModel(
+    id: id,
+    title: data['title'] ?? '',
+    subtitle: data['subtitle'] ?? '',
+    description: data['description'] ?? '',
+    specs: Map<String, dynamic>.from(data['specs'] ?? {}),
+    images: List<String>.from(data['images'] ?? []),
+    price: (data['price'] ?? 0).toDouble(),
+    averageRating: (data['averageRating'] ?? 0).toDouble(),
+    discountPercentage: (data['discountPercentage'] ?? 0).toDouble(),
+    stock: data['inventoryCount'] ?? 0,
+    createdAt: (data['createdAt'] as Timestamp).toDate(),
+    brandName: brandName,
+    firestoreSnapshot: snapshot,
+  );
+}
+
 
   static Future<ProductModel> fromDoc(DocumentSnapshot doc) async {
     final data = doc.data() as Map<String, dynamic>;

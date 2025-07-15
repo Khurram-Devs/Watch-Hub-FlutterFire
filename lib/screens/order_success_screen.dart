@@ -18,7 +18,6 @@ class OrderSuccessScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            const AppHeader(),
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
@@ -66,7 +65,7 @@ class OrderSuccessScreen extends StatelessWidget {
                                 ),
                                 ElevatedButton.icon(
                                   onPressed:
-                                      () => context.go('/profile/orders'),
+                                      () => context.go('/orders'),
                                   icon: const Icon(Icons.receipt_long),
                                   label: const Text("View Order History"),
                                 ),
@@ -86,7 +85,6 @@ class OrderSuccessScreen extends StatelessWidget {
                                         ),
                                       );
                                     } catch (e) {
-                                      print(e);
                                       ScaffoldMessenger.of(
                                         context,
                                       ).showSnackBar(
