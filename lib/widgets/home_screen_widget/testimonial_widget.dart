@@ -16,42 +16,60 @@ class _TestimonialCarouselState extends State<TestimonialCarousel> {
   late Future<List<Testimonial>> _testimonialFuture;
 
   Future<List<Testimonial>> fetchTestimonials() async {
-    final snapshot = await FirebaseFirestore.instance
-        .collection('testimonials')
-        .where('status', isEqualTo: 'show') // ✅ Only show approved ones
-        .orderBy('createdAt', descending: true)
-        .get();
+    try {
+      final snapshot =
+          await FirebaseFirestore.instance
+              .collection('testimonials')
+              .where('status', isEqualTo: 1)
+              .orderBy('createdAt', descending: true)
+              .get();
 
-    return snapshot.docs.map((doc) => Testimonial.fromFirestore(doc)).toList();
+      return snapshot.docs
+          .map((doc) => Testimonial.fromFirestore(doc))
+          .toList();
+    } catch (e) {
+      print("Error fetching testimonials: $e");
+      return [];
+    }
   }
 
   @override
   void initState() {
     super.initState();
     _controller = PageController(viewportFraction: 0.85);
-    _testimonialFuture = fetchTestimonials(); // fetch only once
+    _testimonialFuture = fetchTestimonials();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   void _showAddTestimonialDialog() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
 
-    final doc = await FirebaseFirestore.instance
-        .collection('usersProfile')
-        .doc(user.uid)
-        .get();
+    final doc =
+        await FirebaseFirestore.instance
+            .collection('usersProfile')
+            .doc(user.uid)
+            .get();
 
     final userData = doc.data();
     if (userData == null) return;
 
-    final TextEditingController _testimonialController = TextEditingController();
+    final TextEditingController _testimonialController =
+        TextEditingController();
 
     showDialog(
       context: context,
       builder: (context) {
         final theme = Theme.of(context);
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           title: const Text("Add Testimonial"),
           content: TextFormField(
             controller: _testimonialController,
@@ -71,26 +89,38 @@ class _TestimonialCarouselState extends State<TestimonialCarousel> {
                 final text = _testimonialController.text.trim();
                 if (text.isEmpty) return;
 
-                await FirebaseFirestore.instance.collection('testimonials').add({
-                  'name': userData['name'] ?? 'Anonymous',
-                  'imageUrl': userData['imageUrl'] ?? '',
-                  'testimonial': text,
-                  'occupation': userData['occupation'] ?? 'Customer',
-                  'createdAt': Timestamp.now(),
-                  'status': 'pending', // ✅ Set status to pending
-                  'userId': user.uid,
-                });
+                try {
+                  await FirebaseFirestore.instance
+                      .collection('testimonials')
+                      .add({
+                        'fullName':
+                            userData['fullName'] ??
+                            user.displayName ??
+                            'Anonymous',
+                        'avatarUrl': userData['avatarUrl'] ?? '',
+                        'testimonial': text,
+                        'occupation': userData['occupation'] ?? 'Customer',
+                        'createdAt': Timestamp.now(),
+                        'status': 0,
+                        'userId': user.uid,
+                      });
 
-                Navigator.of(context).pop();
-
-                // Optional: Refresh list in case an admin auto-approves
-                setState(() {
-                  _testimonialFuture = fetchTestimonials();
-                });
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Thank you! Your testimonial is pending approval.")),
-                );
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        "Thank you! Your testimonial is pending approval.",
+                      ),
+                    ),
+                  );
+                } catch (e) {
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("Failed to submit: ${e.toString()}"),
+                    ),
+                  );
+                }
               },
               child: const Text("Submit"),
             ),
@@ -116,11 +146,19 @@ class _TestimonialCarouselState extends State<TestimonialCarousel> {
         }
 
         if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Text('No testimonials found.');
+          return const Padding(
+            padding: EdgeInsets.symmetric(vertical: 40),
+            child: Center(
+              child: Text(
+                "Be the first to leave a testimonial!",
+                style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
+              ),
+            ),
+          );
         }
 
         final testimonials = snapshot.data!;
-        final bool isWide = MediaQuery.of(context).size.width > 600;
+        final isWide = MediaQuery.of(context).size.width > 600;
         final double cardHeight = isWide ? 320 : 280;
         final double avatarRadius = isWide ? 48 : 40;
         final double fontSize = isWide ? 18 : 16;
@@ -155,8 +193,7 @@ class _TestimonialCarouselState extends State<TestimonialCarousel> {
               child: PageView.builder(
                 controller: _controller,
                 itemCount: testimonials.length,
-                onPageChanged: (index) =>
-                    setState(() => _currentIndex = index),
+                onPageChanged: (index) => setState(() => _currentIndex = index),
                 itemBuilder: (context, index) {
                   final t = testimonials[index];
                   return Padding(
@@ -179,7 +216,7 @@ class _TestimonialCarouselState extends State<TestimonialCarousel> {
                         children: [
                           CircleAvatar(
                             radius: avatarRadius,
-                            backgroundImage: NetworkImage(t.imageUrl),
+                            backgroundImage: NetworkImage(t.avatarUrl),
                           ),
                           const SizedBox(height: 12),
                           Text(
@@ -192,17 +229,14 @@ class _TestimonialCarouselState extends State<TestimonialCarousel> {
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            t.name,
+                            t.fullName,
                             style: theme.textTheme.titleSmall?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: theme.colorScheme.secondary,
                               fontSize: fontSize,
                             ),
                           ),
-                          Text(
-                            t.occupation,
-                            style: theme.textTheme.bodySmall,
-                          ),
+                          Text(t.occupation, style: theme.textTheme.bodySmall),
                         ],
                       ),
                     ),
@@ -221,9 +255,10 @@ class _TestimonialCarouselState extends State<TestimonialCarousel> {
                   width: isActive ? 12 : 8,
                   height: 8,
                   decoration: BoxDecoration(
-                    color: isActive
-                        ? theme.colorScheme.secondary
-                        : theme.disabledColor.withOpacity(0.4),
+                    color:
+                        isActive
+                            ? theme.colorScheme.secondary
+                            : theme.disabledColor.withOpacity(0.4),
                     borderRadius: BorderRadius.circular(4),
                   ),
                 );

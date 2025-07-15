@@ -28,57 +28,78 @@ class _SignupScreenState extends State<SignupScreen> {
   Future<void> _signup() async {
     if (!_formKey.currentState!.validate() || !_acceptedTerms) return;
 
+    if (!mounted) return; // <== Just in case
     setState(() => _isLoading = true);
+
     try {
-      final methods = await FirebaseAuth.instance
-          .fetchSignInMethodsForEmail(_email.text.trim());
+      final methods = await FirebaseAuth.instance.fetchSignInMethodsForEmail(
+        _email.text.trim(),
+      );
 
       if (methods.isNotEmpty) {
         throw FirebaseAuthException(code: 'email-already-in-use');
       }
 
-      final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: _email.text.trim(),
-        password: _password.text.trim(),
-      );
+      final credential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+            email: _email.text.trim(),
+            password: _password.text.trim(),
+          );
 
       final user = credential.user;
       final fullName = '${_firstName.text.trim()} ${_lastName.text.trim()}';
 
       if (user != null) {
         await user.updateDisplayName(fullName);
-        await FirebaseFirestore.instance.collection('usersProfile').doc(user.uid).set({
-          'fullName': fullName,
-          'firstName': _firstName.text.trim(),
-          'lastName': _lastName.text.trim(),
-          'email': _email.text.trim(),
-          'createdAt': FieldValue.serverTimestamp(),
-        });
+        await FirebaseFirestore.instance
+            .collection('usersProfile')
+            .doc(user.uid)
+            .set({
+              'fullName': fullName,
+              'firstName': _firstName.text.trim(),
+              'lastName': _lastName.text.trim(),
+              'email': _email.text.trim(),
+              'createdAt': FieldValue.serverTimestamp(),
+            });
 
+        if (!mounted) return; // ← Check before using context
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Signup successful! Please login to continue')),
+          const SnackBar(
+            content: Text('Signup successful! Please login to continue'),
+          ),
         );
 
         context.push('/auth/login');
       }
     } on FirebaseAuthException catch (e) {
       final message = _getFirebaseErrorMessage(e.code);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(message)));
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Signup failed. Please try again.')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Signup failed. Please try again.')),
+        );
+      }
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
   Future<void> _signupWithGoogle() async {
+    if (!mounted) return;
     setState(() => _googleLoading = true);
+
     try {
       UserCredential userCredential;
+
       if (kIsWeb) {
-        userCredential = await FirebaseAuth.instance.signInWithPopup(GoogleAuthProvider());
+        userCredential = await FirebaseAuth.instance.signInWithPopup(
+          GoogleAuthProvider(),
+        );
       } else {
         final googleUser = await GoogleSignIn().signIn();
         if (googleUser == null) return;
@@ -88,24 +109,32 @@ class _SignupScreenState extends State<SignupScreen> {
           accessToken: googleAuth.accessToken,
           idToken: googleAuth.idToken,
         );
-        userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+        userCredential = await FirebaseAuth.instance.signInWithCredential(
+          credential,
+        );
       }
 
-      final user = userCredential.user;
+      final user = userCredential.user; // ✅ ADD THIS LINE
+
       if (user != null) {
-        final userDoc = await FirebaseFirestore.instance
-            .collection('usersProfile')
-            .doc(user.uid)
-            .get();
+        final userDoc =
+            await FirebaseFirestore.instance
+                .collection('usersProfile')
+                .doc(user.uid)
+                .get();
 
         if (!userDoc.exists) {
-          await FirebaseFirestore.instance.collection('usersProfile').doc(user.uid).set({
-            'fullName': user.displayName ?? '',
-            'email': user.email ?? '',
-            'createdAt': FieldValue.serverTimestamp(),
-          });
+          await FirebaseFirestore.instance
+              .collection('usersProfile')
+              .doc(user.uid)
+              .set({
+                'fullName': user.displayName ?? '',
+                'email': user.email ?? '',
+                'createdAt': FieldValue.serverTimestamp(),
+              });
         }
 
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Google Sign-up successful!')),
         );
@@ -114,13 +143,19 @@ class _SignupScreenState extends State<SignupScreen> {
       }
     } on FirebaseAuthException catch (e) {
       final message = _getFirebaseErrorMessage(e.code);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(message)));
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Google Sign-in failed. Try again.')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Google Sign-in failed. Try again.')),
+        );
+      }
     } finally {
-      setState(() => _googleLoading = false);
+      if (mounted) setState(() => _googleLoading = false);
     }
   }
 
@@ -161,8 +196,11 @@ class _SignupScreenState extends State<SignupScreen> {
                       labelText: 'First Name',
                       prefixIcon: Icon(Icons.person_outline),
                     ),
-                    validator: (val) =>
-                        val != null && val.trim().isNotEmpty ? null : 'Enter your first name',
+                    validator:
+                        (val) =>
+                            val != null && val.trim().isNotEmpty
+                                ? null
+                                : 'Enter your first name',
                   ),
                   const SizedBox(height: 16),
 
@@ -172,8 +210,11 @@ class _SignupScreenState extends State<SignupScreen> {
                       labelText: 'Last Name',
                       prefixIcon: Icon(Icons.person_outline),
                     ),
-                    validator: (val) =>
-                        val != null && val.trim().isNotEmpty ? null : 'Enter your last name',
+                    validator:
+                        (val) =>
+                            val != null && val.trim().isNotEmpty
+                                ? null
+                                : 'Enter your last name',
                   ),
                   const SizedBox(height: 16),
 
@@ -183,8 +224,11 @@ class _SignupScreenState extends State<SignupScreen> {
                       labelText: 'Email',
                       prefixIcon: Icon(Icons.email_outlined),
                     ),
-                    validator: (val) =>
-                        val != null && val.contains('@') ? null : 'Enter a valid email',
+                    validator:
+                        (val) =>
+                            val != null && val.contains('@')
+                                ? null
+                                : 'Enter a valid email',
                   ),
                   const SizedBox(height: 16),
 
@@ -196,13 +240,20 @@ class _SignupScreenState extends State<SignupScreen> {
                       prefixIcon: const Icon(Icons.lock_outline),
                       suffixIcon: IconButton(
                         icon: Icon(
-                          _showPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                          _showPassword
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined,
                         ),
-                        onPressed: () => setState(() => _showPassword = !_showPassword),
+                        onPressed:
+                            () =>
+                                setState(() => _showPassword = !_showPassword),
                       ),
                     ),
-                    validator: (val) =>
-                        val != null && val.length >= 6 ? null : 'Minimum 6 characters',
+                    validator:
+                        (val) =>
+                            val != null && val.length >= 6
+                                ? null
+                                : 'Minimum 6 characters',
                     onChanged: (_) => setState(() {}),
                   ),
                   const SizedBox(height: 8),
@@ -218,7 +269,9 @@ class _SignupScreenState extends State<SignupScreen> {
                     children: [
                       Checkbox(
                         value: _acceptedTerms,
-                        onChanged: (val) => setState(() => _acceptedTerms = val ?? false),
+                        onChanged:
+                            (val) =>
+                                setState(() => _acceptedTerms = val ?? false),
                       ),
                       const Expanded(
                         child: Text("I agree to the Terms & Conditions"),
@@ -231,13 +284,16 @@ class _SignupScreenState extends State<SignupScreen> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: _isLoading ? null : _signup,
-                      child: _isLoading
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Text("Sign Up"),
+                      child:
+                          _isLoading
+                              ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                              : const Text("Sign Up"),
                     ),
                   ),
 
@@ -249,13 +305,16 @@ class _SignupScreenState extends State<SignupScreen> {
                     width: double.infinity,
                     child: OutlinedButton.icon(
                       icon: const Icon(Icons.g_mobiledata_outlined, size: 28),
-                      label: _googleLoading
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Text("Sign up with Google"),
+                      label:
+                          _googleLoading
+                              ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                              : const Text("Sign up with Google"),
                       onPressed: _googleLoading ? null : _signupWithGoogle,
                     ),
                   ),

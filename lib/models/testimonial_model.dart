@@ -1,15 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Testimonial {
-  final String imageUrl;
+  final String avatarUrl;
   final String testimonial;
-  final String name;
+  final String fullName;
   final String occupation;
 
   Testimonial({
-    required this.imageUrl,
+    required this.avatarUrl,
     required this.testimonial,
-    required this.name,
+    required this.fullName,
     required this.occupation,
   });
 
@@ -17,9 +17,9 @@ class Testimonial {
     final data = doc.data() as Map<String, dynamic>;
 
     return Testimonial(
-      imageUrl: data['imageUrl'] ?? '',
+      avatarUrl: data['avatarUrl'] ?? '',
       testimonial: data['testimonial'] ?? '',
-      name: data['name'] ?? '',
+      fullName: data['fullName'] ?? '',
       occupation: data['occupation'] ?? '',
     );
   }

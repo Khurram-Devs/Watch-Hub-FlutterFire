@@ -22,32 +22,35 @@ class _ContactUsFormState extends State<ContactUsForm> {
     super.dispose();
   }
 
-void _submitForm() async {
-  if (_formKey.currentState!.validate()) {
-    try {
-      await FirebaseFirestore.instance.collection('contactMessages').add({
-        'name': _nameController.text.trim(),
-        'email': _emailController.text.trim(),
-        'message': _messageController.text.trim(),
-        'createdAt': Timestamp.now(),
-      });
+  void _submitForm() async {
+    if (_formKey.currentState!.validate()) {
+      try {
+        await FirebaseFirestore.instance.collection('contactMessages').add({
+          'name': _nameController.text.trim(),
+          'email': _emailController.text.trim(),
+          'message': _messageController.text.trim(),
+          'createdAt': Timestamp.now(),
+        });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Message sent successfully!')),
-      );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Message sent successfully! A confirmation email was sent to ${_emailController.text.trim()}',
+            ),
+          ),
+        );
 
-      _formKey.currentState!.reset();
-      _nameController.clear();
-      _emailController.clear();
-      _messageController.clear();
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to send message: $e')),
-      );
+        _formKey.currentState!.reset();
+        _nameController.clear();
+        _emailController.clear();
+        _messageController.clear();
+      } catch (e) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to send message: $e')));
+      }
     }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +60,8 @@ void _submitForm() async {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isWide = constraints.maxWidth > 600;
-        final padding = isWide ? const EdgeInsets.all(32) : const EdgeInsets.all(16);
+        final padding =
+            isWide ? const EdgeInsets.all(32) : const EdgeInsets.all(16);
 
         return Center(
           child: ConstrainedBox(
@@ -65,7 +69,9 @@ void _submitForm() async {
             child: Card(
               color: theme.cardColor,
               elevation: 4,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
               child: Padding(
                 padding: padding,
                 child: Form(
@@ -109,7 +115,9 @@ void _submitForm() async {
                           if (value == null || value.trim().isEmpty) {
                             return 'Please enter your email';
                           }
-                          if (!RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                          if (!RegExp(
+                            r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$',
+                          ).hasMatch(value)) {
                             return 'Please enter a valid email';
                           }
                           return null;
