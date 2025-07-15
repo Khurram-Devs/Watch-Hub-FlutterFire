@@ -56,30 +56,136 @@ class NavDrawer extends StatelessWidget {
                   route: '/catalog',
                   context: context,
                 ),
-                _buildNavItem(
-                  icon: Icons.favorite_border,
-                  label: 'Wishlist',
-                  route: '/wishlist',
-                  context: context,
-                ),
-                _buildNavItem(
-                  icon: Icons.shopping_bag_outlined,
-                  label: 'Cart',
-                  route: '/cart',
-                  context: context,
-                ),
-                _buildNavItem(
-                  icon: Icons.shopping_cart_checkout,
-                  label: 'Orders',
-                  route: '/orders',
-                  context: context,
-                ),
-                _buildNavItem(
-                  icon: Icons.location_on_outlined,
-                  label: 'Address Book',
-                  route: '/address-book',
-                  context: context,
-                ),
+
+                // Wishlist with badge
+                if (user != null)
+                  StreamBuilder<DocumentSnapshot>(
+                    stream:
+                        FirebaseFirestore.instance
+                            .collection('usersProfile')
+                            .doc(user.uid)
+                            .snapshots(),
+                    builder: (context, snapshot) {
+                      int count = 0;
+                      if (snapshot.hasData && snapshot.data!.exists) {
+                        final data =
+                            snapshot.data!.data() as Map<String, dynamic>?;
+                        count = (data?['wishlist'] as List?)?.length ?? 0;
+                      }
+                      return ListTile(
+                        leading: const Icon(
+                          Icons.favorite_border,
+                          color: Color(0xFFC0A265),
+                        ),
+                        title: Row(
+                          children: [
+                            const Text('Wishlist'),
+                            const SizedBox(width: 6),
+                            if (count > 0)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.redAccent,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  '$count',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                        onTap: () {
+                          Navigator.pop(context);
+                          context.go('/wishlist');
+                        },
+                      );
+                    },
+                  ),
+
+                // Cart with live quantity badge
+                if (user != null)
+                  StreamBuilder<QuerySnapshot>(
+                    stream:
+                        FirebaseFirestore.instance
+                            .collection('usersProfile')
+                            .doc(user.uid)
+                            .collection('cart')
+                            .snapshots(),
+                    builder: (context, snapshot) {
+                      int totalQty = 0;
+                      if (snapshot.hasData) {
+                        for (var doc in snapshot.data!.docs) {
+                          final data = doc.data() as Map<String, dynamic>;
+                          totalQty += (data['quantity'] ?? 1) as int;
+                        }
+                      }
+
+                      return ListTile(
+                        leading: const Icon(
+                          Icons.shopping_bag_outlined,
+                          color: Color(0xFFC0A265),
+                        ),
+                        title: Row(
+                          children: [
+                            const Text('Cart'),
+                            const SizedBox(width: 6),
+                            if (totalQty > 0)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.redAccent,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  '$totalQty',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                        onTap: () {
+                          Navigator.pop(context);
+                          context.go('/cart');
+                        },
+                      );
+                    },
+                  )
+                else
+                  _buildNavItem(
+                    icon: Icons.shopping_bag_outlined,
+                    label: 'Cart',
+                    route: '/cart',
+                    context: context,
+                  ),
+
+                if (user != null) ...[
+                  _buildNavItem(
+                    icon: Icons.shopping_cart_checkout,
+                    label: 'Orders',
+                    route: '/orders',
+                    context: context,
+                  ),
+                  _buildNavItem(
+                    icon: Icons.location_on_outlined,
+                    label: 'Address Book',
+                    route: '/address-book',
+                    context: context,
+                  ),
+                ],
+
                 _buildNavItem(
                   icon: Icons.info_outline,
                   label: 'About Us',
@@ -92,7 +198,7 @@ class NavDrawer extends StatelessWidget {
 
           const Divider(),
 
-          // Bottom Section
+          // Bottom Section: Theme toggle + Login/logout
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
@@ -109,7 +215,7 @@ class NavDrawer extends StatelessWidget {
                   onPressed: () => themeProvider.toggleTheme(),
                 ),
 
-                // Auth Actions
+                // Auth Section
                 user == null
                     ? ElevatedButton.icon(
                       onPressed: () => context.go('/auth/login'),

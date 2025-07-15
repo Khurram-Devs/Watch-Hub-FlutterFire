@@ -25,14 +25,13 @@ class WishlistScreen extends StatelessWidget {
     return await _cartService.isProductInCart(productId);
   }
 
-Future<void> _addToCart(BuildContext context, ProductModel product) async {
-  await _cartService.addProductToCart(product);
-  await _removeFromWishlist(product.id);
-  ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(content: Text('Product moved to cart')),
-  );
-}
-
+  Future<void> _addToCart(BuildContext context, ProductModel product) async {
+    await _cartService.addProductToCart(product);
+    await _removeFromWishlist(product.id);
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Product moved to cart')));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,13 +54,13 @@ Future<void> _addToCart(BuildContext context, ProductModel product) async {
               Text(
                 'Your Wishlist',
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 16),
               Expanded(
-                child: FutureBuilder<DocumentSnapshot>(
-                  future: usersProfile.doc(uid).get(),
+                child: StreamBuilder<DocumentSnapshot>(
+                  stream: usersProfile.doc(uid).snapshots(),
                   builder: (context, userSnap) {
                     if (!userSnap.hasData) {
                       return const Center(child: CircularProgressIndicator());
@@ -71,14 +70,18 @@ Future<void> _addToCart(BuildContext context, ProductModel product) async {
                     final List<dynamic> wishlistRefs = data['wishlist'] ?? [];
 
                     if (wishlistRefs.isEmpty) {
-                      return const Center(child: Text('No products in wishlist yet.'));
+                      return const Center(
+                        child: Text('No products in wishlist yet.'),
+                      );
                     }
 
                     return FutureBuilder<List<ProductModel>>(
                       future: _fetchWishlistProducts(wishlistRefs),
                       builder: (context, snapshot) {
                         if (!snapshot.hasData) {
-                          return const Center(child: CircularProgressIndicator());
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
                         }
 
                         final products = snapshot.data!;
@@ -95,8 +98,8 @@ Future<void> _addToCart(BuildContext context, ProductModel product) async {
                             return ListView.separated(
                               padding: const EdgeInsets.only(bottom: 32),
                               itemCount: products.length,
-                              separatorBuilder: (_, __) =>
-                                  const SizedBox(height: 16),
+                              separatorBuilder:
+                                  (_, __) => const SizedBox(height: 16),
                               itemBuilder: (context, index) {
                                 final product = products[index];
 
@@ -108,7 +111,8 @@ Future<void> _addToCart(BuildContext context, ProductModel product) async {
                                   child: Padding(
                                     padding: const EdgeInsets.all(12),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         ProductListItem(product: product),
                                         const SizedBox(height: 12),
@@ -118,39 +122,32 @@ Future<void> _addToCart(BuildContext context, ProductModel product) async {
                                           alignment: WrapAlignment.end,
                                           children: [
                                             OutlinedButton.icon(
-                                              icon: const Icon(Icons.delete_outline),
+                                              icon: const Icon(
+                                                Icons.delete_outline,
+                                              ),
                                               label: const Text('Remove'),
-                                              onPressed: () => _removeFromWishlist(product.id),
+                                              onPressed:
+                                                  () => _removeFromWishlist(
+                                                    product.id,
+                                                  ),
                                               style: OutlinedButton.styleFrom(
-                                                foregroundColor: Colors.redAccent,
+                                                foregroundColor:
+                                                    Colors.redAccent,
                                               ),
                                             ),
                                             if (product.stock > 0)
-                                              FutureBuilder<bool>(
-                                                future: _isProductInCart(product.id),
-                                                builder: (context, snapshot) {
-                                                  final isInCart = snapshot.data ?? false;
-
-                                                  return ElevatedButton.icon(
-                                                    icon: Icon(
-                                                      isInCart
-                                                          ? Icons.check
-                                                          : Icons.shopping_cart,
+                                              ElevatedButton.icon(
+                                                icon: const Icon(
+                                                  Icons.shopping_cart,
+                                                ),
+                                                label: const Text(
+                                                  'Move to Cart',
+                                                ),
+                                                onPressed:
+                                                    () => _addToCart(
+                                                      context,
+                                                      product,
                                                     ),
-                                                    label: Text(
-                                                      isInCart
-                                                          ? 'Already in Cart'
-                                                          : 'Move to Cart',
-                                                    ),
-                                                    onPressed: isInCart
-                                                        ? null
-                                                        : () => _addToCart(context, product),
-                                                    style: ElevatedButton.styleFrom(
-                                                      backgroundColor:
-                                                          isInCart ? Colors.grey : null,
-                                                    ),
-                                                  );
-                                                },
                                               ),
                                           ],
                                         ),

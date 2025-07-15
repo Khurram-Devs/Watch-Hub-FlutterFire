@@ -63,7 +63,7 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
                             .collection('usersProfile')
                             .doc(user.uid)
                             .collection('notifications')
-                            .where('isRead', isEqualTo: false) // 👈 Only unread
+                            .where('isRead', isEqualTo: false)
                             .snapshots(),
                     builder: (context, snapshot) {
                       final count = snapshot.data?.docs.length ?? 0;

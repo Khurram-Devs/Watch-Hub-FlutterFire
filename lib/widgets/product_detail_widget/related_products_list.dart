@@ -44,7 +44,7 @@ class RelatedProductsList extends StatelessWidget {
             final products = snapshot.data!;
 
             return SizedBox(
-              height: 360,
+              height: 380,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: products.length,

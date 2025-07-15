@@ -7,6 +7,7 @@ class ProfileService {
   final uid = FirebaseAuth.instance.currentUser!.uid;
   final usersProfile = FirebaseFirestore.instance.collection('usersProfile');
 
+  // ----- Profile -----
   Stream<DocumentSnapshot<Map<String, dynamic>>> profileStream() =>
       usersProfile.doc(uid).snapshots();
 
@@ -16,6 +17,7 @@ class ProfileService {
   Future<void> updateProfile(Map<String, dynamic> data) =>
       usersProfile.doc(uid).update(data);
 
+  // ----- Addresses -----
   CollectionReference<Map<String, dynamic>> get addressRef =>
       usersProfile.doc(uid).collection('addresses');
 
@@ -26,29 +28,20 @@ class ProfileService {
 
   Future<void> removeAddress(String id) => addressRef.doc(id).delete();
 
-  CollectionReference<Map<String, dynamic>> get wishlistRef =>
-      usersProfile.doc(uid).collection('wishlist');
+  // ----- Wishlist (now using array in main doc) -----
+  Future<void> addToWishlist(DocumentReference productRef) async {
+    await usersProfile.doc(uid).update({
+      'wishlist': FieldValue.arrayUnion([productRef])
+    });
+  }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> wishlistStream() =>
-      wishlistRef.snapshots();
+  Future<void> removeFromWishlist(String productId) async {
+    final productRef =
+        FirebaseFirestore.instance.collection('products').doc(productId);
 
-  Future<void> removeFromWishlist(String docId) =>
-      wishlistRef.doc(docId).delete();
-
-  Future<void> addToWishlist(DocumentReference productRef) =>
-      wishlistRef.add({'product': productRef});
-
-  CollectionReference<Map<String, dynamic>> get ordersRef =>
-      usersProfile.doc(uid).collection('orders');
-
-  Stream<QuerySnapshot<Map<String, dynamic>>> ordersStream() =>
-      ordersRef.orderBy('createdAt', descending: true).snapshots();
-
-  Future<void> cancelOrder(String orderId) =>
-      ordersRef.doc(orderId).update({'status': 'Cancelled'});
-
-  Future<void> moveToCart(ProductModel product) async {
-    debugPrint('Moving to cart: ${product.title}');
+    await usersProfile.doc(uid).update({
+      'wishlist': FieldValue.arrayRemove([productRef])
+    });
   }
 
   Future<List<ProductModel>> getProductsFromRefs(List<dynamic> refs) async {
@@ -69,4 +62,14 @@ class ProfileService {
 
     return products;
   }
+
+  // ----- Orders -----
+  CollectionReference<Map<String, dynamic>> get ordersRef =>
+      usersProfile.doc(uid).collection('orders');
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> ordersStream() =>
+      ordersRef.orderBy('createdAt', descending: true).snapshots();
+
+  Future<void> cancelOrder(String orderId) =>
+      ordersRef.doc(orderId).update({'status': 'Cancelled'});
 }
