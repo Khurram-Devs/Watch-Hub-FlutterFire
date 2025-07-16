@@ -117,7 +117,7 @@ class ThemeProvider with ChangeNotifier {
       selectedColor: midnightPrimary.withOpacity(0.15),
       secondarySelectedColor: midnightPrimary,
     ),
-    tabBarTheme: const TabBarTheme(
+    tabBarTheme: const TabBarThemeData(
       labelColor: midnightPrimary,
       unselectedLabelColor: softGray,
       indicatorColor: midnightPrimary,
@@ -180,7 +180,7 @@ class ThemeProvider with ChangeNotifier {
       selectedColor: goldenAccent.withOpacity(0.1),
       secondarySelectedColor: goldenAccent,
     ),
-    tabBarTheme: const TabBarTheme(
+    tabBarTheme: const TabBarThemeData(
       labelColor: goldenAccent,
       unselectedLabelColor: Colors.grey,
       indicatorColor: goldenAccent,
