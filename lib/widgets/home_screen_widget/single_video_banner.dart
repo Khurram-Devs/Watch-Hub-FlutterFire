@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:video_player/video_player.dart';
-import 'package:watch_hub_ep/screens/catalog_screen.dart';
 
 class SingleVideoBanner extends StatefulWidget {
   final String videoUrl;
@@ -104,9 +103,8 @@ class _SingleVideoBannerState extends State<SingleVideoBanner> {
                   children: [
                     Text(
                       "Elevate Your Style",
-                      style: theme.textTheme.titleLarge?.copyWith(
+                      style: theme.textTheme.headlineLarge?.copyWith(
                         fontWeight: FontWeight.bold,
-                        fontSize: 24,
                         color: theme.colorScheme.secondary,
                       ),
                       textAlign: TextAlign.center,

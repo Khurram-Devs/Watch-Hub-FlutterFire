@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:watch_hub_ep/models/address_model.dart';
 import 'package:watch_hub_ep/services/profile_service.dart';
+import 'package:watch_hub_ep/utils/string_utils.dart';
 
 class AddressBookScreen extends StatelessWidget {
   AddressBookScreen({super.key});
@@ -10,6 +11,7 @@ class AddressBookScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -20,8 +22,9 @@ class AddressBookScreen extends StatelessWidget {
               Text(
                 'Address Book',
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.primary,
+                ),
               ),
               const SizedBox(height: 16),
               Expanded(
@@ -55,12 +58,17 @@ class AddressBookScreen extends StatelessWidget {
                         ...docs.map((d) {
                           final a = AddressModel(d.id, d.data()!);
                           return Card(
-                            margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+                            margin: const EdgeInsets.symmetric(
+                              vertical: 8,
+                              horizontal: 4,
+                            ),
                             child: ListTile(
-                              title: Text(a.label),
-                              subtitle: Text('${a.street}, ${a.city}, ${a.country}'),
+                              title: Text(capitalize(a.label)),
+                              subtitle: Text(
+                                '${capitalize(a.street)}, ${capitalize(a.city)}, ${capitalize(a.country)}',
+                              ),
                               trailing: IconButton(
-                                icon: const Icon(Icons.delete_outline),
+                                icon: const Icon(Icons.delete_outline), color: Colors.redAccent,
                                 onPressed: () => _srv.removeAddress(a.id),
                               ),
                             ),
@@ -100,21 +108,24 @@ class _AddressDialogState extends State<AddressDialog> {
 
   @override
   Widget build(BuildContext ctx) {
+    final theme = Theme.of(ctx);
+
     return AlertDialog(
-      title: const Text('Add Address'),
+      title: Text('Add Address', style: TextStyle(color: theme.colorScheme.primary),),
       content: Form(
         key: _form,
         child: SingleChildScrollView(
           child: Column(
-            children: model.keys.map((field) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 6),
-                child: TextFormField(
-                  decoration: InputDecoration(labelText: field),
-                  onSaved: (v) => model[field] = v ?? '',
-                ),
-              );
-            }).toList(),
+            children:
+                model.keys.map((field) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    child: TextFormField(
+                      decoration: InputDecoration(labelText: capitalize(field)),
+                      onSaved: (v) => model[field] = v ?? '',
+                    ),
+                  );
+                }).toList(),
           ),
         ),
       ),

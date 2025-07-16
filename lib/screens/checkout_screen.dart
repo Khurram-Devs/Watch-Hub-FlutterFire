@@ -21,46 +21,56 @@ class CheckoutScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 700;
+    final formKey = GlobalKey<FormState>(); // <-- Add this
 
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
-          child: isMobile
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    CheckoutFormSection(isMobile: isMobile),
-                    const SizedBox(height: 24),
-                    PromoAndSummarySection(
-                      cartItems: cartItems,
-                      subtotal: subtotal,
-                      tax: tax,
-                      shipping: shipping,
-                      total: total,
-                    ),
-                  ],
-                )
-              : Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      flex: 3,
-                      child: CheckoutFormSection(isMobile: isMobile),
-                    ),
-                    const SizedBox(width: 24),
-                    Expanded(
-                      flex: 2,
-                      child: PromoAndSummarySection(
+          child:
+              isMobile
+                  ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CheckoutFormSection(
+                        isMobile: isMobile,
+                        formKey: formKey, // <-- Pass here
+                      ),
+                      const SizedBox(height: 24),
+                      PromoAndSummarySection(
+                        formKey: formKey, // <-- Pass here
                         cartItems: cartItems,
                         subtotal: subtotal,
                         tax: tax,
                         shipping: shipping,
                         total: total,
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  )
+                  : Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        flex: 3,
+                        child: CheckoutFormSection(
+                          isMobile: isMobile,
+                          formKey: formKey,
+                        ),
+                      ),
+                      const SizedBox(width: 24),
+                      Expanded(
+                        flex: 2,
+                        child: PromoAndSummarySection(
+                          formKey: formKey,
+                          cartItems: cartItems,
+                          subtotal: subtotal,
+                          tax: tax,
+                          shipping: shipping,
+                          total: total,
+                        ),
+                      ),
+                    ],
+                  ),
         ),
       ),
     );

@@ -154,6 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
               const SizedBox(height: 32),
               ContactUsForm(),
+              const SizedBox(height: 16),
             ],
           ),
         ),

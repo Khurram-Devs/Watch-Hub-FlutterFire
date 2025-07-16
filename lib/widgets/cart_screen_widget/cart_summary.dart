@@ -89,7 +89,7 @@ class CartSummary extends StatelessWidget {
                           context.pushNamed('checkout', extra: cartData);
                         },
                         child: const Text("Proceed to Checkout"),
-                      ),
+                    ),
                     ),
                   ],
                 ),

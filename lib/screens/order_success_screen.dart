@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:watch_hub_ep/services/pdf_invoice_service.dart';
-import 'package:watch_hub_ep/widgets/layout_widget/app_header.dart';
 import 'package:watch_hub_ep/widgets/layout_widget/nav_drawer.dart';
 
 class OrderSuccessScreen extends StatelessWidget {
@@ -36,7 +36,9 @@ class OrderSuccessScreen extends StatelessWidget {
                             const SizedBox(height: 20),
                             Text(
                               "Order Placed Successfully!",
-                              style: theme.textTheme.headlineSmall,
+                              style: theme.textTheme.headlineSmall!.copyWith(
+                                color: theme.colorScheme.primary,
+                              ),
                               textAlign: TextAlign.center,
                             ),
                             const SizedBox(height: 10),
@@ -45,13 +47,37 @@ class OrderSuccessScreen extends StatelessWidget {
                               style: theme.textTheme.bodyMedium,
                               textAlign: TextAlign.center,
                             ),
-                            Text(
-                              orderId,
-                              style: theme.textTheme.bodyLarge?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
-                              textAlign: TextAlign.center,
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SelectableText(
+                                  orderId,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: theme.colorScheme.primary,
+                                  ),
+                                ),
+                                IconButton(
+                                  tooltip: 'Copy Order ID',
+                                  icon: const Icon(Icons.copy, size: 18),
+                                  onPressed: () async {
+                                    await Clipboard.setData(
+                                      ClipboardData(text: orderId),
+                                    );
+                                    if (context.mounted) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text('Order ID copied'),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                ),
+                              ],
                             ),
+
                             const SizedBox(height: 24),
                             Wrap(
                               spacing: 16,
@@ -64,8 +90,7 @@ class OrderSuccessScreen extends StatelessWidget {
                                   label: const Text("Continue Shopping"),
                                 ),
                                 ElevatedButton.icon(
-                                  onPressed:
-                                      () => context.go('/orders'),
+                                  onPressed: () => context.go('/orders'),
                                   icon: const Icon(Icons.receipt_long),
                                   label: const Text("View Order History"),
                                 ),

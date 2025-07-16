@@ -22,7 +22,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _lastNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
-  final _avatarController = TextEditingController();
+  final _occupationController = TextEditingController();
+  String _avatarUrl = '';
 
   bool _editing = false;
   late final StreamSubscription _profileSub;
@@ -38,7 +39,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _lastNameController.text = user.lastName ?? '';
         _emailController.text = user.email;
         _phoneController.text = user.phone;
-        _avatarController.text = user.avatar;
+        _occupationController.text = user.occupation ?? '';
+        _avatarUrl = user.avatar;
       });
     });
   }
@@ -50,7 +52,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _lastNameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
-    _avatarController.dispose();
+    _occupationController.dispose();
     super.dispose();
   }
 
@@ -74,8 +76,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final data = jsonDecode(body);
 
       if (data['success'] == true) {
-        final url = data['data']['url'];
-        setState(() => _avatarController.text = url);
+        setState(() => _avatarUrl = data['data']['url']);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Avatar updated successfully.")),
         );
@@ -105,66 +106,101 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Edit Profile',
-                style: theme.textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
+              // Header Row with Buttons
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Profile',
+                    style: theme.textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.primary,
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      if (_editing)
+                        ElevatedButton.icon(
+                          icon: const Icon(Icons.save, size: 18),
+                          label: const Text('Save'),
+                          onPressed: () {
+                            if (_formKey.currentState!.validate()) {
+                              final firstName =
+                                  _firstNameController.text.trim();
+                              final lastName = _lastNameController.text.trim();
+                              final fullName = "$firstName $lastName";
+
+                              _profileService.updateProfile({
+                                'firstName': firstName,
+                                'lastName': lastName,
+                                'fullName': fullName,
+                                'phone': _phoneController.text.trim(),
+                                'occupation': _occupationController.text.trim(),
+                                'avatarUrl': _avatarUrl,
+                              });
+
+                              setState(() => _editing = false);
+                            }
+                          },
+                        ),
+                      const SizedBox(width: 12),
+                      OutlinedButton.icon(
+                        icon: Icon(_editing ? Icons.cancel : Icons.edit),
+                        label: Text(_editing ? "Cancel" : "Edit"),
+                        onPressed: () {
+                          setState(() => _editing = !_editing);
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+
+              // Avatar
+              Center(
+                child: Stack(
+                  alignment: Alignment.bottomRight,
+                  children: [
+                    CircleAvatar(
+                      radius: 50,
+                      backgroundImage:
+                          _avatarUrl.isNotEmpty
+                              ? NetworkImage(_avatarUrl)
+                              : const AssetImage(
+                                    'assets/images/default_user.png',
+                                  )
+                                  as ImageProvider,
+                    ),
+                    if (_editing)
+                      IconButton(
+                        icon: const Icon(
+                          Icons.camera_alt,
+                          color: Colors.black87,
+                        ),
+                        onPressed: _pickAndUploadImage,
+                      ),
+                  ],
                 ),
               ),
               const SizedBox(height: 24),
+
+              // Form
               Form(
                 key: _formKey,
                 child: Column(
                   children: [
-                    Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 40,
-                          backgroundImage:
-                              _avatarController.text.isNotEmpty
-                                  ? NetworkImage(_avatarController.text)
-                                  : const AssetImage(
-                                        'assets/images/default_user.png',
-                                      )
-                                      as ImageProvider,
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Text(
-                            "${_firstNameController.text} ${_lastNameController.text}",
-                            style: theme.textTheme.titleLarge,
-                          ),
-                        ),
-                        IconButton(
-                          icon: Icon(_editing ? Icons.cancel : Icons.edit),
-                          onPressed: () {
-                            setState(() => _editing = !_editing);
-                          },
-                        ),
-                      ],
-                    ),
-                    if (_editing)
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: TextButton.icon(
-                          onPressed: _pickAndUploadImage,
-                          icon: const Icon(Icons.upload),
-                          label: const Text("Change Avatar"),
-                        ),
-                      ),
-                    const SizedBox(height: 24),
-
-                    // First & Last Name
+                    // First/Last Name
                     Row(
                       children: [
                         Expanded(
                           child: TextFormField(
                             controller: _firstNameController,
-                            enabled: false,
+                            enabled: _editing,
                             decoration: const InputDecoration(
                               labelText: 'First Name',
                             ),
@@ -174,7 +210,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Expanded(
                           child: TextFormField(
                             controller: _lastNameController,
-                            enabled: false,
+                            enabled: _editing,
                             decoration: const InputDecoration(
                               labelText: 'Last Name',
                             ),
@@ -184,26 +220,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Email & Forgot Password
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextFormField(
-                            controller: _emailController,
-                            enabled: false,
-                            decoration: const InputDecoration(
-                              labelText: 'Email',
-                            ),
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: _sendPasswordReset,
-                          child: const Text("Forgot Password?"),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-
+                    // Phone
                     TextFormField(
                       controller: _phoneController,
                       enabled: _editing,
@@ -211,32 +228,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     const SizedBox(height: 16),
 
+                    // Occupation
                     TextFormField(
-                      controller: _avatarController,
-                      enabled: false,
+                      controller: _occupationController,
+                      enabled: _editing,
                       decoration: const InputDecoration(
-                        labelText: 'Avatar URL',
+                        labelText: 'Occupation',
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 16),
 
-                    if (_editing)
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: ElevatedButton.icon(
-                          icon: const Icon(Icons.save),
-                          label: const Text('Save'),
-                          onPressed: () {
-                            if (_formKey.currentState!.validate()) {
-                              _profileService.updateProfile({
-                                'phone': _phoneController.text.trim(),
-                                'avatar': _avatarController.text.trim(),
-                              });
-                              setState(() => _editing = false);
-                            }
-                          },
-                        ),
+                    // Email (always disabled)
+                    TextFormField(
+                      controller: _emailController,
+                      enabled: false,
+                      decoration: const InputDecoration(labelText: 'Email'),
+                    ),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: _sendPasswordReset,
+                        child: const Text("Forgot Password?"),
                       ),
+                    ),
                   ],
                 ),
               ),

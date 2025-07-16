@@ -28,7 +28,7 @@ class _SignupScreenState extends State<SignupScreen> {
   Future<void> _signup() async {
     if (!_formKey.currentState!.validate() || !_acceptedTerms) return;
 
-    if (!mounted) return; // <== Just in case
+    if (!mounted) return;
     setState(() => _isLoading = true);
 
     try {
@@ -187,7 +187,14 @@ class _SignupScreenState extends State<SignupScreen> {
               key: _formKey,
               child: Column(
                 children: [
-                  Text("Create Account", style: theme.textTheme.displayLarge),
+                  Text(
+                    "Create Account",
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: theme.primaryColor,
+                    ),
+                  ),
                   const SizedBox(height: 24),
 
                   TextFormField(
@@ -208,7 +215,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     controller: _lastName,
                     decoration: const InputDecoration(
                       labelText: 'Last Name',
-                      prefixIcon: Icon(Icons.person_outline),
+                      prefixIcon: Icon(Icons.person_4_outlined),
                     ),
                     validator:
                         (val) =>

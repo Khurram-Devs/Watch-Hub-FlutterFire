@@ -317,7 +317,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: _products.length,
-                      separatorBuilder: (_, __) => const Divider(height: 24),
+                      separatorBuilder: (_, __) => const Divider(height: 10,color: Colors.transparent,),
                       itemBuilder:
                           (_, i) => ProductListItem(product: _products[i]),
                     ),

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:watch_hub_ep/utils/string_utils.dart';
-import '../../models/testimonial_model.dart';
 
 class TestimonialCarousel extends StatefulWidget {
   const TestimonialCarousel({super.key});
@@ -14,20 +13,17 @@ class TestimonialCarousel extends StatefulWidget {
 class _TestimonialCarouselState extends State<TestimonialCarousel> {
   late final PageController _controller;
   int _currentIndex = 0;
-  late Future<List<Testimonial>> _testimonialFuture;
+  late Future<List<DocumentSnapshot>> _testimonialFuture;
 
-  Future<List<Testimonial>> fetchTestimonials() async {
+  Future<List<DocumentSnapshot>> fetchTestimonials() async {
     try {
-      final snapshot =
-          await FirebaseFirestore.instance
-              .collection('testimonials')
-              .where('status', isEqualTo: 1)
-              .orderBy('createdAt', descending: true)
-              .get();
+      final snapshot = await FirebaseFirestore.instance
+          .collection('testimonials')
+          .where('status', isEqualTo: 1)
+          .orderBy('createdAt', descending: true)
+          .get();
 
-      return snapshot.docs
-          .map((doc) => Testimonial.fromFirestore(doc))
-          .toList();
+      return snapshot.docs;
     } catch (e) {
       print("Error fetching testimonials: $e");
       return [];
@@ -51,83 +47,55 @@ class _TestimonialCarouselState extends State<TestimonialCarousel> {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
 
-    final doc =
-        await FirebaseFirestore.instance
-            .collection('usersProfile')
-            .doc(user.uid)
-            .get();
-
-    final userData = doc.data();
-    if (userData == null) return;
-
-    final TextEditingController _testimonialController =
-        TextEditingController();
+    final userRef = FirebaseFirestore.instance.collection('usersProfile').doc(user.uid);
+    final controller = TextEditingController();
 
     showDialog(
       context: context,
-      builder: (context) {
-        final theme = Theme.of(context);
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text("Add Testimonial"),
+        content: TextFormField(
+          controller: controller,
+          maxLines: 4,
+          decoration: const InputDecoration(
+            labelText: 'Your testimonial',
+            border: OutlineInputBorder(),
           ),
-          title: const Text("Add Testimonial"),
-          content: TextFormField(
-            controller: _testimonialController,
-            maxLines: 4,
-            decoration: const InputDecoration(
-              labelText: 'Your testimonial',
-              border: OutlineInputBorder(),
-            ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text("Cancel"),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text("Cancel"),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                final text = _testimonialController.text.trim();
-                if (text.isEmpty) return;
+          ElevatedButton(
+            onPressed: () async {
+              final text = controller.text.trim();
+              if (text.isEmpty) return;
 
-                try {
-                  await FirebaseFirestore.instance
-                      .collection('testimonials')
-                      .add({
-                        'fullName':
-                            userData['fullName'] ??
-                            user.displayName ??
-                            'Anonymous',
-                        'avatarUrl': userData['avatarUrl'] ?? '',
-                        'testimonial': text,
-                        'occupation': userData['occupation'] ?? 'Customer',
-                        'createdAt': Timestamp.now(),
-                        'status': 0,
-                        'userId': user.uid,
-                      });
+              try {
+                await FirebaseFirestore.instance.collection('testimonials').add({
+                  'testimonial': text,
+                  'createdAt': Timestamp.now(),
+                  'status': 0,
+                  'userRef': userRef,
+                });
 
-                  Navigator.of(context).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        "Thank you! Your testimonial is pending approval.",
-                      ),
-                    ),
-                  );
-                } catch (e) {
-                  Navigator.of(context).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text("Failed to submit: ${e.toString()}"),
-                    ),
-                  );
-                }
-              },
-              child: const Text("Submit"),
-            ),
-          ],
-        );
-      },
+                Navigator.of(context).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Thank you! Your testimonial is pending approval.")),
+                );
+              } catch (e) {
+                Navigator.of(context).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Failed to submit: ${e.toString()}")),
+                );
+              }
+            },
+            child: const Text("Submit"),
+          ),
+        ],
+      ),
     );
   }
 
@@ -136,7 +104,7 @@ class _TestimonialCarouselState extends State<TestimonialCarousel> {
     final theme = Theme.of(context);
     final user = FirebaseAuth.instance.currentUser;
 
-    return FutureBuilder<List<Testimonial>>(
+    return FutureBuilder<List<DocumentSnapshot>>(
       future: _testimonialFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -196,51 +164,69 @@ class _TestimonialCarouselState extends State<TestimonialCarousel> {
                 itemCount: testimonials.length,
                 onPageChanged: (index) => setState(() => _currentIndex = index),
                 itemBuilder: (context, index) {
-                  final t = testimonials[index];
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: theme.cardColor,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: theme.shadowColor.withOpacity(0.1),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
+                  final t = testimonials[index].data() as Map<String, dynamic>;
+                  final userRef = t['userRef'] as DocumentReference?;
+
+                  if (userRef == null) {
+                    return const Center(child: Text("Missing user reference"));
+                  }
+
+                  return FutureBuilder<DocumentSnapshot>(
+                    future: userRef.get(),
+                    builder: (context, userSnap) {
+                      if (!userSnap.hasData) return const Center(child: CircularProgressIndicator());
+
+                      final userData = userSnap.data!.data() as Map<String, dynamic>? ?? {};
+                      final fullName = capitalizeEachWord(userData['fullName'] ?? 'Unnamed');
+                      final avatarUrl = userData['avatarUrl'];
+                      final occupation = capitalize(userData['occupation'] ?? 'Customer');
+
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: theme.cardColor,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: theme.shadowColor.withOpacity(0.1),
+                                blurRadius: 8,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          CircleAvatar(
-                            radius: avatarRadius,
-                            backgroundImage: NetworkImage(t.avatarUrl),
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              CircleAvatar(
+                                radius: avatarRadius,
+                                backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl) : null,
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                '"${capitalize(t['testimonial'] ?? '')}"',
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  fontStyle: FontStyle.italic,
+                                  fontSize: fontSize,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                fullName,
+                                style: theme.textTheme.titleSmall?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: theme.colorScheme.secondary,
+                                  fontSize: fontSize,
+                                ),
+                              ),
+                              Text(occupation, style: theme.textTheme.bodySmall),
+                            ],
                           ),
-                          const SizedBox(height: 12),
-                          Text(
-                            '"${capitalize(t.testimonial)}"',
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              fontStyle: FontStyle.italic,
-                              fontSize: fontSize,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            capitalizeEachWord(t.fullName),
-                            style: theme.textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: theme.colorScheme.secondary,
-                              fontSize: fontSize,
-                            ),
-                          ),
-                          Text(capitalize(t.occupation), style: theme.textTheme.bodySmall),
-                        ],
-                      ),
-                    ),
+                        ),
+                      );
+                    },
                   );
                 },
               ),
@@ -256,10 +242,7 @@ class _TestimonialCarouselState extends State<TestimonialCarousel> {
                   width: isActive ? 12 : 8,
                   height: 8,
                   decoration: BoxDecoration(
-                    color:
-                        isActive
-                            ? theme.colorScheme.secondary
-                            : theme.disabledColor.withOpacity(0.4),
+                    color: isActive ? theme.colorScheme.secondary : theme.disabledColor.withOpacity(0.4),
                     borderRadius: BorderRadius.circular(4),
                   ),
                 );

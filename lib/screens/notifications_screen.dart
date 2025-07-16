@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:intl/intl.dart';
+import 'package:timeago/timeago.dart' as timeago;
+import 'package:watch_hub_ep/utils/string_utils.dart';
 
 class NotificationsScreen extends StatelessWidget {
   const NotificationsScreen({super.key});
@@ -19,10 +20,9 @@ class NotificationsScreen extends StatelessWidget {
     }
   }
 
-  String _formatTimestamp(Timestamp? timestamp) {
+  String _formatRelativeTime(Timestamp? timestamp) {
     if (timestamp == null) return '';
-    final dt = timestamp.toDate();
-    return DateFormat.yMMMd().add_jm().format(dt);
+    return timeago.format(timestamp.toDate());
   }
 
   Future<void> _markAsRead(String uid, String docId) async {
@@ -36,6 +36,7 @@ class NotificationsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final uid = FirebaseAuth.instance.currentUser?.uid;
 
     if (uid == null) {
@@ -81,12 +82,9 @@ class NotificationsScreen extends StatelessWidget {
                 onTap: () => !isRead ? _markAsRead(uid, doc.id) : null,
                 child: Container(
                   decoration: BoxDecoration(
-                    color:
-                        isRead
-                            ? Theme.of(context).scaffoldBackgroundColor
-                            : Theme.of(
-                              context,
-                            ).primaryColor.withOpacity(0.05),
+                    color: isRead
+                        ? theme.scaffoldBackgroundColor
+                        : theme.colorScheme.primary.withOpacity(0.05),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   padding: const EdgeInsets.all(12),
@@ -103,14 +101,11 @@ class NotificationsScreen extends StatelessWidget {
                               children: [
                                 Expanded(
                                   child: Text(
-                                    title,
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.titleMedium?.copyWith(
+                                    capitalizeEachWord(title),
+                                    style: theme.textTheme.titleMedium?.copyWith(
+                                      color: theme.colorScheme.primary,
                                       fontWeight:
-                                          isRead
-                                              ? FontWeight.normal
-                                              : FontWeight.bold,
+                                          isRead ? FontWeight.normal : FontWeight.bold,
                                     ),
                                   ),
                                 ),
@@ -129,15 +124,14 @@ class NotificationsScreen extends StatelessWidget {
                             const SizedBox(height: 4),
                             Text(
                               message,
-                              style: Theme.of(context).textTheme.bodyMedium,
+                              style: theme.textTheme.bodyMedium,
                             ),
                             if (ts != null)
                               Padding(
                                 padding: const EdgeInsets.only(top: 6),
                                 child: Text(
-                                  _formatTimestamp(ts),
-                                  style: Theme.of(context).textTheme.bodySmall
-                                      ?.copyWith(color: Colors.grey),
+                                  _formatRelativeTime(ts),
+                                  style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey),
                                 ),
                               ),
                           ],

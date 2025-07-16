@@ -21,13 +21,13 @@ class AboutUsScreen extends StatelessWidget {
                   "About WatchHub",
                   style: theme.textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: theme.primaryColor,
+                    color: theme.colorScheme.primary,
                   ),
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  "WatchHub is a premium destination for watch enthusiasts, offering a seamless and luxurious shopping experience through a modern Flutter & Firebase-powered mobile app. "
-                  "We curate the finest selection of timepieces from top global brands, delivering style, precision, and elegance right to your wrist.",
+                  "At WatchHub, we believe a timepiece is more than a way to tell time — it’s a symbol of craftsmanship, identity, and timeless style. "
+                  "As your trusted destination for luxury watches, we bring the finest collections from world-renowned brands directly to your wrist.",
                   style: theme.textTheme.bodyLarge?.copyWith(height: 1.6),
                 ),
                 const SizedBox(height: 24),
@@ -36,54 +36,62 @@ class AboutUsScreen extends StatelessWidget {
                 const SizedBox(height: 24),
 
                 Text(
-                  "✨ What Makes Us Different",
+                  "🌟 Why Shop With Us?",
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 const SizedBox(height: 24),
+
                 _buildFeature(
-                  icon: Icons.watch,
-                  title: "Curated Collections",
+                  icon: Icons.workspace_premium_rounded,
+                  title: "Exquisite Collections",
                   description:
-                      "Explore limited-edition and handpicked collections that blend tradition with innovation.",
+                      "From heritage classics to cutting-edge designs, each watch we offer reflects excellence and artistry.",
                 ),
                 _buildFeature(
-                  icon: Icons.security,
-                  title: "Authenticity Guaranteed",
+                  icon: Icons.verified_user_rounded,
+                  title: "100% Authenticity",
                   description:
-                      "Every watch is sourced from verified suppliers and undergoes strict quality checks.",
+                      "All timepieces are sourced from authorized distributors and come with verified certificates.",
                 ),
                 _buildFeature(
-                  icon: Icons.flash_on,
-                  title: "Fast & Secure Delivery",
+                  icon: Icons.local_shipping_rounded,
+                  title: "Global Shipping",
                   description:
-                      "We ensure your timepiece reaches you quickly and securely, anywhere in the world.",
+                      "We deliver worldwide with fast, insured, and reliable logistics to ensure safe arrival of your purchase.",
                 ),
                 _buildFeature(
-                  icon: Icons.support_agent,
-                  title: "Dedicated Support",
+                  icon: Icons.headset_mic_rounded,
+                  title: "Luxury Support",
                   description:
-                      "Our team is always available to assist you with personalized recommendations and order support.",
+                      "Our experts are available to guide you, from choosing the right watch to post-purchase care.",
+                ),
+                _buildFeature(
+                  icon: Icons.payment_rounded,
+                  title: "Secure Payments",
+                  description:
+                      "We support trusted, encrypted payment options including cards, wallets, and cash-on-delivery where available.",
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: 32),
                 Divider(color: theme.dividerColor, thickness: 1.2),
-
                 const SizedBox(height: 32),
+
                 Text(
-                  "👨‍💻 Built With Passion",
+                  "⏱️ A Legacy in the Making",
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 Text(
-                  "WatchHub is a student-led Flutter project built with modern UI/UX, real-time cloud integration, and e-commerce best practices.",
-                  style: theme.textTheme.bodyLarge?.copyWith(height: 1.5),
+                  "WatchHub was founded with a singular purpose — to redefine the online watch shopping experience. "
+                  "We are committed to offering premium service, curated collections, and a platform built on trust and elegance.",
+                  style: theme.textTheme.bodyLarge?.copyWith(height: 1.6),
                 ),
-                const SizedBox(height: 32),
 
+                const SizedBox(height: 32),
                 Center(
                   child: Text(
                     "© ${DateTime.now().year} WatchHub. All rights reserved.",
@@ -110,7 +118,7 @@ class AboutUsScreen extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 32, color: const Color(0xFFC0A265)),
+          Icon(icon, size: 28, color: const Color(0xFFC0A265)),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
@@ -126,7 +134,10 @@ class AboutUsScreen extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   description,
-                  style: const TextStyle(fontSize: 14, height: 1.5),
+                  style: const TextStyle(
+                    fontSize: 14,
+                    height: 1.6,
+                  ),
                 ),
               ],
             ),

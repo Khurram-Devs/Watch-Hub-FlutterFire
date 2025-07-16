@@ -179,9 +179,9 @@ class MyApp extends StatelessWidget {
           name: 'order-success',
           builder: (context, state) {
             final orderId = state.pathParameters['orderId']!;
-            return const MainScaffold(
+            return MainScaffold(
               currentIndex: 0,
-              child: OrderSuccessScreen(orderId: ''),
+              child: OrderSuccessScreen(orderId: orderId),
             );
           },
         ),

@@ -48,21 +48,27 @@ class _CartScreenState extends State<CartScreen> {
                   );
                 }
 
-                if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Column(
-                    children: [
-                      const SizedBox(height: 60),
-                      const Icon(Icons.shopping_cart_outlined, size: 64),
-                      const SizedBox(height: 16),
-                      const Text("No items in cart", style: TextStyle(fontSize: 20)),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: () => context.push('/catalog'),
-                        child: const Text("Add Products"),
-                      ),
-                    ],
-                  );
-                }
+if (!snapshot.hasData || snapshot.data!.isEmpty) {
+  return SizedBox(
+    height: MediaQuery.of(context).size.height * 0.7,
+    child: Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.shopping_cart_outlined, size: 64),
+          const SizedBox(height: 16),
+          const Text("No items in cart", style: TextStyle(fontSize: 20)),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () => context.push('/catalog'),
+            child: const Text("Add Products"),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
 
                 final cartItems = snapshot.data!;
                 final isWide = MediaQuery.of(context).size.width > 700;

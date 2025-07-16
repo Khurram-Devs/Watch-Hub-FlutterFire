@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:watch_hub_ep/services/checkout_service.dart';
+import 'package:watch_hub_ep/utils/string_utils.dart';
 
 class CheckoutFormSection extends StatefulWidget {
   final bool isMobile;
-  const CheckoutFormSection({super.key, required this.isMobile});
+  final GlobalKey<FormState> formKey;
+
+  const CheckoutFormSection({
+    super.key,
+    required this.isMobile,
+    required this.formKey,
+  });
 
   @override
   State<CheckoutFormSection> createState() => _CheckoutFormSectionState();
 }
 
 class _CheckoutFormSectionState extends State<CheckoutFormSection> {
-  final _formKey = GlobalKey<FormState>();
   final _auth = FirebaseAuth.instance;
 
   List<Map<String, dynamic>> savedAddresses = [];
@@ -65,7 +70,13 @@ class _CheckoutFormSectionState extends State<CheckoutFormSection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Billing Details', style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
+        Text(
+          'Billing Details',
+          style: theme.textTheme.headlineSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: theme.colorScheme.primary,
+          ),
+        ),
         const SizedBox(height: 12),
         if (savedAddresses.isNotEmpty)
           DropdownButtonFormField<Map<String, dynamic>?>(
@@ -76,7 +87,9 @@ class _CheckoutFormSectionState extends State<CheckoutFormSection> {
               ...savedAddresses.map((addr) {
                 return DropdownMenuItem(
                   value: addr,
-                  child: Text('${addr['label']} • ${addr['street']}'),
+                  child: Text(
+                    '${capitalize(addr['label'])} • ${capitalize(addr['street'])}, ${capitalize(addr['city'])}, ${capitalize(addr['state'])} - ${capitalize(addr['postalCode'])}',
+                  ),
                 );
               }),
               const DropdownMenuItem<Map<String, dynamic>?>(
@@ -102,7 +115,7 @@ class _CheckoutFormSectionState extends State<CheckoutFormSection> {
           ),
         const SizedBox(height: 16),
         Form(
-          key: _formKey,
+          key: widget.formKey,
           child: Wrap(
             spacing: 16,
             runSpacing: 16,
@@ -121,7 +134,12 @@ class _CheckoutFormSectionState extends State<CheckoutFormSection> {
           ),
         ),
         const SizedBox(height: 24),
-        Text('Payment Method', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+        Text(
+          'Payment Method',
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         const SizedBox(height: 8),
         RadioListTile<String>(
           title: const Text('Cash on Delivery'),
@@ -133,20 +151,38 @@ class _CheckoutFormSectionState extends State<CheckoutFormSection> {
     );
   }
 
-  Widget _field(TextEditingController controller, String label, [bool required = false]) {
-    final alwaysEnabled = [firstNameCtrl, lastNameCtrl, companyCtrl].contains(controller);
+  Widget _field(
+    TextEditingController controller,
+    String label, [
+    bool required = false,
+  ]) {
+    final alwaysEnabled = [
+      firstNameCtrl,
+      lastNameCtrl,
+      companyCtrl,
+    ].contains(controller);
     final alwaysDisabled = controller == emailCtrl;
 
     return SizedBox(
       width: widget.isMobile ? double.infinity : 260,
       child: TextFormField(
         controller: controller,
-        decoration: InputDecoration(labelText: label, border: const OutlineInputBorder()),
-        validator: required && controller.text.isEmpty
-            ? (_) => '$label is required'
-            : null,
+        decoration: InputDecoration(
+          labelText: label,
+          border: const OutlineInputBorder(),
+        ),
+        validator:
+            required
+                ? (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return '$label is required';
+                  }
+                  return null;
+                }
+                : null,
         readOnly: alwaysDisabled,
-        enabled: alwaysDisabled ? false : (alwaysEnabled || selectedAddress == null),
+        enabled:
+            alwaysDisabled ? false : (alwaysEnabled || selectedAddress == null),
       ),
     );
   }

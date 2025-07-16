@@ -35,6 +35,7 @@ class WishlistScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+        final theme = Theme.of(context);
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) {
       return const Scaffold(
@@ -55,6 +56,7 @@ class WishlistScreen extends StatelessWidget {
                 'Your Wishlist',
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.primary
                 ),
               ),
               const SizedBox(height: 16),

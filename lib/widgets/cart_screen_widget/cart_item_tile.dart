@@ -57,7 +57,7 @@ class CartItemTile extends StatelessWidget {
                                 }
                                 : null,
                         icon: const Icon(Icons.add),
-                      ),
+                    ),
                     ],
                   ),
                   IconButton(
@@ -65,7 +65,7 @@ class CartItemTile extends StatelessWidget {
                       await CartService().removeFromCart(product.id);
                       onChanged();
                     },
-                    icon: const Icon(Icons.delete_outline),
+                    icon: const Icon(Icons.delete_outline), color: Colors.redAccent,
                   ),
                 ],
               ),

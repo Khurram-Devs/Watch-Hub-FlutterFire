@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:watch_hub_ep/services/checkout_service.dart';
 
 class PromoAndSummarySection extends StatefulWidget {
+  final GlobalKey<FormState> formKey;
   final List<Map<String, dynamic>> cartItems;
   final double subtotal;
   final double tax;
@@ -12,6 +13,7 @@ class PromoAndSummarySection extends StatefulWidget {
 
   const PromoAndSummarySection({
     super.key,
+    required this.formKey,
     required this.cartItems,
     required this.subtotal,
     required this.tax,
@@ -47,6 +49,13 @@ class _PromoAndSummarySectionState extends State<PromoAndSummarySection> {
   }
 
   Future<void> placeOrder() async {
+    if (!widget.formKey.currentState!.validate()) {
+      setState(() {
+        message = 'Please fill all required fields before placing the order.';
+      });
+      return;
+    }
+
     setState(() {
       isPlacing = true;
       message = '';
@@ -92,7 +101,12 @@ class _PromoAndSummarySectionState extends State<PromoAndSummarySection> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Promo Code', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+            Text(
+              'Promo Code',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(height: 12),
             Row(
               children: [
@@ -118,7 +132,8 @@ class _PromoAndSummarySectionState extends State<PromoAndSummarySection> {
                 child: Text(
                   message,
                   style: TextStyle(
-                    color: message.contains('applied') ? Colors.green : Colors.red,
+                    color:
+                        message.contains('applied') ? Colors.green : Colors.red,
                   ),
                 ),
               ),
@@ -139,13 +154,14 @@ class _PromoAndSummarySectionState extends State<PromoAndSummarySection> {
               height: 48,
               child: ElevatedButton.icon(
                 onPressed: isPlacing ? null : placeOrder,
-                icon: isPlacing
-                    ? const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Icon(Icons.check_circle_outline),
+                icon:
+                    isPlacing
+                        ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                        : const Icon(Icons.check_circle_outline),
                 label: Text(isPlacing ? 'Placing Order...' : 'Place Order'),
               ),
             ),

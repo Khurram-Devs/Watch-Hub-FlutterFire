@@ -128,7 +128,7 @@ class _LoginScreenState extends State<LoginScreen> {
               key: _formKey,
               child: Column(
                 children: [
-                  Text("Welcome Back", style: theme.textTheme.displayLarge),
+                  Text("Welcome Back", style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: theme.primaryColor)),
                   const SizedBox(height: 24),
 
                   TextFormField(
