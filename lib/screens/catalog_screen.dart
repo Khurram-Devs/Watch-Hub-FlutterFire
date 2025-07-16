@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:watch_hub_ep/widgets/home_screen_widget/search_bar_widget.dart';
+import 'package:watch_hub_ep/widgets/skeleton_widget/product_grid_skeleton.dart';
+import 'package:watch_hub_ep/widgets/skeleton_widget/product_list_skeleton.dart';
 import '../../services/product_service.dart';
 import '../../models/product_model.dart';
 import '../../models/sort_option.dart';
@@ -92,34 +94,33 @@ class _CatalogScreenState extends State<CatalogScreen> {
   }
 
   Future<void> _fetchPage() async {
-  if (_isLoading || !_hasMore) return;
+    if (_isLoading || !_hasMore) return;
 
-  setState(() => _isLoading = true);
+    setState(() => _isLoading = true);
 
-  final results = await _service.fetchCatalog(
-    page: 1,
-    limit: 20,
-    sort: _sortBy,
-    brand: _brand,
-    minPrice: _minPrice,
-    maxPrice: _maxPrice,
-    lastDoc: _lastDoc,
-    categories: _selectedCategories,
-    inStock: _inStock,
-    discountedOnly: _discountOnly,
-    minRating: _minRating,
-  );
+    final results = await _service.fetchCatalog(
+      page: 1,
+      limit: 20,
+      sort: _sortBy,
+      brand: _brand,
+      minPrice: _minPrice,
+      maxPrice: _maxPrice,
+      lastDoc: _lastDoc,
+      categories: _selectedCategories,
+      inStock: _inStock,
+      discountedOnly: _discountOnly,
+      minRating: _minRating,
+    );
 
-  if (!mounted) return;
+    if (!mounted) return;
 
-  setState(() {
-    if (results.length < 20) _hasMore = false;
-    if (results.isNotEmpty) _lastDoc = results.last.firestoreSnapshot;
-    _products.addAll(results);
-    _isLoading = false;
-  });
-}
-
+    setState(() {
+      if (results.length < 20) _hasMore = false;
+      if (results.isNotEmpty) _lastDoc = results.last.firestoreSnapshot;
+      _products.addAll(results);
+      _isLoading = false;
+    });
+  }
 
   List<String> _selectedCategories = [];
   bool _inStock = false;
@@ -197,93 +198,114 @@ class _CatalogScreenState extends State<CatalogScreen> {
                 const SizedBox(height: 12),
 
                 LayoutBuilder(
-  builder: (context, constraints) {
-    final isWide = constraints.maxWidth > 700;
-    return isWide
-        ? Align(
-            alignment: Alignment.centerLeft,
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                maxWidth: constraints.maxWidth * 0.5,
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ViewToggle(
-                    isGrid: _isGrid,
-                    onToggle: _onToggleView,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    flex: 2,
-                    child: SortPanel(
-                      current: _sortBy,
-                      onSort: _onSortChanged,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  ElevatedButton.icon(
-                    onPressed: () => _showFilterOverlay(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.secondary,
-                      foregroundColor: Theme.of(context).cardColor,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 22,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    icon: const Icon(Icons.tune),
-                    label: const Text("Filters"),
-                  ),
-                ],
-              ),
-            ),
-          )
-        : Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              ElevatedButton.icon(
-                onPressed: () => _showFilterOverlay(context),
-                icon: const Icon(Icons.tune),
-                label: const Text("Filters"),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.secondary,
-                  foregroundColor: Theme.of(context).cardColor,
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 12,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+                  builder: (context, constraints) {
+                    final isWide = constraints.maxWidth > 700;
+                    return isWide
+                        ? Align(
+                          alignment: Alignment.centerLeft,
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxWidth: constraints.maxWidth * 0.5,
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                ViewToggle(
+                                  isGrid: _isGrid,
+                                  onToggle: _onToggleView,
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  flex: 2,
+                                  child: SortPanel(
+                                    current: _sortBy,
+                                    onSort: _onSortChanged,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                ElevatedButton.icon(
+                                  onPressed: () => _showFilterOverlay(context),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        Theme.of(context).colorScheme.secondary,
+                                    foregroundColor:
+                                        Theme.of(context).cardColor,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 22,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  icon: const Icon(Icons.tune),
+                                  label: const Text("Filters"),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                        : Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            ElevatedButton.icon(
+                              onPressed: () => _showFilterOverlay(context),
+                              icon: const Icon(Icons.tune),
+                              label: const Text("Filters"),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.secondary,
+                                foregroundColor: Theme.of(context).cardColor,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            SortPanel(current: _sortBy, onSort: _onSortChanged),
+                            const SizedBox(height: 12),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: ViewToggle(
+                                isGrid: _isGrid,
+                                onToggle: _onToggleView,
+                              ),
+                            ),
+                          ],
+                        );
+                  },
                 ),
-              ),
-              const SizedBox(height: 12),
-              SortPanel(current: _sortBy, onSort: _onSortChanged),
-              const SizedBox(height: 12),
-              Align(
-                alignment: Alignment.centerRight,
-                child: ViewToggle(
-                  isGrid: _isGrid,
-                  onToggle: _onToggleView,
-                ),
-              ),
-            ],
-          );
-  },
-),
 
                 const SizedBox(height: 12),
 
                 const SizedBox(height: 12),
 
                 _isLoading
-                    ? const Padding(
-                      padding: EdgeInsets.all(16),
-                      child: CircularProgressIndicator(),
-                    )
+                    ? _isGrid
+                        ? GridView.builder(
+                          padding: const EdgeInsets.only(top: 8),
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: crossAxisCount * 2,
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: crossAxisCount,
+                                mainAxisSpacing: 16,
+                                crossAxisSpacing: 16,
+                                childAspectRatio: aspectRatio,
+                              ),
+                          itemBuilder: (_, __) => const ProductGridSkeleton(),
+                        )
+                        : ListView.builder(
+                          padding: const EdgeInsets.only(top: 8),
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: 3,
+                          itemBuilder: (_, __) => const ProductListSkeleton(),
+                        )
                     : _products.isEmpty
                     ? Padding(
                       padding: const EdgeInsets.symmetric(vertical: 48),
@@ -317,7 +339,11 @@ class _CatalogScreenState extends State<CatalogScreen> {
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: _products.length,
-                      separatorBuilder: (_, __) => const Divider(height: 10,color: Colors.transparent,),
+                      separatorBuilder:
+                          (_, __) => const Divider(
+                            height: 10,
+                            color: Colors.transparent,
+                          ),
                       itemBuilder:
                           (_, i) => ProductListItem(product: _products[i]),
                     ),

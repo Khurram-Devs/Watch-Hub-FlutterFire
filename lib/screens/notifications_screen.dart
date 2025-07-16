@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:watch_hub_ep/utils/string_utils.dart';
+import 'package:watch_hub_ep/widgets/skeleton_widget/notifications_skeleton.dart';
 
 class NotificationsScreen extends StatelessWidget {
   const NotificationsScreen({super.key});
@@ -56,7 +57,7 @@ class NotificationsScreen extends StatelessWidget {
         stream: notificationsRef.snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const NotificationsSkeleton();
           }
 
           final docs = snapshot.data?.docs ?? [];
@@ -82,9 +83,10 @@ class NotificationsScreen extends StatelessWidget {
                 onTap: () => !isRead ? _markAsRead(uid, doc.id) : null,
                 child: Container(
                   decoration: BoxDecoration(
-                    color: isRead
-                        ? theme.scaffoldBackgroundColor
-                        : theme.colorScheme.primary.withOpacity(0.05),
+                    color:
+                        isRead
+                            ? theme.scaffoldBackgroundColor
+                            : theme.colorScheme.primary.withOpacity(0.05),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   padding: const EdgeInsets.all(12),
@@ -102,11 +104,14 @@ class NotificationsScreen extends StatelessWidget {
                                 Expanded(
                                   child: Text(
                                     capitalizeEachWord(title),
-                                    style: theme.textTheme.titleMedium?.copyWith(
-                                      color: theme.colorScheme.primary,
-                                      fontWeight:
-                                          isRead ? FontWeight.normal : FontWeight.bold,
-                                    ),
+                                    style: theme.textTheme.titleMedium
+                                        ?.copyWith(
+                                          color: theme.colorScheme.primary,
+                                          fontWeight:
+                                              isRead
+                                                  ? FontWeight.normal
+                                                  : FontWeight.bold,
+                                        ),
                                   ),
                                 ),
                                 if (!isRead)
@@ -122,16 +127,15 @@ class NotificationsScreen extends StatelessWidget {
                               ],
                             ),
                             const SizedBox(height: 4),
-                            Text(
-                              message,
-                              style: theme.textTheme.bodyMedium,
-                            ),
+                            Text(message, style: theme.textTheme.bodyMedium),
                             if (ts != null)
                               Padding(
                                 padding: const EdgeInsets.only(top: 6),
                                 child: Text(
                                   _formatRelativeTime(ts),
-                                  style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey),
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: Colors.grey,
+                                  ),
                                 ),
                               ),
                           ],

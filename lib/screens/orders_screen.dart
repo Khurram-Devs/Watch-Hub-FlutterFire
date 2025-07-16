@@ -6,6 +6,7 @@ import 'package:watch_hub_ep/services/profile_service.dart';
 import 'package:watch_hub_ep/utils/string_utils.dart';
 import 'package:watch_hub_ep/widgets/orders_screen_widget/order_detail_modal.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:watch_hub_ep/widgets/skeleton_widget/orders_skeleton.dart';
 
 class OrdersScreen extends StatefulWidget {
   const OrdersScreen({super.key});
@@ -81,9 +82,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                       stream: _srv.ordersStream(),
                       builder: (ctx, snap) {
                         if (snap.connectionState == ConnectionState.waiting) {
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
+                          return OrdersSkeleton(isWide: isWide);
                         }
 
                         final docs = snap.data?.docs;

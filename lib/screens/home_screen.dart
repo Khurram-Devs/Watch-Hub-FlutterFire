@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:watch_hub_ep/widgets/skeleton_widget/brands_scroller_skeleton.dart';
+import 'package:watch_hub_ep/widgets/skeleton_widget/testimonial_carousel_skeleton.dart';
 import '../models/product_model.dart';
 import '../services/product_service.dart';
 import '../services/testimonial_service.dart';
@@ -11,6 +13,8 @@ import '../widgets/home_screen_widget/infinite_brands_scroller.dart';
 import '../widgets/home_screen_widget/contact_us_form.dart';
 import 'package:watch_hub_ep/widgets/catalog_screen_widget/product_grid_item.dart';
 import 'package:watch_hub_ep/widgets/catalog_screen_widget/product_list_item.dart';
+import 'package:watch_hub_ep/widgets/skeleton_widget/product_grid_skeleton.dart';
+import 'package:watch_hub_ep/widgets/skeleton_widget/product_list_skeleton.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -62,7 +66,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 future: _productService.getNewArrivals(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
+                    return SizedBox(
+                      height: 380,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: 5,
+                        itemBuilder: (_, __) => const ProductGridSkeleton(),
+                        separatorBuilder: (_, __) => const SizedBox(width: 16),
+                      ),
+                    );
                   } else if (snapshot.hasError) {
                     return const Text('Error loading products');
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -70,7 +82,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   }
 
                   final products = snapshot.data!;
-
                   return SizedBox(
                     height: 380,
                     child: ListView.separated(
@@ -94,16 +105,22 @@ class _HomeScreenState extends State<HomeScreen> {
                 future: _productService.loadDiscountedProducts(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
+                    return Column(
+                      children: List.generate(
+                        3,
+                        (_) => const ProductListSkeleton(),
+                      ),
+                    );
                   }
                   if (!snapshot.hasData || snapshot.data!.isEmpty) {
                     return const Text("No discounted products found.");
                   }
 
                   return Column(
-                    children: snapshot.data!.map((product) {
-                      return ProductListItem(product: product);
-                    }).toList(),
+                    children:
+                        snapshot.data!.map((product) {
+                          return ProductListItem(product: product);
+                        }).toList(),
                   );
                 },
               ),
@@ -111,7 +128,17 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 32),
               const SectionTitle(title: 'Our Brands'),
               const SizedBox(height: 12),
-              const InfiniteBrandsScroller(),
+              FutureBuilder(
+                future: Future.delayed(
+                  const Duration(seconds: 2),
+                ), // simulate load
+                builder: (_, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const BrandsScrollerSkeleton();
+                  }
+                  return const InfiniteBrandsScroller();
+                },
+              ),
 
               const SizedBox(height: 32),
               SectionTitle(
@@ -125,7 +152,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 future: _productService.getFeaturedProducts(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
+                    return SizedBox(
+                      height: 380,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: 5,
+                        itemBuilder: (_, __) => const ProductGridSkeleton(),
+                        separatorBuilder: (_, __) => const SizedBox(width: 16),
+                      ),
+                    );
                   } else if (snapshot.hasError) {
                     return const Text('Error loading products');
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -133,7 +168,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   }
 
                   final products = snapshot.data!;
-
                   return SizedBox(
                     height: 380,
                     child: ListView.separated(
@@ -150,7 +184,17 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
 
               const SizedBox(height: 32),
-              const TestimonialCarousel(),
+              FutureBuilder(
+                future: Future.delayed(
+                  const Duration(seconds: 2),
+                ), // simulate load
+                builder: (_, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const TestimonialCarouselSkeleton();
+                  }
+                  return const TestimonialCarousel();
+                },
+              ),
 
               const SizedBox(height: 32),
               ContactUsForm(),

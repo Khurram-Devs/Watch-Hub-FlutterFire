@@ -6,6 +6,7 @@ import 'package:watch_hub_ep/models/product_model.dart';
 import 'package:watch_hub_ep/widgets/catalog_screen_widget/product_list_item.dart';
 import 'package:watch_hub_ep/services/profile_service.dart';
 import 'package:watch_hub_ep/services/cart_service.dart';
+import 'package:watch_hub_ep/widgets/skeleton_widget/wishlist_item_skeleton.dart';
 
 class WishlistScreen extends StatelessWidget {
   WishlistScreen({super.key});
@@ -21,22 +22,19 @@ class WishlistScreen extends StatelessWidget {
     await _srv.removeFromWishlist(productId);
   }
 
-  Future<bool> _isProductInCart(String productId) async {
-    return await _cartService.isProductInCart(productId);
-  }
-
   Future<void> _addToCart(BuildContext context, ProductModel product) async {
     await _cartService.addProductToCart(product);
     await _removeFromWishlist(product.id);
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Product moved to cart')));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Product moved to cart')),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-        final theme = Theme.of(context);
+    final theme = Theme.of(context);
     final uid = FirebaseAuth.instance.currentUser?.uid;
+
     if (uid == null) {
       return const Scaffold(
         body: Center(child: Text('Please log in to view your wishlist.')),
@@ -54,9 +52,9 @@ class WishlistScreen extends StatelessWidget {
             children: [
               Text(
                 'Your Wishlist',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                style: theme.textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.primary
+                  color: theme.colorScheme.primary,
                 ),
               ),
               const SizedBox(height: 16),
@@ -65,7 +63,10 @@ class WishlistScreen extends StatelessWidget {
                   stream: usersProfile.doc(uid).snapshots(),
                   builder: (context, userSnap) {
                     if (!userSnap.hasData) {
-                      return const Center(child: CircularProgressIndicator());
+                      return ListView.builder(
+                        itemCount: 3,
+                        itemBuilder: (_, __) => const WishlistItemSkeleton(),
+                      );
                     }
 
                     final data = userSnap.data!.data() as Map<String, dynamic>;
@@ -81,8 +82,10 @@ class WishlistScreen extends StatelessWidget {
                       future: _fetchWishlistProducts(wishlistRefs),
                       builder: (context, snapshot) {
                         if (!snapshot.hasData) {
-                          return const Center(
-                            child: CircularProgressIndicator(),
+                          return ListView.builder(
+                            itemCount: 3,
+                            itemBuilder: (_, __) =>
+                                const WishlistItemSkeleton(),
                           );
                         }
 
@@ -93,71 +96,52 @@ class WishlistScreen extends StatelessWidget {
                           );
                         }
 
-                        return LayoutBuilder(
-                          builder: (context, constraints) {
-                            final isWide = constraints.maxWidth > 600;
+                        return ListView.separated(
+                          padding: const EdgeInsets.only(bottom: 32),
+                          itemCount: products.length,
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(height: 16),
+                          itemBuilder: (context, index) {
+                            final product = products[index];
 
-                            return ListView.separated(
-                              padding: const EdgeInsets.only(bottom: 32),
-                              itemCount: products.length,
-                              separatorBuilder:
-                                  (_, __) => const SizedBox(height: 16),
-                              itemBuilder: (context, index) {
-                                final product = products[index];
-
-                                return Card(
-                                  elevation: 3,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(12),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                            return Card(
+                              elevation: 3,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(12),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    ProductListItem(product: product),
+                                    const SizedBox(height: 12),
+                                    Wrap(
+                                      spacing: 12,
+                                      runSpacing: 8,
+                                      alignment: WrapAlignment.end,
                                       children: [
-                                        ProductListItem(product: product),
-                                        const SizedBox(height: 12),
-                                        Wrap(
-                                          spacing: 12,
-                                          runSpacing: 8,
-                                          alignment: WrapAlignment.end,
-                                          children: [
-                                            OutlinedButton.icon(
-                                              icon: const Icon(
-                                                Icons.delete_outline,
-                                              ),
-                                              label: const Text('Remove'),
-                                              onPressed:
-                                                  () => _removeFromWishlist(
-                                                    product.id,
-                                                  ),
-                                              style: OutlinedButton.styleFrom(
-                                                foregroundColor:
-                                                    Colors.redAccent,
-                                              ),
-                                            ),
-                                            if (product.stock > 0)
-                                              ElevatedButton.icon(
-                                                icon: const Icon(
-                                                  Icons.shopping_cart,
-                                                ),
-                                                label: const Text(
-                                                  'Move to Cart',
-                                                ),
-                                                onPressed:
-                                                    () => _addToCart(
-                                                      context,
-                                                      product,
-                                                    ),
-                                              ),
-                                          ],
+                                        OutlinedButton.icon(
+                                          icon: const Icon(Icons.delete_outline),
+                                          label: const Text('Remove'),
+                                          onPressed: () =>
+                                              _removeFromWishlist(product.id),
+                                          style: OutlinedButton.styleFrom(
+                                            foregroundColor: Colors.redAccent,
+                                          ),
                                         ),
+                                        if (product.stock > 0)
+                                          ElevatedButton.icon(
+                                            icon: const Icon(Icons.shopping_cart),
+                                            label: const Text('Move to Cart'),
+                                            onPressed: () =>
+                                                _addToCart(context, product),
+                                          ),
                                       ],
                                     ),
-                                  ),
-                                );
-                              },
+                                  ],
+                                ),
+                              ),
                             );
                           },
                         );

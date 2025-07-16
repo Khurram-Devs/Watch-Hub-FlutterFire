@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:watch_hub_ep/models/address_model.dart';
 import 'package:watch_hub_ep/services/profile_service.dart';
 import 'package:watch_hub_ep/utils/string_utils.dart';
+import 'package:watch_hub_ep/widgets/skeleton_widget/address_skeleton.dart';
 
 class AddressBookScreen extends StatelessWidget {
   AddressBookScreen({super.key});
@@ -32,7 +33,7 @@ class AddressBookScreen extends StatelessWidget {
                   stream: _srv.addressesStream(),
                   builder: (ctx, snap) {
                     if (!snap.hasData) {
-                      return const Center(child: CircularProgressIndicator());
+                      return const AddressSkeleton();
                     }
 
                     final docs = snap.data!.docs;
@@ -68,7 +69,8 @@ class AddressBookScreen extends StatelessWidget {
                                 '${capitalize(a.street)}, ${capitalize(a.city)}, ${capitalize(a.country)}',
                               ),
                               trailing: IconButton(
-                                icon: const Icon(Icons.delete_outline), color: Colors.redAccent,
+                                icon: const Icon(Icons.delete_outline),
+                                color: Colors.redAccent,
                                 onPressed: () => _srv.removeAddress(a.id),
                               ),
                             ),
@@ -111,7 +113,10 @@ class _AddressDialogState extends State<AddressDialog> {
     final theme = Theme.of(ctx);
 
     return AlertDialog(
-      title: Text('Add Address', style: TextStyle(color: theme.colorScheme.primary),),
+      title: Text(
+        'Add Address',
+        style: TextStyle(color: theme.colorScheme.primary),
+      ),
       content: Form(
         key: _form,
         child: SingleChildScrollView(

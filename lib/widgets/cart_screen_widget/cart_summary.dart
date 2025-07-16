@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:watch_hub_ep/models/product_model.dart';
+import 'package:watch_hub_ep/widgets/skeleton_widget/cart_summary_skeleton.dart';
 
 class CartSummary extends StatelessWidget {
   const CartSummary({super.key});
@@ -16,15 +17,14 @@ class CartSummary extends StatelessWidget {
     }
 
     return StreamBuilder<QuerySnapshot>(
-      stream:
-          FirebaseFirestore.instance
-              .collection('usersProfile')
-              .doc(uid)
-              .collection('cart')
-              .snapshots(),
+      stream: FirebaseFirestore.instance
+          .collection('usersProfile')
+          .doc(uid)
+          .collection('cart')
+          .snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return const Center(child: CircularProgressIndicator());
+          return const CartSummarySkeleton();
         }
 
         final cartDocs = snapshot.data!.docs;
@@ -32,8 +32,9 @@ class CartSummary extends StatelessWidget {
         return FutureBuilder<List<Map<String, dynamic>>>(
           future: _buildCartItems(cartDocs),
           builder: (context, productSnapshot) {
-            if (!productSnapshot.hasData) {
-              return const Center(child: CircularProgressIndicator());
+            if (productSnapshot.connectionState == ConnectionState.waiting ||
+                !productSnapshot.hasData) {
+              return const CartSummarySkeleton();
             }
 
             final items = productSnapshot.data!;
@@ -89,7 +90,7 @@ class CartSummary extends StatelessWidget {
                           context.pushNamed('checkout', extra: cartData);
                         },
                         child: const Text("Proceed to Checkout"),
-                    ),
+                      ),
                     ),
                   ],
                 ),
@@ -102,18 +103,24 @@ class CartSummary extends StatelessWidget {
   }
 
   Future<List<Map<String, dynamic>>> _buildCartItems(
-    List<QueryDocumentSnapshot> cartDocs,
-  ) async {
+      List<QueryDocumentSnapshot> cartDocs) async {
     final List<Map<String, dynamic>> result = [];
 
     for (final doc in cartDocs) {
-      final data = doc.data() as Map<String, dynamic>;
+      final data = doc.data() as Map<String, dynamic>?;
+
+      if (data == null || data['productRef'] == null) continue;
+
       final quantity = (data['quantity'] ?? 1) as int;
       final productRef = data['productRef'] as DocumentReference;
-      final productSnap = await productRef.get();
 
-      if (productSnap.exists) {
-        final productData = productSnap.data() as Map<String, dynamic>;
+      try {
+        final productSnap = await productRef.get();
+        if (!productSnap.exists) continue;
+
+        final productData = productSnap.data() as Map<String, dynamic>?;
+        if (productData == null) continue;
+
         final product = await ProductModel.fromFirestoreWithBrand(
           productData,
           productSnap.id,
@@ -121,8 +128,12 @@ class CartSummary extends StatelessWidget {
         );
 
         result.add({'product': product, 'quantity': quantity});
+      } catch (e) {
+        debugPrint("Error loading productRef: ${productRef.path} -> $e");
+        continue;
       }
     }
+
     return result;
   }
 
@@ -134,11 +145,15 @@ class CartSummary extends StatelessWidget {
         children: [
           Text(
             label,
-            style: bold ? const TextStyle(fontWeight: FontWeight.bold) : null,
+            style: bold
+                ? const TextStyle(fontWeight: FontWeight.bold)
+                : const TextStyle(),
           ),
           Text(
             "\$${amount.toStringAsFixed(2)}",
-            style: bold ? const TextStyle(fontWeight: FontWeight.bold) : null,
+            style: bold
+                ? const TextStyle(fontWeight: FontWeight.bold)
+                : const TextStyle(),
           ),
         ],
       ),
