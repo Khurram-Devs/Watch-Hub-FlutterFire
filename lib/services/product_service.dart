@@ -96,12 +96,23 @@ class ProductService {
   }) async {
     Query<Map<String, dynamic>> q = _productsRef;
 
-    if (brand != null && brand.isNotEmpty) {
-      final brandRef = FirebaseFirestore.instance
-          .collection('categories')
-          .doc(brand);
-      q = q.where('brand', isEqualTo: brandRef);
-    }
+if (brand != null && brand.isNotEmpty) {
+  // Fetch the brand document from 'categories' collection by name
+  final brandQuerySnapshot = await FirebaseFirestore.instance
+      .collection('categories')
+      .where('name', isEqualTo: brand)
+      .limit(1)
+      .get();
+
+  if (brandQuerySnapshot.docs.isEmpty) {
+    // No brand found, return empty list or skip brand filter
+    return [];
+  }
+
+  final brandRef = brandQuerySnapshot.docs.first.reference;
+  q = q.where('brand', isEqualTo: brandRef);
+}
+
 
     if (categories != null && categories.isNotEmpty) {
       final categoryRefs =
