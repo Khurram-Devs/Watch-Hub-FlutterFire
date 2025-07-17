@@ -30,15 +30,17 @@ class _InfiniteBrandsScrollerState extends State<InfiniteBrandsScroller>
 
   Future<void> _fetchBrandsFromFirestore() async {
     try {
-      final query = await FirebaseFirestore.instance
-          .collection('categories')
-          .where('type', isEqualTo: 1)
-          .get();
+      final query =
+          await FirebaseFirestore.instance
+              .collection('categories')
+              .where('type', isEqualTo: 1)
+              .get();
 
-      final urls = query.docs
-          .map((doc) => doc['iconUrl'] as String? ?? '')
-          .where((url) => url.isNotEmpty)
-          .toList();
+      final urls =
+          query.docs
+              .map((doc) => doc['iconUrl'] as String? ?? '')
+              .where((url) => url.isNotEmpty)
+              .toList();
 
       if (urls.isEmpty) return;
 
@@ -72,7 +74,8 @@ class _InfiniteBrandsScrollerState extends State<InfiniteBrandsScroller>
 
     final offset = _scrollController.offset;
     final maxExtent = _scrollController.position.maxScrollExtent;
-    final newOffset = offset + _scrollSpeed * (_frameRate.inMilliseconds / 1000);
+    final newOffset =
+        offset + _scrollSpeed * (_frameRate.inMilliseconds / 1000);
 
     if (newOffset >= maxExtent - 200) {
       final middle = maxExtent / 2;
@@ -98,40 +101,52 @@ class _InfiniteBrandsScrollerState extends State<InfiniteBrandsScroller>
 
     return SizedBox(
       height: avatarSize + 24,
-      child: _isReady
-          ? ListView.builder(
-              controller: _scrollController,
-              scrollDirection: Axis.horizontal,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: _brandImages.length,
-              itemBuilder: (context, index) {
-                final imageUrl = _brandImages[index];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: _spacing / 2),
-                  child: Container(
-                    width: avatarSize,
-                    height: avatarSize,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: isDark ? Colors.black45 : Colors.grey.shade300,
-                          blurRadius: 6,
-                          offset: const Offset(0, 4),
+      child:
+          _isReady
+              ? ListView.builder(
+                controller: _scrollController,
+                scrollDirection: Axis.horizontal,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: _brandImages.length,
+                itemBuilder: (context, index) {
+                  final imageUrl = _brandImages[index];
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: _spacing / 2,
+                    ),
+                    child: Container(
+                      width: avatarSize - 50,
+                      height: avatarSize - 50,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white, // White background
+                        boxShadow: [
+                          BoxShadow(
+                            color:
+                                isDark ? Colors.black45 : Colors.grey.shade300,
+                            blurRadius: 6,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: ClipOval(
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Image.network(
+                            imageUrl,
+                            fit:
+                                BoxFit
+                                    .contain, // Show full image without cropping
+                            errorBuilder:
+                                (_, __, ___) => const Icon(Icons.error),
+                          ),
                         ),
-                      ],
+                      ),
                     ),
-                    child: CircleAvatar(
-                      radius: avatarSize / 2,
-                      backgroundColor: theme.cardColor,
-                      backgroundImage: NetworkImage(imageUrl),
-                      onBackgroundImageError: (_, __) {},
-                    ),
-                  ),
-                );
-              },
-            )
-          : const Center(child: CircularProgressIndicator()),
+                  );
+                },
+              )
+              : const Center(child: CircularProgressIndicator()),
     );
   }
 }
