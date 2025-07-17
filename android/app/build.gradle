@@ -5,12 +5,12 @@ apply plugin: 'dev.flutter.flutter-gradle-plugin'
 
 android {
     namespace 'com.example.watch_hub_ep'
-    compileSdkVersion 34
+    compileSdkVersion 35
     ndkVersion '27.0.12077973' // Codemagic NDK fix
 
     defaultConfig {
         applicationId 'com.example.watch_hub_ep'
-        minSdkVersion 21
+        minSdkVersion 23
         targetSdkVersion 34
         versionCode 1
         versionName "1.0"
