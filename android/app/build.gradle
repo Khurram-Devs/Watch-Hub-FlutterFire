@@ -1,12 +1,11 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
-apply plugin: 'kotlin-android'
 apply plugin: 'dev.flutter.flutter-gradle-plugin'
 
 android {
     namespace 'com.example.watch_hub_ep'
-    compileSdkVersion 35
-    ndkVersion '27.0.12077973' // Codemagic NDK fix
+    compileSdkVersion 34
+    ndkVersion '27.0.12077973'
 
     defaultConfig {
         applicationId 'com.example.watch_hub_ep'
@@ -27,7 +26,7 @@ android {
 
     buildTypes {
         release {
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.debug // Use release config for production
             minifyEnabled false
             shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
