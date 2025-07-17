@@ -16,6 +16,14 @@ class NotificationsScreen extends StatelessWidget {
         return const Icon(Icons.inventory_2_outlined, color: Colors.blue);
       case 'out_of_stock':
         return const Icon(Icons.warning_amber_rounded, color: Colors.orange);
+      case 'order_pending':
+        return const Icon(Icons.hourglass_empty, color: Colors.amber);
+      case 'order_shipped':
+        return const Icon(Icons.local_shipping_outlined, color: Colors.blue);
+      case 'order_delivered':
+        return const Icon(Icons.check_circle_outline, color: Colors.green);
+      case 'order_cancelled':
+        return const Icon(Icons.cancel_outlined, color: Colors.red);
       default:
         return const Icon(Icons.notifications_outlined);
     }
