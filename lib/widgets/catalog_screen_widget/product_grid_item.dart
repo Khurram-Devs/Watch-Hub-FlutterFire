@@ -155,7 +155,7 @@ class ProductGridItem extends StatelessWidget {
                           '\$${product.price.toStringAsFixed(0)}',
                           style: theme.textTheme.bodyMedium?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: ThemeProvider.midnightPrimary,
+                            color: ThemeProvider.goldenAccent,
                           ),
                         ),
                 ],

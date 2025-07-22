@@ -129,14 +129,12 @@ class _InfiniteBrandsScrollerState extends State<InfiniteBrandsScroller>
                           ),
                         ],
                       ),
-                      child: ClipOval(
-                        child: Padding(
-                          padding: const EdgeInsets.all(12.0),
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: ClipOval(
                           child: Image.network(
                             imageUrl,
-                            fit:
-                                BoxFit
-                                    .contain, // Show full image without cropping
+                            fit: BoxFit.contain,
                             errorBuilder:
                                 (_, __, ___) => const Icon(Icons.error),
                           ),

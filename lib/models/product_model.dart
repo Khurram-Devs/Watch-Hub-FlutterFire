@@ -37,7 +37,6 @@ class ProductModel {
     String id, {
     DocumentSnapshot? snapshot,
   }) async {
-    // Check if brand exists and is a DocumentReference
     final brandRef = data['brand'];
     String brandName = '';
 

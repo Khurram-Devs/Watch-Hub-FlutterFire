@@ -47,6 +47,7 @@ class ProductInfo extends StatelessWidget {
             Text(
               "\$${(product.price * (1 - product.discountPercentage / 100)).toStringAsFixed(2)}",
               style: theme.textTheme.headlineSmall?.copyWith(
+                color: theme.colorScheme.secondary,
                 fontWeight: FontWeight.bold,
               ),
             ),
