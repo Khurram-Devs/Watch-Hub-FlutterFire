@@ -304,10 +304,25 @@ class _OverlayContent extends StatelessWidget {
   const _OverlayContent({required this.theme});
   final ThemeData theme;
 
+  double _getHeadingFontSize(double width) {
+    if (width < 400) return 22;
+    if (width < 600) return 26;
+    if (width < 900) return 32;
+    return 38; // For desktop
+  }
+
+  double _getBodyFontSize(double width) {
+    if (width < 400) return 12;
+    if (width < 600) return 14;
+    return 16; // Tablet & desktop
+  }
+
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -315,38 +330,42 @@ class _OverlayContent extends StatelessWidget {
             "Elevate Your Style",
             style: theme.textTheme.headlineLarge?.copyWith(
               fontWeight: FontWeight.bold,
+              fontSize: _getHeadingFontSize(screenWidth),
               color: theme.colorScheme.secondary,
             ),
             textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
           Text(
             "Discover timeless luxury with our exclusive watch collection.",
             style: theme.textTheme.bodyMedium?.copyWith(
               color: Colors.white70,
-              fontSize: 16,
+              fontSize: _getBodyFontSize(screenWidth),
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 24),
-          ElevatedButton(
-            onPressed: () {
-              context.push('/catalog');
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: theme.colorScheme.secondary,
-              foregroundColor: Colors.black,
-              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24),
+          const SizedBox(height: 20),
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 200),
+            child: ElevatedButton(
+              onPressed: () => context.push('/catalog'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: theme.colorScheme.secondary,
+                foregroundColor: Colors.black,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24),
+                ),
               ),
-            ),
-            child: const Text(
-              "Discover",
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 1.2,
+              child: Text(
+                "Discover",
+                style: TextStyle(
+                  fontSize: screenWidth < 400 ? 14 : 16,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 1.1,
+                ),
               ),
             ),
           ),
@@ -355,3 +374,4 @@ class _OverlayContent extends StatelessWidget {
     );
   }
 }
+

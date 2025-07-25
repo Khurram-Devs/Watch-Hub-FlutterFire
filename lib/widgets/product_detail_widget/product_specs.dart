@@ -14,26 +14,53 @@ class ProductSpecs extends StatelessWidget {
       children: [
         Text(
           "Specifications",
-          style: theme.textTheme.titleMedium?.copyWith(
+          style: theme.textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.bold,
             color: theme.colorScheme.secondary,
           ),
         ),
-        const SizedBox(height: 12),
-        ...specs.entries.map((e) => Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              child: Row(
+        const SizedBox(height: 16),
+
+        ...specs.entries.map((e) {
+          return Column(
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(e.key, style: theme.textTheme.bodyMedium),
-                  Text(
-                    e.value.toString(),
-                    style: theme.textTheme.bodyMedium
-                        ?.copyWith(fontWeight: FontWeight.w600),
+                  Expanded(
+                    flex: 4,
+                    child: Text(
+                      e.key,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurface,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 6,
+                    child: Text(
+                      e.value.toString(),
+                      textAlign: TextAlign.right,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: theme.colorScheme.onSurface,
+                        fontSize: 12,
+                      ),
+                    ),
                   ),
                 ],
               ),
-            )),
+              if (e != specs.entries.last) ...[
+                const SizedBox(height: 8),
+                Divider(color: Colors.grey.withOpacity(0.3), thickness: 0.7),
+                const SizedBox(height: 8),
+              ],
+            ],
+          );
+        }),
       ],
     );
   }
