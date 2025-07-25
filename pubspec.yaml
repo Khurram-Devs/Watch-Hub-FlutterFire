@@ -41,7 +41,8 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/splash_logo.png
-    - assets/images/default_user.png
+    - assets/images/default_user.png  
+    - assets/images/fallback_banner.png
     - assets/fonts/NotoSans-Regular.ttf
 
 flutter_native_splash:

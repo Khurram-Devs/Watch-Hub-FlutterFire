@@ -46,11 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 12),
               SearchBarWidget(controller: _searchController),
               const SizedBox(height: 12),
-
-              const SingleVideoBanner(
-                videoUrl:
-                    'https://media.rolex.com/video/upload/c_limit,w_2880/f_auto:video/q_auto:eco/v1/rolexcom/new-watches/2025/hub/videos/autoplay/cover/rolex-watches-new-watches-2025-cover-autoplay',
-              ),
+              const SingleVideoBanner(),
               const SizedBox(height: 32),
 
               SectionTitle(
