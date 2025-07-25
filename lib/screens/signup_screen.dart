@@ -4,8 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:watch_hub_ep/theme/theme_provider.dart';
-import 'package:provider/provider.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -62,7 +60,7 @@ class _SignupScreenState extends State<SignupScreen> {
               'createdAt': FieldValue.serverTimestamp(),
             });
 
-        if (!mounted) return; // ← Check before using context
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Signup successful! Please login to continue'),
@@ -114,7 +112,7 @@ class _SignupScreenState extends State<SignupScreen> {
         );
       }
 
-      final user = userCredential.user; // ✅ ADD THIS LINE
+      final user = userCredential.user;
 
       if (user != null) {
         final userDoc =
@@ -175,7 +173,6 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = context.watch<ThemeProvider>().isDarkMode;
 
     return Scaffold(
       body: Center(

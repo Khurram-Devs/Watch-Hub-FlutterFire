@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:watch_hub_ep/services/cart_service.dart';
 import '../../../models/product_model.dart';
 
@@ -79,15 +78,15 @@ class _AddToCartButtonState extends State<AddToCartButton> {
         isOutOfStock
             ? Icons.block
             : isInCart
-                ? Icons.check_circle
-                : Icons.add_shopping_cart,
+            ? Icons.check_circle
+            : Icons.add_shopping_cart,
       ),
       label: Text(
         isOutOfStock
             ? "Out of Stock"
             : isInCart
-                ? "Already in Cart"
-                : "Add to Cart",
+            ? "Already in Cart"
+            : "Add to Cart",
       ),
       style: ElevatedButton.styleFrom(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),

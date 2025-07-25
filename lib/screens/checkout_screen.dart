@@ -21,7 +21,7 @@ class CheckoutScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 700;
-    final formKey = GlobalKey<FormState>(); // <-- Add this
+    final formKey = GlobalKey<FormState>();
 
     return Scaffold(
       body: SafeArea(
@@ -32,13 +32,10 @@ class CheckoutScreen extends StatelessWidget {
                   ? Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      CheckoutFormSection(
-                        isMobile: isMobile,
-                        formKey: formKey, // <-- Pass here
-                      ),
+                      CheckoutFormSection(isMobile: isMobile, formKey: formKey),
                       const SizedBox(height: 24),
                       PromoAndSummarySection(
-                        formKey: formKey, // <-- Pass here
+                        formKey: formKey,
                         cartItems: cartItems,
                         subtotal: subtotal,
                         tax: tax,

@@ -123,7 +123,7 @@ class _BannerFallbackImage extends StatelessWidget {
             color: theme.cardColor,
             boxShadow: [
               BoxShadow(
-                color: theme.shadowColor.withOpacity(0.3),
+                color: theme.shadowColor.withValues(alpha: 0.3),
                 blurRadius: 8,
                 offset: const Offset(0, 4),
               ),
@@ -248,7 +248,7 @@ class _VideoBannerState extends State<_VideoBanner> {
             color: theme.cardColor,
             boxShadow: [
               BoxShadow(
-                color: theme.shadowColor.withOpacity(0.3),
+                color: theme.shadowColor.withValues(alpha: 0.3),
                 blurRadius: 8,
                 offset: const Offset(0, 4),
               ),
@@ -288,9 +288,9 @@ class _GradientOverlay extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Colors.black.withOpacity(0.6),
+            Colors.black.withValues(alpha: 0.6),
             Colors.transparent,
-            Colors.black.withOpacity(0.6),
+            Colors.black.withValues(alpha: 0.6),
           ],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
@@ -308,13 +308,13 @@ class _OverlayContent extends StatelessWidget {
     if (width < 400) return 22;
     if (width < 600) return 26;
     if (width < 900) return 32;
-    return 38; // For desktop
+    return 38;
   }
 
   double _getBodyFontSize(double width) {
     if (width < 400) return 12;
     if (width < 600) return 14;
-    return 16; // Tablet & desktop
+    return 16;
   }
 
   @override
@@ -354,7 +354,10 @@ class _OverlayContent extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: theme.colorScheme.secondary,
                 foregroundColor: Colors.black,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 10,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(24),
                 ),
@@ -374,4 +377,3 @@ class _OverlayContent extends StatelessWidget {
     );
   }
 }
-

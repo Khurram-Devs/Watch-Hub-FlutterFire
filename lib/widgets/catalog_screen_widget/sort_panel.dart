@@ -19,19 +19,20 @@ class SortPanel extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           margin: const EdgeInsets.symmetric(horizontal: 4),
           decoration: BoxDecoration(
-            color: isSelected
-                ? theme.colorScheme.secondary.withOpacity(0.15)
-                : theme.cardColor,
+            color:
+                isSelected
+                    ? theme.colorScheme.secondary.withValues(alpha: 0.15)
+                    : theme.cardColor,
             borderRadius: BorderRadius.circular(10),
-            
           ),
           child: Text(
             label,
             style: theme.textTheme.bodySmall?.copyWith(
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-              color: isSelected
-                  ? theme.colorScheme.secondary
-                  : theme.textTheme.bodySmall?.color,
+              color:
+                  isSelected
+                      ? theme.colorScheme.secondary
+                      : theme.textTheme.bodySmall?.color,
             ),
           ),
         ),
@@ -46,7 +47,7 @@ class SortPanel extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: theme.shadowColor.withOpacity(0.05),
+            color: theme.shadowColor.withValues(alpha: 0.05),
             blurRadius: 6,
             offset: const Offset(0, 3),
           ),

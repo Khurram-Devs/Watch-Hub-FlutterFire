@@ -18,7 +18,7 @@ class ViewToggle extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: theme.shadowColor.withOpacity(0.05),
+            color: theme.shadowColor.withValues(alpha: 0.05),
             blurRadius: 6,
             offset: const Offset(0, 3),
           ),
@@ -29,7 +29,10 @@ class ViewToggle extends StatelessWidget {
           IconButton(
             icon: Icon(
               Icons.grid_view,
-              color: isGrid ? secondary : theme.iconTheme.color?.withOpacity(0.6),
+              color:
+                  isGrid
+                      ? secondary
+                      : theme.iconTheme.color?.withValues(alpha: 0.6),
             ),
             tooltip: "Grid View",
             onPressed: () => onToggle(true),
@@ -37,7 +40,10 @@ class ViewToggle extends StatelessWidget {
           IconButton(
             icon: Icon(
               Icons.view_list,
-              color: !isGrid ? secondary : theme.iconTheme.color?.withOpacity(0.6),
+              color:
+                  !isGrid
+                      ? secondary
+                      : theme.iconTheme.color?.withValues(alpha: 0.6),
             ),
             tooltip: "List View",
             onPressed: () => onToggle(false),

@@ -25,7 +25,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
   double? _minPrice, _maxPrice;
   SortOption _sortBy = SortOption.New;
   bool _isGrid = true;
-  List<ProductModel> _products = [];
+  final List<ProductModel> _products = [];
   bool _isLoading = false;
   bool _hasMore = true;
   DocumentSnapshot? _lastDoc;

@@ -17,11 +17,12 @@ class CartSummary extends StatelessWidget {
     }
 
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection('usersProfile')
-          .doc(uid)
-          .collection('cart')
-          .snapshots(),
+      stream:
+          FirebaseFirestore.instance
+              .collection('usersProfile')
+              .doc(uid)
+              .collection('cart')
+              .snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return const CartSummarySkeleton();
@@ -103,7 +104,8 @@ class CartSummary extends StatelessWidget {
   }
 
   Future<List<Map<String, dynamic>>> _buildCartItems(
-      List<QueryDocumentSnapshot> cartDocs) async {
+    List<QueryDocumentSnapshot> cartDocs,
+  ) async {
     final List<Map<String, dynamic>> result = [];
 
     for (final doc in cartDocs) {
@@ -145,15 +147,17 @@ class CartSummary extends StatelessWidget {
         children: [
           Text(
             label,
-            style: bold
-                ? const TextStyle(fontWeight: FontWeight.bold)
-                : const TextStyle(),
+            style:
+                bold
+                    ? const TextStyle(fontWeight: FontWeight.bold)
+                    : const TextStyle(),
           ),
           Text(
             "\$${amount.toStringAsFixed(2)}",
-            style: bold
-                ? const TextStyle(fontWeight: FontWeight.bold)
-                : const TextStyle(),
+            style:
+                bold
+                    ? const TextStyle(fontWeight: FontWeight.bold)
+                    : const TextStyle(),
           ),
         ],
       ),

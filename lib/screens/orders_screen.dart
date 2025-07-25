@@ -119,8 +119,6 @@ class _OrdersScreenState extends State<OrdersScreen> {
                             final items =
                                 (data['items'] as List<dynamic>? ?? [])
                                     .cast<Map<String, dynamic>>();
-                            final total =
-                                (data['total'] as num?)?.toDouble() ?? 0.0;
 
                             return GestureDetector(
                               onTap:
@@ -340,14 +338,6 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                               );
 
                                               if (confirm == true) {
-                                                final uid =
-                                                    FirebaseFirestore.instance
-                                                        .collection(
-                                                          'usersProfile',
-                                                        )
-                                                        .doc()
-                                                        .id; // WRONG WAY
-
                                                 final currentUser =
                                                     FirebaseAuth
                                                         .instance

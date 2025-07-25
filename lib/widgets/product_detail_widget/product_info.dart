@@ -28,10 +28,7 @@ class ProductInfo extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        Text(
-          product.description,
-          style: theme.textTheme.bodyMedium,
-        ),
+        Text(product.description, style: theme.textTheme.bodyMedium),
         const SizedBox(height: 16),
         Row(
           children: [

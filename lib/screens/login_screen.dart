@@ -26,16 +26,16 @@ class _LoginScreenState extends State<LoginScreen> {
     final password = _password.text.trim();
 
     try {
-      // ✅ Do NOT manually check sign-in methods; trust Firebase to throw exact error
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
       if (mounted) context.go('/home');
     } on FirebaseAuthException catch (e) {
-      // ✅ Show clean messages
       final message = _getFirebaseErrorMessage(e.code);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Login failed. Please try again.')),
@@ -91,9 +91,9 @@ class _LoginScreenState extends State<LoginScreen> {
       final msg = _getFirebaseErrorMessage(e.code);
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${e.toString()}')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
     }
   }
 
@@ -128,7 +128,14 @@ class _LoginScreenState extends State<LoginScreen> {
               key: _formKey,
               child: Column(
                 children: [
-                  Text("Welcome Back", style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: theme.primaryColor)),
+                  Text(
+                    "Welcome Back",
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: theme.primaryColor,
+                    ),
+                  ),
                   const SizedBox(height: 24),
 
                   TextFormField(
@@ -138,8 +145,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       labelText: 'Email',
                       prefixIcon: Icon(Icons.email_outlined),
                     ),
-                    validator: (val) =>
-                        val != null && val.contains('@') ? null : 'Enter a valid email',
+                    validator:
+                        (val) =>
+                            val != null && val.contains('@')
+                                ? null
+                                : 'Enter a valid email',
                   ),
                   const SizedBox(height: 16),
 
@@ -155,11 +165,16 @@ class _LoginScreenState extends State<LoginScreen> {
                               ? Icons.visibility_off_outlined
                               : Icons.visibility_outlined,
                         ),
-                        onPressed: () => setState(() => _showPassword = !_showPassword),
+                        onPressed:
+                            () =>
+                                setState(() => _showPassword = !_showPassword),
                       ),
                     ),
-                    validator: (val) =>
-                        val != null && val.length >= 6 ? null : 'Minimum 6 characters',
+                    validator:
+                        (val) =>
+                            val != null && val.length >= 6
+                                ? null
+                                : 'Minimum 6 characters',
                   ),
                   const SizedBox(height: 12),
 
@@ -176,13 +191,16 @@ class _LoginScreenState extends State<LoginScreen> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: _isLoading ? null : _login,
-                      child: _isLoading
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Text("Login"),
+                      child:
+                          _isLoading
+                              ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                              : const Text("Login"),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -193,13 +211,16 @@ class _LoginScreenState extends State<LoginScreen> {
                     width: double.infinity,
                     child: OutlinedButton.icon(
                       icon: const Icon(Icons.g_mobiledata_outlined, size: 28),
-                      label: _isLoading
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Text("Login with Google"),
+                      label:
+                          _isLoading
+                              ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                              : const Text("Login with Google"),
                       onPressed: _isLoading ? null : _loginWithGoogle,
                     ),
                   ),

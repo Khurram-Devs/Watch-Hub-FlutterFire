@@ -34,7 +34,7 @@ class CartService {
         snapshot: productSnap,
       );
 
-      if (product.stock != null && product.stock! > 0) {
+      if (product.stock > 0) {
         products.add(product);
       } else {
         await doc.reference.delete();
@@ -51,7 +51,6 @@ class CartService {
     final docSnap = await cartDoc.get();
 
     if (docSnap.exists) {
-      // Already in cart → Optionally increase quantity
       await cartDoc.update({'quantity': FieldValue.increment(1)});
     } else {
       await cartDoc.set({
@@ -105,7 +104,7 @@ class CartService {
         snapshot: productSnap,
       );
 
-      if (product.stock != null && product.stock! > 0) {
+      if (product.stock > 0) {
         result.add({'product': product, 'quantity': quantity});
       } else {
         await doc.reference.delete();

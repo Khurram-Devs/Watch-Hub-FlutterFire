@@ -55,7 +55,10 @@ class ProductSpecs extends StatelessWidget {
               ),
               if (e != specs.entries.last) ...[
                 const SizedBox(height: 8),
-                Divider(color: Colors.grey.withOpacity(0.3), thickness: 0.7),
+                Divider(
+                  color: Colors.grey.withValues(alpha: 0.3),
+                  thickness: 0.7,
+                ),
                 const SizedBox(height: 8),
               ],
             ],

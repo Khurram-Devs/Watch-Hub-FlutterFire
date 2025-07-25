@@ -12,11 +12,13 @@ class ProductGridItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDiscounted = product.discountPercentage != null && product.discountPercentage! > 0;
-    final discountedPrice = isDiscounted
-        ? product.price * (1 - product.discountPercentage! / 100)
-        : product.price;
-    final isOutOfStock = product.stock != null && product.stock! <= 0;
+    final isDiscounted =
+        product.discountPercentage > 0;
+    final discountedPrice =
+        isDiscounted
+            ? product.price * (1 - product.discountPercentage / 100)
+            : product.price;
+    final isOutOfStock = product.stock <= 0;
 
     return GestureDetector(
       onTap: () => context.push('/product/${product.id}'),
@@ -29,7 +31,7 @@ class ProductGridItem extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: theme.shadowColor.withOpacity(0.15),
+              color: theme.shadowColor.withValues(alpha: 0.15),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -50,11 +52,15 @@ class ProductGridItem extends StatelessWidget {
                       child: Image.network(
                         product.images.first,
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Container(
-                          color: theme.disabledColor.withOpacity(0.1),
-                          alignment: Alignment.center,
-                          child: Icon(Icons.watch, color: theme.colorScheme.secondary),
-                        ),
+                        errorBuilder:
+                            (_, __, ___) => Container(
+                              color: theme.disabledColor.withValues(alpha: 0.1),
+                              alignment: Alignment.center,
+                              child: Icon(
+                                Icons.watch,
+                                color: theme.colorScheme.secondary,
+                              ),
+                            ),
                       ),
                     ),
                   ),
@@ -64,14 +70,19 @@ class ProductGridItem extends StatelessWidget {
                       top: 8,
                       left: 8,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: ThemeProvider.goldenAccent,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
-                          '-${product.discountPercentage!.toStringAsFixed(0)}%',
-                          style: theme.textTheme.labelSmall?.copyWith(color: Colors.black),
+                          '-${product.discountPercentage.toStringAsFixed(0)}%',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: Colors.black,
+                          ),
                         ),
                       ),
                     ),
@@ -81,14 +92,19 @@ class ProductGridItem extends StatelessWidget {
                       top: 8,
                       right: 8,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.redAccent,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
                           'Out of Stock',
-                          style: theme.textTheme.labelSmall?.copyWith(color: Colors.white),
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
@@ -96,7 +112,10 @@ class ProductGridItem extends StatelessWidget {
                   Positioned(
                     bottom: 8,
                     right: 8,
-                    child: AddToWishlistButton(product: product, productId: product.id),
+                    child: AddToWishlistButton(
+                      product: product,
+                      productId: product.id,
+                    ),
                   ),
                 ],
               ),
@@ -124,40 +143,42 @@ class ProductGridItem extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.bodyLarge?.copyWith(
                       fontWeight: FontWeight.w900,
-                      color: theme.textTheme.bodySmall?.color?.withOpacity(0.7),
+                      color: theme.textTheme.bodySmall?.color?.withValues(
+                        alpha: 0.7,
+                      ),
                     ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 6),
                   isDiscounted
                       ? RichText(
-                          text: TextSpan(
-                            children: [
-                              TextSpan(
-                                text: '\$${product.price.toStringAsFixed(0)} ',
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  decoration: TextDecoration.lineThrough,
-                                  color: Colors.grey,
-                                  fontSize: 14,
-                                ),
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: '\$${product.price.toStringAsFixed(0)} ',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                decoration: TextDecoration.lineThrough,
+                                color: Colors.grey,
+                                fontSize: 14,
                               ),
-                              TextSpan(
-                                text: ' \$${discountedPrice.toStringAsFixed(0)}',
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: ThemeProvider.goldenAccent,
-                                ),
+                            ),
+                            TextSpan(
+                              text: ' \$${discountedPrice.toStringAsFixed(0)}',
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: ThemeProvider.goldenAccent,
                               ),
-                            ],
-                          ),
-                        )
-                      : Text(
-                          '\$${product.price.toStringAsFixed(0)}',
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: ThemeProvider.goldenAccent,
-                          ),
+                            ),
+                          ],
                         ),
+                      )
+                      : Text(
+                        '\$${product.price.toStringAsFixed(0)}',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: ThemeProvider.goldenAccent,
+                        ),
+                      ),
                 ],
               ),
             ),

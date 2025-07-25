@@ -10,7 +10,6 @@ class OrderSuccessScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isMobile = MediaQuery.of(context).size.width < 600;
     final theme = Theme.of(context);
 
     return Scaffold(

@@ -1,4 +1,3 @@
-
 class AddressModel {
   final String id, label, street, city, state, country, postalCode, phone;
   AddressModel(this.id, Map<String, dynamic> d)

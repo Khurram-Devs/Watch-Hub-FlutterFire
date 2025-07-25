@@ -6,7 +6,6 @@ class AboutUsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isMobile = MediaQuery.of(context).size.width < 600;
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -134,10 +133,7 @@ class AboutUsScreen extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   description,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    height: 1.6,
-                  ),
+                  style: const TextStyle(fontSize: 14, height: 1.6),
                 ),
               ],
             ),

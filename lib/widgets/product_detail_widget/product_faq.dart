@@ -9,10 +9,11 @@ class ProductFAQ extends StatelessWidget {
     final theme = Theme.of(context);
 
     return FutureBuilder<QuerySnapshot>(
-      future: FirebaseFirestore.instance
-          .collection('productFAQ')
-          .orderBy('question')
-          .get(),
+      future:
+          FirebaseFirestore.instance
+              .collection('productFAQ')
+              .orderBy('question')
+              .get(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Padding(
@@ -29,7 +30,7 @@ class ProductFAQ extends StatelessWidget {
         }
 
         final faqDocs = snapshot.data?.docs ?? [];
-        
+
         if (faqDocs.isEmpty) {
           return const Padding(
             padding: EdgeInsets.all(16.0),
@@ -40,7 +41,10 @@ class ProductFAQ extends StatelessWidget {
         return ExpansionTile(
           initiallyExpanded: false,
           tilePadding: const EdgeInsets.symmetric(horizontal: 12),
-          childrenPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          childrenPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 8,
+          ),
           title: Text(
             "Frequently Asked Questions",
             style: theme.textTheme.titleMedium?.copyWith(
@@ -48,20 +52,19 @@ class ProductFAQ extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          children: faqDocs.map((doc) {
-            try {
-              final data = doc.data() as Map<String, dynamic>;
-              return ListTile(
-                title: Text(data['question'] ?? 'No question'),
-                subtitle: Text(data['answer'] ?? 'No answer provided.'),
-              );
-            } catch (e) {
-              debugPrint('Error parsing FAQ doc: $e');
-              return const ListTile(
-                title: Text("Invalid FAQ format."),
-              );
-            }
-          }).toList(),
+          children:
+              faqDocs.map((doc) {
+                try {
+                  final data = doc.data() as Map<String, dynamic>;
+                  return ListTile(
+                    title: Text(data['question'] ?? 'No question'),
+                    subtitle: Text(data['answer'] ?? 'No answer provided.'),
+                  );
+                } catch (e) {
+                  debugPrint('Error parsing FAQ doc: $e');
+                  return const ListTile(title: Text("Invalid FAQ format."));
+                }
+              }).toList(),
         );
       },
     );

@@ -7,7 +7,7 @@ class WishlistItemSkeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
-      baseColor: Theme.of(context).colorScheme.surfaceVariant,
+      baseColor: Theme.of(context).colorScheme.surfaceContainerHighest,
       highlightColor: Theme.of(context).colorScheme.surface,
       child: Card(
         elevation: 2,
@@ -30,20 +30,32 @@ class WishlistItemSkeleton extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(height: 20, width: double.infinity, color: Colors.grey[300]),
+                    Container(
+                      height: 20,
+                      width: double.infinity,
+                      color: Colors.grey[300],
+                    ),
                     const SizedBox(height: 8),
                     Container(height: 16, width: 150, color: Colors.grey[300]),
                     const SizedBox(height: 16),
                     Row(
                       children: [
-                        Container(height: 160, width: 100, color: Colors.grey[300]),
+                        Container(
+                          height: 160,
+                          width: 100,
+                          color: Colors.grey[300],
+                        ),
                         const SizedBox(width: 12),
-                        Container(height: 160, width: 120, color: Colors.grey[300]),
+                        Container(
+                          height: 160,
+                          width: 120,
+                          color: Colors.grey[300],
+                        ),
                       ],
                     ),
                   ],
                 ),
-              )
+              ),
             ],
           ),
         ),

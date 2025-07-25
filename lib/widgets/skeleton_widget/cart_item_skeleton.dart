@@ -9,7 +9,7 @@ class CartItemSkeleton extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Shimmer.fromColors(
-      baseColor: theme.colorScheme.surfaceVariant,
+      baseColor: theme.colorScheme.surfaceContainerHighest,
       highlightColor: theme.colorScheme.surface,
       child: Card(
         margin: const EdgeInsets.only(bottom: 16),
@@ -32,22 +32,38 @@ class CartItemSkeleton extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(height: 20, width: double.infinity, color: Colors.grey[300]),
+                    Container(
+                      height: 20,
+                      width: double.infinity,
+                      color: Colors.grey[300],
+                    ),
                     const SizedBox(height: 8),
                     Container(height: 16, width: 100, color: Colors.grey[300]),
                     const SizedBox(height: 16),
                     Row(
                       children: [
-                        Container(height: 36, width: 36, color: Colors.grey[300]),
+                        Container(
+                          height: 36,
+                          width: 36,
+                          color: Colors.grey[300],
+                        ),
                         const SizedBox(width: 8),
-                        Container(height: 36, width: 36, color: Colors.grey[300]),
+                        Container(
+                          height: 36,
+                          width: 36,
+                          color: Colors.grey[300],
+                        ),
                         const Spacer(),
-                        Container(height: 36, width: 36, color: Colors.grey[300]),
+                        Container(
+                          height: 36,
+                          width: 36,
+                          color: Colors.grey[300],
+                        ),
                       ],
                     ),
                   ],
                 ),
-              )
+              ),
             ],
           ),
         ),

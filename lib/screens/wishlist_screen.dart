@@ -25,9 +25,9 @@ class WishlistScreen extends StatelessWidget {
   Future<void> _addToCart(BuildContext context, ProductModel product) async {
     await _cartService.addProductToCart(product);
     await _removeFromWishlist(product.id);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Product moved to cart')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Product moved to cart')));
   }
 
   @override
@@ -84,8 +84,8 @@ class WishlistScreen extends StatelessWidget {
                         if (!snapshot.hasData) {
                           return ListView.builder(
                             itemCount: 3,
-                            itemBuilder: (_, __) =>
-                                const WishlistItemSkeleton(),
+                            itemBuilder:
+                                (_, __) => const WishlistItemSkeleton(),
                           );
                         }
 
@@ -99,8 +99,8 @@ class WishlistScreen extends StatelessWidget {
                         return ListView.separated(
                           padding: const EdgeInsets.only(bottom: 32),
                           itemCount: products.length,
-                          separatorBuilder: (_, __) =>
-                              const SizedBox(height: 16),
+                          separatorBuilder:
+                              (_, __) => const SizedBox(height: 16),
                           itemBuilder: (context, index) {
                             final product = products[index];
 
@@ -122,20 +122,29 @@ class WishlistScreen extends StatelessWidget {
                                       alignment: WrapAlignment.end,
                                       children: [
                                         OutlinedButton.icon(
-                                          icon: const Icon(Icons.delete_outline),
+                                          icon: const Icon(
+                                            Icons.delete_outline,
+                                          ),
                                           label: const Text('Remove'),
-                                          onPressed: () =>
-                                              _removeFromWishlist(product.id),
+                                          onPressed:
+                                              () => _removeFromWishlist(
+                                                product.id,
+                                              ),
                                           style: OutlinedButton.styleFrom(
                                             foregroundColor: Colors.redAccent,
                                           ),
                                         ),
                                         if (product.stock > 0)
                                           ElevatedButton.icon(
-                                            icon: const Icon(Icons.shopping_cart),
+                                            icon: const Icon(
+                                              Icons.shopping_cart,
+                                            ),
                                             label: const Text('Move to Cart'),
-                                            onPressed: () =>
-                                                _addToCart(context, product),
+                                            onPressed:
+                                                () => _addToCart(
+                                                  context,
+                                                  product,
+                                                ),
                                           ),
                                       ],
                                     ),

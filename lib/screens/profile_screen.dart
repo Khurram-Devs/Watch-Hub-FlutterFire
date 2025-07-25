@@ -110,7 +110,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header Row with Buttons
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -161,7 +160,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               const SizedBox(height: 24),
 
-              // Avatar
               Center(
                 child: Stack(
                   alignment: Alignment.bottomRight,
@@ -189,12 +187,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               const SizedBox(height: 24),
 
-              // Form
               Form(
                 key: _formKey,
                 child: Column(
                   children: [
-                    // First/Last Name
                     Row(
                       children: [
                         Expanded(
@@ -220,7 +216,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Phone
                     TextFormField(
                       controller: _phoneController,
                       enabled: _editing,
@@ -228,7 +223,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Occupation
                     TextFormField(
                       controller: _occupationController,
                       enabled: _editing,
@@ -238,7 +232,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Email (always disabled)
                     TextFormField(
                       controller: _emailController,
                       enabled: false,

@@ -11,12 +11,13 @@ class PDFInvoiceService {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) throw Exception("User not logged in");
 
-    final orderDoc = await FirebaseFirestore.instance
-        .collection('usersProfile')
-        .doc(uid)
-        .collection('orders')
-        .doc(orderId)
-        .get();
+    final orderDoc =
+        await FirebaseFirestore.instance
+            .collection('usersProfile')
+            .doc(uid)
+            .collection('orders')
+            .doc(orderId)
+            .get();
 
     final order = orderDoc.data();
     if (order == null) throw Exception("Order not found");
@@ -27,7 +28,8 @@ class PDFInvoiceService {
     final pdf = pw.Document();
 
     final createdAt = (order['createdAt'] as Timestamp).toDate();
-    final items = (order['items'] as List<dynamic>).cast<Map<String, dynamic>>();
+    final items =
+        (order['items'] as List<dynamic>).cast<Map<String, dynamic>>();
     final total = order['total'] as num? ?? 0;
     final subtotal = order['subtotal'] as num? ?? 0;
     final tax = order['tax'] as num? ?? 0;
@@ -38,13 +40,43 @@ class PDFInvoiceService {
       pw.TableRow(
         decoration: const pw.BoxDecoration(color: PdfColors.grey300),
         children: [
-          pw.Padding(child: pw.Text('#', style: pw.TextStyle(font: ttf, fontWeight: pw.FontWeight.bold)), padding: const pw.EdgeInsets.all(4)),
-          pw.Padding(child: pw.Text('Product', style: pw.TextStyle(font: ttf, fontWeight: pw.FontWeight.bold)), padding: const pw.EdgeInsets.all(4)),
-          pw.Padding(child: pw.Text('Unit Price', style: pw.TextStyle(font: ttf, fontWeight: pw.FontWeight.bold)), padding: const pw.EdgeInsets.all(4)),
-          pw.Padding(child: pw.Text('Qty', style: pw.TextStyle(font: ttf, fontWeight: pw.FontWeight.bold)), padding: const pw.EdgeInsets.all(4)),
-          pw.Padding(child: pw.Text('Subtotal', style: pw.TextStyle(font: ttf, fontWeight: pw.FontWeight.bold)), padding: const pw.EdgeInsets.all(4)),
+          pw.Padding(
+            child: pw.Text(
+              '#',
+              style: pw.TextStyle(font: ttf, fontWeight: pw.FontWeight.bold),
+            ),
+            padding: const pw.EdgeInsets.all(4),
+          ),
+          pw.Padding(
+            child: pw.Text(
+              'Product',
+              style: pw.TextStyle(font: ttf, fontWeight: pw.FontWeight.bold),
+            ),
+            padding: const pw.EdgeInsets.all(4),
+          ),
+          pw.Padding(
+            child: pw.Text(
+              'Unit Price',
+              style: pw.TextStyle(font: ttf, fontWeight: pw.FontWeight.bold),
+            ),
+            padding: const pw.EdgeInsets.all(4),
+          ),
+          pw.Padding(
+            child: pw.Text(
+              'Qty',
+              style: pw.TextStyle(font: ttf, fontWeight: pw.FontWeight.bold),
+            ),
+            padding: const pw.EdgeInsets.all(4),
+          ),
+          pw.Padding(
+            child: pw.Text(
+              'Subtotal',
+              style: pw.TextStyle(font: ttf, fontWeight: pw.FontWeight.bold),
+            ),
+            padding: const pw.EdgeInsets.all(4),
+          ),
         ],
-      )
+      ),
     ];
 
     int index = 1;
@@ -58,11 +90,32 @@ class PDFInvoiceService {
       productRows.add(
         pw.TableRow(
           children: [
-            pw.Padding(child: pw.Text('$index', style: pw.TextStyle(font: ttf)), padding: const pw.EdgeInsets.all(4)),
-            pw.Padding(child: pw.Text(title, style: pw.TextStyle(font: ttf)), padding: const pw.EdgeInsets.all(4)),
-            pw.Padding(child: pw.Text('\$${price.toStringAsFixed(2)}', style: pw.TextStyle(font: ttf)), padding: const pw.EdgeInsets.all(4)),
-            pw.Padding(child: pw.Text('$qty', style: pw.TextStyle(font: ttf)), padding: const pw.EdgeInsets.all(4)),
-            pw.Padding(child: pw.Text('\$${(price * qty).toStringAsFixed(2)}', style: pw.TextStyle(font: ttf)), padding: const pw.EdgeInsets.all(4)),
+            pw.Padding(
+              child: pw.Text('$index', style: pw.TextStyle(font: ttf)),
+              padding: const pw.EdgeInsets.all(4),
+            ),
+            pw.Padding(
+              child: pw.Text(title, style: pw.TextStyle(font: ttf)),
+              padding: const pw.EdgeInsets.all(4),
+            ),
+            pw.Padding(
+              child: pw.Text(
+                '\$${price.toStringAsFixed(2)}',
+                style: pw.TextStyle(font: ttf),
+              ),
+              padding: const pw.EdgeInsets.all(4),
+            ),
+            pw.Padding(
+              child: pw.Text('$qty', style: pw.TextStyle(font: ttf)),
+              padding: const pw.EdgeInsets.all(4),
+            ),
+            pw.Padding(
+              child: pw.Text(
+                '\$${(price * qty).toStringAsFixed(2)}',
+                style: pw.TextStyle(font: ttf),
+              ),
+              padding: const pw.EdgeInsets.all(4),
+            ),
           ],
         ),
       );
@@ -73,66 +126,98 @@ class PDFInvoiceService {
       pw.Page(
         pageFormat: PdfPageFormat.a4,
         margin: const pw.EdgeInsets.all(24),
-        build: (context) => pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
-          children: [
-            pw.Text('WatchHub - Premium Watch Store',
-                style: pw.TextStyle(font: ttf, fontSize: 22, fontWeight: pw.FontWeight.bold)),
-            pw.SizedBox(height: 8),
-            pw.Text('Invoice', style: pw.TextStyle(font: ttf, fontSize: 18)),
-            pw.SizedBox(height: 8),
-            pw.Text('Order ID: $orderId', style: pw.TextStyle(font: ttf)),
-            pw.Text('Date: $createdAt', style: pw.TextStyle(font: ttf)),
-            pw.Divider(),
-
-            pw.SizedBox(height: 10),
-            pw.Text('Products:', style: pw.TextStyle(font: ttf, fontSize: 16, fontWeight: pw.FontWeight.bold)),
-            pw.SizedBox(height: 6),
-            pw.Table(
-              border: pw.TableBorder.all(width: 0.5),
-              children: productRows,
-            ),
-
-            pw.SizedBox(height: 16),
-            pw.Divider(),
-            pw.Align(
-              alignment: pw.Alignment.centerRight,
-              child: pw.Container(
-                width: 200,
-                child: pw.Column(
-                  crossAxisAlignment: pw.CrossAxisAlignment.start,
-                  children: [
-                    pw.Text('Subtotal: \$${subtotal.toStringAsFixed(2)}', style: pw.TextStyle(font: ttf)),
-                    pw.Text('Tax: \$${tax.toStringAsFixed(2)}', style: pw.TextStyle(font: ttf)),
-                    pw.Text('Shipping: \$${shipping.toStringAsFixed(2)}', style: pw.TextStyle(font: ttf)),
-                    pw.Text('Discount: -\$${discount.toStringAsFixed(2)}', style: pw.TextStyle(font: ttf)),
-                    pw.SizedBox(height: 6),
-                    pw.Text(
-                      'Total: \$${total.toStringAsFixed(2)}',
-                      style: pw.TextStyle(
-                        font: ttf,
-                        fontSize: 14,
-                        fontWeight: pw.FontWeight.bold,
-                      ),
-                    ),
-                  ],
+        build:
+            (context) => pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Text(
+                  'WatchHub - Premium Watch Store',
+                  style: pw.TextStyle(
+                    font: ttf,
+                    fontSize: 22,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
                 ),
-              ),
-            ),
+                pw.SizedBox(height: 8),
+                pw.Text(
+                  'Invoice',
+                  style: pw.TextStyle(font: ttf, fontSize: 18),
+                ),
+                pw.SizedBox(height: 8),
+                pw.Text('Order ID: $orderId', style: pw.TextStyle(font: ttf)),
+                pw.Text('Date: $createdAt', style: pw.TextStyle(font: ttf)),
+                pw.Divider(),
 
-            pw.SizedBox(height: 24),
-            pw.Text('Thank you for shopping with WatchHub!',
-                style: pw.TextStyle(font: ttf, fontSize: 14, fontStyle: pw.FontStyle.italic)),
-          ],
-        ),
+                pw.SizedBox(height: 10),
+                pw.Text(
+                  'Products:',
+                  style: pw.TextStyle(
+                    font: ttf,
+                    fontSize: 16,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
+                pw.SizedBox(height: 6),
+                pw.Table(
+                  border: pw.TableBorder.all(width: 0.5),
+                  children: productRows,
+                ),
+
+                pw.SizedBox(height: 16),
+                pw.Divider(),
+                pw.Align(
+                  alignment: pw.Alignment.centerRight,
+                  child: pw.Container(
+                    width: 200,
+                    child: pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Text(
+                          'Subtotal: \$${subtotal.toStringAsFixed(2)}',
+                          style: pw.TextStyle(font: ttf),
+                        ),
+                        pw.Text(
+                          'Tax: \$${tax.toStringAsFixed(2)}',
+                          style: pw.TextStyle(font: ttf),
+                        ),
+                        pw.Text(
+                          'Shipping: \$${shipping.toStringAsFixed(2)}',
+                          style: pw.TextStyle(font: ttf),
+                        ),
+                        pw.Text(
+                          'Discount: -\$${discount.toStringAsFixed(2)}',
+                          style: pw.TextStyle(font: ttf),
+                        ),
+                        pw.SizedBox(height: 6),
+                        pw.Text(
+                          'Total: \$${total.toStringAsFixed(2)}',
+                          style: pw.TextStyle(
+                            font: ttf,
+                            fontSize: 14,
+                            fontWeight: pw.FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                pw.SizedBox(height: 24),
+                pw.Text(
+                  'Thank you for shopping with WatchHub!',
+                  style: pw.TextStyle(
+                    font: ttf,
+                    fontSize: 14,
+                    fontStyle: pw.FontStyle.italic,
+                  ),
+                ),
+              ],
+            ),
       ),
     );
 
     final Uint8List bytes = await pdf.save();
 
-    await Printing.sharePdf(
-      bytes: bytes,
-      filename: 'invoice_$orderId.pdf',
-    );
+    await Printing.sharePdf(bytes: bytes, filename: 'invoice_$orderId.pdf');
   }
 }

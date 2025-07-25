@@ -7,11 +7,7 @@ class MainScaffold extends StatelessWidget {
   final Widget child;
   final int? currentIndex;
 
-  const MainScaffold({
-    super.key,
-    required this.child,
-    this.currentIndex,
-  });
+  const MainScaffold({super.key, required this.child, this.currentIndex});
 
   @override
   Widget build(BuildContext context) {
@@ -19,9 +15,10 @@ class MainScaffold extends StatelessWidget {
       appBar: const AppHeader(),
       drawer: const NavDrawer(),
       body: SafeArea(child: child),
-      bottomNavigationBar: currentIndex != null
-          ? AdaptiveBottomNavBar(currentIndex: currentIndex!)
-          : null,
+      bottomNavigationBar:
+          currentIndex != null
+              ? AdaptiveBottomNavBar(currentIndex: currentIndex!)
+              : null,
     );
   }
 }

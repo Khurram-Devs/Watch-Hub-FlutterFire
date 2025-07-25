@@ -31,10 +31,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   Future<void> _loadProduct() async {
     try {
-      final doc = await FirebaseFirestore.instance
-          .collection('products')
-          .doc(widget.productId)
-          .get();
+      final doc =
+          await FirebaseFirestore.instance
+              .collection('products')
+              .doc(widget.productId)
+              .get();
       final model = await ProductModel.fromDoc(doc);
       setState(() {
         product = model;
@@ -50,45 +51,49 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Scaffold(
       body: SafeArea(
-        child: isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : hasError || product == null
+        child:
+            isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : hasError || product == null
                 ? const Center(child: Text('Failed to load product.'))
                 : SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ImageGallery(images: product!.images),
-                        const SizedBox(height: 24),
-                        ProductInfo(product: product!),
-                        const SizedBox(height: 20),
-                        Row(
-                          children: [
-                            Expanded(child: AddToCartButton(product: product!)),
-                            const SizedBox(width: 12),
-                            AddToWishlistButton(product: product!, productId: product!.id,),
-                          ],
-                        ),
-                        const SizedBox(height: 32),
-                        ProductSpecs(specs: product!.specs),
-                        const SizedBox(height: 32),
-                        RelatedProductsList(
-                          brandName: product!.brandName,
-                          currentProductId: product!.id,
-                        ),
-                        const SizedBox(height: 32),
-                        const ProductFAQ(),
-                        const SizedBox(height: 32),
-                        ProductReviewsSection(productId: product!.id),
-
-                      ],
-                    ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 20,
                   ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ImageGallery(images: product!.images),
+                      const SizedBox(height: 24),
+                      ProductInfo(product: product!),
+                      const SizedBox(height: 20),
+                      Row(
+                        children: [
+                          Expanded(child: AddToCartButton(product: product!)),
+                          const SizedBox(width: 12),
+                          AddToWishlistButton(
+                            product: product!,
+                            productId: product!.id,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 32),
+                      ProductSpecs(specs: product!.specs),
+                      const SizedBox(height: 32),
+                      RelatedProductsList(
+                        brandName: product!.brandName,
+                        currentProductId: product!.id,
+                      ),
+                      const SizedBox(height: 32),
+                      const ProductFAQ(),
+                      const SizedBox(height: 32),
+                      ProductReviewsSection(productId: product!.id),
+                    ],
+                  ),
+                ),
       ),
     );
   }

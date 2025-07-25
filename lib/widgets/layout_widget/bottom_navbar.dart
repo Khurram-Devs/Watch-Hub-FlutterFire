@@ -25,10 +25,11 @@ class AdaptiveBottomNavBar extends StatelessWidget {
       items.add(
         BottomNavigationBarItem(
           icon: StreamBuilder<DocumentSnapshot>(
-            stream: FirebaseFirestore.instance
-                .collection('usersProfile')
-                .doc(user.uid)
-                .snapshots(),
+            stream:
+                FirebaseFirestore.instance
+                    .collection('usersProfile')
+                    .doc(user.uid)
+                    .snapshots(),
             builder: (context, snapshot) {
               int count = 0;
               if (snapshot.hasData && snapshot.data!.exists) {
@@ -74,10 +75,12 @@ class AdaptiveBottomNavBar extends StatelessWidget {
       );
     }
 
-    items.add(const BottomNavigationBarItem(
-      icon: Icon(Icons.person_outline),
-      label: '',
-    ));
+    items.add(
+      const BottomNavigationBarItem(
+        icon: Icon(Icons.person_outline),
+        label: '',
+      ),
+    );
 
     return BottomNavigationBar(
       currentIndex: currentIndex,

@@ -119,7 +119,7 @@ class _InfiniteBrandsScrollerState extends State<InfiniteBrandsScroller>
                       height: avatarSize - 50,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.white, // White background
+                        color: Colors.white,
                         boxShadow: [
                           BoxShadow(
                             color:

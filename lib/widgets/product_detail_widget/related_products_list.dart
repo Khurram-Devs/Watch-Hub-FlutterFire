@@ -23,9 +23,9 @@ class RelatedProductsList extends StatelessWidget {
         Text(
           'You may also like',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.secondary,
-              ),
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.secondary,
+          ),
         ),
         const SizedBox(height: 12),
         FutureBuilder<List<ProductModel>>(

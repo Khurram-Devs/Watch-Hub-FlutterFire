@@ -57,7 +57,7 @@ class AddressBookScreen extends StatelessWidget {
                         if (docs.isEmpty)
                           const Center(child: Text('No saved addresses.')),
                         ...docs.map((d) {
-                          final a = AddressModel(d.id, d.data()!);
+                          final a = AddressModel(d.id, d.data());
                           return Card(
                             margin: const EdgeInsets.symmetric(
                               vertical: 8,
@@ -75,7 +75,7 @@ class AddressBookScreen extends StatelessWidget {
                               ),
                             ),
                           );
-                        }).toList(),
+                        }),
                       ],
                     );
                   },

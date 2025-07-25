@@ -19,26 +19,33 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         AppBar(
-          backgroundColor: theme.appBarTheme.backgroundColor ?? theme.scaffoldBackgroundColor,
+          backgroundColor:
+              theme.appBarTheme.backgroundColor ??
+              theme.scaffoldBackgroundColor,
           elevation: 0,
           toolbarHeight: 60,
           leading: Builder(
-            builder: (context) => IconButton(
-              icon: Icon(Icons.menu, color: colorScheme.secondary),
-              onPressed: () {
-                final scaffold = Scaffold.maybeOf(context);
-                if (scaffold?.hasDrawer ?? false) {
-                  scaffold?.openDrawer();
-                } else {
-                  debugPrint('No drawer found in parent Scaffold');
-                }
-              },
-            ),
+            builder:
+                (context) => IconButton(
+                  icon: Icon(Icons.menu, color: colorScheme.secondary),
+                  onPressed: () {
+                    final scaffold = Scaffold.maybeOf(context);
+                    if (scaffold?.hasDrawer ?? false) {
+                      scaffold?.openDrawer();
+                    } else {
+                      debugPrint('No drawer found in parent Scaffold');
+                    }
+                  },
+                ),
           ),
           title: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.diamond_rounded, color: colorScheme.secondary, size: 20),
+              Icon(
+                Icons.diamond_rounded,
+                color: colorScheme.secondary,
+                size: 20,
+              ),
               const SizedBox(width: 6),
               Text(
                 'WATCH-HUB',
@@ -56,14 +63,14 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
             if (user != null)
               Row(
                 children: [
-                  // Notifications badge
                   StreamBuilder<QuerySnapshot>(
-                    stream: FirebaseFirestore.instance
-                        .collection('usersProfile')
-                        .doc(user.uid)
-                        .collection('notifications')
-                        .where('isRead', isEqualTo: false)
-                        .snapshots(),
+                    stream:
+                        FirebaseFirestore.instance
+                            .collection('usersProfile')
+                            .doc(user.uid)
+                            .collection('notifications')
+                            .where('isRead', isEqualTo: false)
+                            .snapshots(),
                     builder: (context, snapshot) {
                       final count = snapshot.data?.docs.length ?? 0;
 
@@ -107,13 +114,13 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
                     },
                   ),
 
-                  // Cart badge
                   StreamBuilder<QuerySnapshot>(
-                    stream: FirebaseFirestore.instance
-                        .collection('usersProfile')
-                        .doc(user.uid)
-                        .collection('cart')
-                        .snapshots(),
+                    stream:
+                        FirebaseFirestore.instance
+                            .collection('usersProfile')
+                            .doc(user.uid)
+                            .collection('cart')
+                            .snapshots(),
                     builder: (context, snapshot) {
                       int totalQty = 0;
                       if (snapshot.hasData) {

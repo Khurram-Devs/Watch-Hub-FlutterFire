@@ -17,15 +17,16 @@ class _TestimonialCarouselState extends State<TestimonialCarousel> {
 
   Future<List<DocumentSnapshot>> fetchTestimonials() async {
     try {
-      final snapshot = await FirebaseFirestore.instance
-          .collection('testimonials')
-          .where('status', isEqualTo: 1)
-          .orderBy('createdAt', descending: true)
-          .get();
+      final snapshot =
+          await FirebaseFirestore.instance
+              .collection('testimonials')
+              .where('status', isEqualTo: 1)
+              .orderBy('createdAt', descending: true)
+              .get();
 
       return snapshot.docs;
     } catch (e) {
-      print("Error fetching testimonials: $e");
+      debugPrint("Error fetching testimonials: $e");
       return [];
     }
   }
@@ -47,55 +48,68 @@ class _TestimonialCarouselState extends State<TestimonialCarousel> {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
 
-    final userRef = FirebaseFirestore.instance.collection('usersProfile').doc(user.uid);
+    final userRef = FirebaseFirestore.instance
+        .collection('usersProfile')
+        .doc(user.uid);
     final controller = TextEditingController();
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text("Add Testimonial"),
-        content: TextFormField(
-          controller: controller,
-          maxLines: 4,
-          decoration: const InputDecoration(
-            labelText: 'Your testimonial',
-            border: OutlineInputBorder(),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text("Cancel"),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              final text = controller.text.trim();
-              if (text.isEmpty) return;
+      builder:
+          (context) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: const Text("Add Testimonial"),
+            content: TextFormField(
+              controller: controller,
+              maxLines: 4,
+              decoration: const InputDecoration(
+                labelText: 'Your testimonial',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text("Cancel"),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  final text = controller.text.trim();
+                  if (text.isEmpty) return;
 
-              try {
-                await FirebaseFirestore.instance.collection('testimonials').add({
-                  'testimonial': text,
-                  'createdAt': Timestamp.now(),
-                  'status': 0,
-                  'userRef': userRef,
-                });
+                  try {
+                    await FirebaseFirestore.instance
+                        .collection('testimonials')
+                        .add({
+                          'testimonial': text,
+                          'createdAt': Timestamp.now(),
+                          'status': 0,
+                          'userRef': userRef,
+                        });
 
-                Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Thank you! Your testimonial is pending approval.")),
-                );
-              } catch (e) {
-                Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("Failed to submit: ${e.toString()}")),
-                );
-              }
-            },
-            child: const Text("Submit"),
+                    Navigator.of(context).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          "Thank you! Your testimonial is pending approval.",
+                        ),
+                      ),
+                    );
+                  } catch (e) {
+                    Navigator.of(context).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text("Failed to submit: ${e.toString()}"),
+                      ),
+                    );
+                  }
+                },
+                child: const Text("Submit"),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
@@ -174,12 +188,19 @@ class _TestimonialCarouselState extends State<TestimonialCarousel> {
                   return FutureBuilder<DocumentSnapshot>(
                     future: userRef.get(),
                     builder: (context, userSnap) {
-                      if (!userSnap.hasData) return const Center(child: CircularProgressIndicator());
+                      if (!userSnap.hasData) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
 
-                      final userData = userSnap.data!.data() as Map<String, dynamic>? ?? {};
-                      final fullName = capitalizeEachWord(userData['fullName'] ?? 'Unnamed');
+                      final userData =
+                          userSnap.data!.data() as Map<String, dynamic>? ?? {};
+                      final fullName = capitalizeEachWord(
+                        userData['fullName'] ?? 'Unnamed',
+                      );
                       final avatarUrl = userData['avatarUrl'];
-                      final occupation = capitalize(userData['occupation'] ?? 'Customer');
+                      final occupation = capitalize(
+                        userData['occupation'] ?? 'Customer',
+                      );
 
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -189,7 +210,7 @@ class _TestimonialCarouselState extends State<TestimonialCarousel> {
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
-                                color: theme.shadowColor.withOpacity(0.1),
+                                color: theme.shadowColor.withValues(alpha: 0.1),
                                 blurRadius: 8,
                                 offset: const Offset(0, 4),
                               ),
@@ -201,7 +222,10 @@ class _TestimonialCarouselState extends State<TestimonialCarousel> {
                             children: [
                               CircleAvatar(
                                 radius: avatarRadius,
-                                backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl) : null,
+                                backgroundImage:
+                                    avatarUrl != null
+                                        ? NetworkImage(avatarUrl)
+                                        : null,
                               ),
                               const SizedBox(height: 12),
                               Text(
@@ -221,7 +245,10 @@ class _TestimonialCarouselState extends State<TestimonialCarousel> {
                                   fontSize: fontSize,
                                 ),
                               ),
-                              Text(occupation, style: theme.textTheme.bodySmall),
+                              Text(
+                                occupation,
+                                style: theme.textTheme.bodySmall,
+                              ),
                             ],
                           ),
                         ),
@@ -242,7 +269,10 @@ class _TestimonialCarouselState extends State<TestimonialCarousel> {
                   width: isActive ? 12 : 8,
                   height: 8,
                   decoration: BoxDecoration(
-                    color: isActive ? theme.colorScheme.secondary : theme.disabledColor.withOpacity(0.4),
+                    color:
+                        isActive
+                            ? theme.colorScheme.secondary
+                            : theme.disabledColor.withValues(alpha: 0.4),
                     borderRadius: BorderRadius.circular(4),
                   ),
                 );

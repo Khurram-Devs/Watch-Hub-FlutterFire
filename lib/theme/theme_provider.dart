@@ -12,7 +12,6 @@ class ThemeProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // ===== WatchHub Color Palette =====
   static const Color goldenAccent = Color(0xFFC8AB65);
   static const Color midnightPrimary = Color(0xFF1E1E1E);
   static const Color darkNavy = Color(0xFF121212);
@@ -21,10 +20,9 @@ class ThemeProvider with ChangeNotifier {
   static const Color softGray = Color(0xFF6B7280);
   static const Color errorRed = Colors.redAccent;
 
-  static const Color lightTextBase = Color(0xFF1A1A1A); // Modern black
-  static const Color darkTextBase = Color(0xFFF1F1F1); // Soft white
+  static const Color lightTextBase = Color(0xFF1A1A1A);
+  static const Color darkTextBase = Color(0xFFF1F1F1);
 
-  // ===== Text Theme =====
   TextTheme _customTextTheme(Brightness brightness) {
     final baseColor =
         brightness == Brightness.dark ? darkTextBase : lightTextBase;
@@ -43,24 +41,24 @@ class ThemeProvider with ChangeNotifier {
       titleMedium: TextStyle(
         fontSize: 20,
         fontWeight: FontWeight.w600,
-        color: baseColor.withOpacity(0.9),
+        color: baseColor.withValues(alpha: 0.9),
       ),
       titleSmall: TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.w500,
-        color: baseColor.withOpacity(0.85),
+        color: baseColor.withValues(alpha: 0.85),
       ),
       bodyLarge: GoogleFonts.lato(
         fontSize: 16,
-        color: baseColor.withOpacity(0.95),
+        color: baseColor.withValues(alpha: 0.95),
       ),
       bodyMedium: GoogleFonts.lato(
         fontSize: 14,
-        color: baseColor.withOpacity(0.85),
+        color: baseColor.withValues(alpha: 0.85),
       ),
       bodySmall: GoogleFonts.lato(
         fontSize: 12,
-        color: baseColor.withOpacity(0.7),
+        color: baseColor.withValues(alpha: 0.7),
       ),
       labelSmall: GoogleFonts.lato(
         fontSize: 12,
@@ -70,7 +68,6 @@ class ThemeProvider with ChangeNotifier {
     );
   }
 
-  // ===== Light Theme =====
   ThemeData get lightTheme => ThemeData(
     useMaterial3: true,
     brightness: Brightness.light,
@@ -81,7 +78,6 @@ class ThemeProvider with ChangeNotifier {
       primary: midnightPrimary,
       secondary: goldenAccent,
       error: errorRed,
-      background: lightSurface,
       surface: Colors.white,
     ),
     textTheme: _customTextTheme(Brightness.light),
@@ -102,7 +98,7 @@ class ThemeProvider with ChangeNotifier {
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: Colors.white,
-      hintStyle: TextStyle(color: softGray.withOpacity(0.7)),
+      hintStyle: TextStyle(color: softGray.withValues(alpha: 0.7)),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide(color: Colors.grey.shade300),
@@ -114,7 +110,7 @@ class ThemeProvider with ChangeNotifier {
     chipTheme: ChipThemeData(
       backgroundColor: Colors.grey[200]!,
       labelStyle: const TextStyle(color: midnightPrimary),
-      selectedColor: midnightPrimary.withOpacity(0.15),
+      selectedColor: midnightPrimary.withValues(alpha: 0.15),
       secondarySelectedColor: midnightPrimary,
     ),
     tabBarTheme: const TabBarThemeData(
@@ -133,7 +129,6 @@ class ThemeProvider with ChangeNotifier {
     ),
   );
 
-  // ===== Dark Theme =====
   ThemeData get darkTheme => ThemeData(
     useMaterial3: true,
     brightness: Brightness.dark,
@@ -142,9 +137,8 @@ class ThemeProvider with ChangeNotifier {
     primaryColor: goldenAccent,
     colorScheme: const ColorScheme.dark(
       primary: goldenAccent,
-      secondary: goldenAccent, // Corrected secondary for contrast
+      secondary: goldenAccent,
       error: errorRed,
-      background: darkNavy,
       surface: darkCard,
     ),
     textTheme: _customTextTheme(Brightness.dark),
@@ -177,7 +171,7 @@ class ThemeProvider with ChangeNotifier {
     chipTheme: ChipThemeData(
       backgroundColor: darkCard,
       labelStyle: const TextStyle(color: goldenAccent),
-      selectedColor: goldenAccent.withOpacity(0.1),
+      selectedColor: goldenAccent.withValues(alpha: 0.1),
       secondarySelectedColor: goldenAccent,
     ),
     tabBarTheme: const TabBarThemeData(

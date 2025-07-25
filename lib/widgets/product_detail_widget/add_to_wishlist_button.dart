@@ -11,7 +11,8 @@ class AddToWishlistButton extends StatefulWidget {
   const AddToWishlistButton({
     super.key,
     required this.product,
-    this.onTap, required String productId,
+    this.onTap,
+    required String productId,
   });
 
   @override
@@ -32,12 +33,14 @@ class _AddToWishlistButtonState extends State<AddToWishlistButton> {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
 
-    final userDoc = await FirebaseFirestore.instance
-        .collection('usersProfile')
-        .doc(user.uid)
-        .get();
+    final userDoc =
+        await FirebaseFirestore.instance
+            .collection('usersProfile')
+            .doc(user.uid)
+            .get();
 
-    final wishlist = (userDoc.data()?['wishlist'] as List?)?.cast<DocumentReference>() ?? [];
+    final wishlist =
+        (userDoc.data()?['wishlist'] as List?)?.cast<DocumentReference>() ?? [];
     final exists = wishlist.any((ref) => ref.id == widget.product.id);
 
     setState(() => _isInWishlist = exists);
@@ -55,15 +58,23 @@ class _AddToWishlistButtonState extends State<AddToWishlistButton> {
 
     setState(() => _loading = true);
 
-    final docRef = FirebaseFirestore.instance.collection('usersProfile').doc(user.uid);
-    final prodRef = FirebaseFirestore.instance.collection('products').doc(widget.product.id);
+    final docRef = FirebaseFirestore.instance
+        .collection('usersProfile')
+        .doc(user.uid);
+    final prodRef = FirebaseFirestore.instance
+        .collection('products')
+        .doc(widget.product.id);
     final doc = await docRef.get();
     final List wishlist = (doc.data()?['wishlist'] as List?) ?? [];
 
     if (_isInWishlist) {
-      wishlist.removeWhere((ref) => (ref as DocumentReference).id == widget.product.id);
+      wishlist.removeWhere(
+        (ref) => (ref as DocumentReference).id == widget.product.id,
+      );
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${widget.product.title} removed from wishlist')),
+        SnackBar(
+          content: Text('${widget.product.title} removed from wishlist'),
+        ),
       );
     } else {
       wishlist.add(prodRef);

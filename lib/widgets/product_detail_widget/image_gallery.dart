@@ -54,7 +54,6 @@ class _ImageGalleryState extends State<ImageGallery> {
     final screenWidth = MediaQuery.of(context).size.width;
     final theme = Theme.of(context);
 
-    // Responsive height: bigger on desktop
     double height = screenWidth < 800 ? 320 : 500;
 
     return Column(
@@ -129,7 +128,7 @@ class _ImageGalleryState extends State<ImageGallery> {
                 color:
                     isActive
                         ? theme.colorScheme.secondary
-                        : theme.disabledColor.withOpacity(0.4),
+                        : theme.disabledColor.withValues(alpha: 0.4),
                 borderRadius: BorderRadius.circular(4),
               ),
             );
@@ -201,7 +200,7 @@ class _FullscreenImageViewerState extends State<FullscreenImageViewer> {
               );
             },
           ),
-          // Close Button
+
           Positioned(
             top: 40,
             right: 20,

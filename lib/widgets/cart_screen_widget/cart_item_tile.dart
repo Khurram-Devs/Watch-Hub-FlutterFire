@@ -46,8 +46,7 @@ class CartItemTile extends StatelessWidget {
                       Text('$quantity'),
                       IconButton(
                         onPressed:
-                            quantity <
-                                    (product.stock ?? 1) // ✅ Respect stock
+                            quantity < (product.stock ?? 1)
                                 ? () async {
                                   await CartService().updateQuantity(
                                     product.id,
@@ -57,7 +56,7 @@ class CartItemTile extends StatelessWidget {
                                 }
                                 : null,
                         icon: const Icon(Icons.add),
-                    ),
+                      ),
                     ],
                   ),
                   IconButton(
@@ -65,7 +64,8 @@ class CartItemTile extends StatelessWidget {
                       await CartService().removeFromCart(product.id);
                       onChanged();
                     },
-                    icon: const Icon(Icons.delete_outline), color: Colors.redAccent,
+                    icon: const Icon(Icons.delete_outline),
+                    color: Colors.redAccent,
                   ),
                 ],
               ),

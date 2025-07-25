@@ -17,8 +17,10 @@ class OrderDetailModal extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final createdAt = (orderData['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now();
-    final items = (orderData['items'] as List?)?.cast<Map<String, dynamic>>() ?? [];
+    final createdAt =
+        (orderData['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now();
+    final items =
+        (orderData['items'] as List?)?.cast<Map<String, dynamic>>() ?? [];
     final total = (orderData['total'] as num?)?.toDouble() ?? 0.0;
     final tax = (orderData['tax'] as num?)?.toDouble() ?? 0.0;
     final subtotal = (orderData['subtotal'] as num?)?.toDouble() ?? 0.0;
@@ -34,7 +36,6 @@ class OrderDetailModal extends StatelessWidget {
         constraints: const BoxConstraints(maxHeight: 620, maxWidth: 600),
         child: Column(
           children: [
-            // HEADER
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 20, 12, 0),
               child: Row(
@@ -44,7 +45,10 @@ class OrderDetailModal extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Order #$orderId', style: theme.textTheme.titleMedium),
+                        Text(
+                          'Order #$orderId',
+                          style: theme.textTheme.titleMedium,
+                        ),
                         const SizedBox(height: 4),
                         Text(
                           DateFormat.yMMMd().add_jm().format(createdAt),
@@ -70,7 +74,6 @@ class OrderDetailModal extends StatelessWidget {
               ),
             ),
 
-            // INVOICE BUTTON
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 4, 20, 0),
               child: Align(
@@ -87,7 +90,6 @@ class OrderDetailModal extends StatelessWidget {
 
             const Divider(height: 24),
 
-            // ITEM LIST
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -106,14 +108,21 @@ class OrderDetailModal extends StatelessWidget {
                         future: ref.get(),
                         builder: (context, snap) {
                           if (!snap.hasData) {
-                            return const Center(child: LinearProgressIndicator());
+                            return const Center(
+                              child: LinearProgressIndicator(),
+                            );
                           }
 
-                          final product = snap.data!.data() as Map<String, dynamic>? ?? {};
+                          final product =
+                              snap.data!.data() as Map<String, dynamic>? ?? {};
                           final title = product['title'] ?? 'Unknown';
-                          final price = (product['price'] as num?)?.toDouble() ?? 0.0;
+                          final price =
+                              (product['price'] as num?)?.toDouble() ?? 0.0;
                           final imageList = product['images'] as List? ?? [];
-                          final imageUrl = imageList.isNotEmpty ? imageList.first.toString() : '';
+                          final imageUrl =
+                              imageList.isNotEmpty
+                                  ? imageList.first.toString()
+                                  : '';
 
                           return Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -125,12 +134,16 @@ class OrderDetailModal extends StatelessWidget {
                                   width: 60,
                                   height: 60,
                                   fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) => Container(
-                                    width: 60,
-                                    height: 60,
-                                    color: Colors.grey.shade200,
-                                    child: const Icon(Icons.watch, size: 24),
-                                  ),
+                                  errorBuilder:
+                                      (_, __, ___) => Container(
+                                        width: 60,
+                                        height: 60,
+                                        color: Colors.grey.shade200,
+                                        child: const Icon(
+                                          Icons.watch,
+                                          size: 24,
+                                        ),
+                                      ),
                                 ),
                               ),
                               const SizedBox(width: 12),
@@ -144,10 +157,14 @@ class OrderDetailModal extends StatelessWidget {
                                     ),
                                     const SizedBox(height: 4),
                                     Text('Quantity: $qty'),
-                                    Text('Price: \$${price.toStringAsFixed(2)}'),
+                                    Text(
+                                      'Price: \$${price.toStringAsFixed(2)}',
+                                    ),
                                     Text(
                                       'Total: \$${(price * qty).toStringAsFixed(2)}',
-                                      style: const TextStyle(fontWeight: FontWeight.w500),
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -162,7 +179,6 @@ class OrderDetailModal extends StatelessWidget {
               ),
             ),
 
-            // FOOTER TOTALS
             const Divider(height: 24),
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),

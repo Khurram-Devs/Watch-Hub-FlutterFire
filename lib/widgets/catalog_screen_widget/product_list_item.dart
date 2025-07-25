@@ -12,11 +12,13 @@ class ProductListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDiscounted = product.discountPercentage != null && product.discountPercentage! > 0;
-    final discountedPrice = isDiscounted
-        ? product.price * (1 - product.discountPercentage! / 100)
-        : product.price;
-    final isOutOfStock = product.stock != null && product.stock! <= 0;
+    final isDiscounted =
+        product.discountPercentage > 0;
+    final discountedPrice =
+        isDiscounted
+            ? product.price * (1 - product.discountPercentage / 100)
+            : product.price;
+    final isOutOfStock = product.stock <= 0;
 
     return GestureDetector(
       onTap: () => context.push('/product/${product.id}'),
@@ -45,14 +47,19 @@ class ProductListItem extends StatelessWidget {
                       top: 6,
                       left: 6,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 3,
+                        ),
                         decoration: BoxDecoration(
                           color: ThemeProvider.goldenAccent,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
-                          '-${product.discountPercentage!.toStringAsFixed(0)}%',
-                          style: theme.textTheme.labelSmall?.copyWith(color: Colors.black),
+                          '-${product.discountPercentage.toStringAsFixed(0)}%',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: Colors.black,
+                          ),
                         ),
                       ),
                     ),
@@ -62,14 +69,19 @@ class ProductListItem extends StatelessWidget {
                       top: 6,
                       right: 6,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 3,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.redAccent,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
                           'Out of Stock',
-                          style: theme.textTheme.labelSmall?.copyWith(color: Colors.white),
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
@@ -77,7 +89,10 @@ class ProductListItem extends StatelessWidget {
                   Positioned(
                     bottom: 6,
                     right: 6,
-                    child: AddToWishlistButton(product: product,productId: product.id),
+                    child: AddToWishlistButton(
+                      product: product,
+                      productId: product.id,
+                    ),
                   ),
                 ],
               ),
@@ -99,7 +114,9 @@ class ProductListItem extends StatelessWidget {
                     Text(
                       capitalizeEachWord(product.brandName),
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.textTheme.bodySmall?.color?.withOpacity(0.7),
+                        color: theme.textTheme.bodySmall?.color?.withValues(
+                          alpha: 0.7,
+                        ),
                         fontWeight: FontWeight.w600,
                       ),
                     ),

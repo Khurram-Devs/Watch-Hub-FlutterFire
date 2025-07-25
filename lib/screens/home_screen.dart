@@ -4,7 +4,6 @@ import 'package:watch_hub_ep/widgets/skeleton_widget/brands_scroller_skeleton.da
 import 'package:watch_hub_ep/widgets/skeleton_widget/testimonial_carousel_skeleton.dart';
 import '../models/product_model.dart';
 import '../services/product_service.dart';
-import '../services/testimonial_service.dart';
 import 'package:watch_hub_ep/widgets/home_screen_widget/search_bar_widget.dart';
 import 'package:watch_hub_ep/widgets/home_screen_widget/testimonial_widget.dart';
 import '../widgets/layout_widget/section_title.dart';
@@ -26,7 +25,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
   final _productService = ProductService();
-  final _testimonialService = TestimonialService();
 
   @override
   void dispose() {
@@ -125,9 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const SectionTitle(title: 'Our Brands'),
               const SizedBox(height: 12),
               FutureBuilder(
-                future: Future.delayed(
-                  const Duration(seconds: 2),
-                ), // simulate load
+                future: Future.delayed(const Duration(seconds: 2)),
                 builder: (_, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const BrandsScrollerSkeleton();
@@ -181,9 +177,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
               const SizedBox(height: 32),
               FutureBuilder(
-                future: Future.delayed(
-                  const Duration(seconds: 2),
-                ), // simulate load
+                future: Future.delayed(const Duration(seconds: 2)),
                 builder: (_, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const TestimonialCarouselSkeleton();

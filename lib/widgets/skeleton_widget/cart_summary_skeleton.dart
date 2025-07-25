@@ -9,7 +9,7 @@ class CartSummarySkeleton extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Shimmer.fromColors(
-      baseColor: theme.colorScheme.surfaceVariant,
+      baseColor: theme.colorScheme.surfaceContainerHighest,
       highlightColor: theme.colorScheme.surface,
       child: Card(
         elevation: 4,
@@ -28,15 +28,14 @@ class CartSummarySkeleton extends StatelessWidget {
                   color: Colors.grey[300],
                 ),
               );
-            })
-              ..addAll([
-                const SizedBox(height: 16),
-                Container(
-                  height: 48,
-                  width: double.infinity,
-                  color: Colors.grey[300],
-                ),
-              ]),
+            })..addAll([
+              const SizedBox(height: 16),
+              Container(
+                height: 48,
+                width: double.infinity,
+                color: Colors.grey[300],
+              ),
+            ]),
           ),
         ),
       ),

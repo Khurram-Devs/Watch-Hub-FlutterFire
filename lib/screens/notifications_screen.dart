@@ -94,7 +94,7 @@ class NotificationsScreen extends StatelessWidget {
                     color:
                         isRead
                             ? theme.scaffoldBackgroundColor
-                            : theme.colorScheme.primary.withOpacity(0.05),
+                            : theme.colorScheme.primary.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   padding: const EdgeInsets.all(12),
